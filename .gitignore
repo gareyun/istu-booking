@@ -28,3 +28,17 @@ Homestead.json
 .env.production
 .phpactor.json
 auth.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Vite / Tailwind
+/.vite/
