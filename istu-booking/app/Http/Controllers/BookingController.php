@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
 use Illuminate\Http\Request;
-use App\Models\Classroom;
 
-class ClassroomController extends Controller
+class BookingController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $classrooms = Classroom::all();
-
-        return view('classrooms', ['classrooms' => $classrooms]);
+        $bookings = Booking::with(['classroom', 'user'])->get();
+        return view('admin', compact('bookings'));
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use HasFactory;
 
 class Classroom extends Model
 {
@@ -12,4 +13,9 @@ class Classroom extends Model
         'equipment',
         'capacity'
     ];
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
 }
