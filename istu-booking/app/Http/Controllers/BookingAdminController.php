@@ -16,6 +16,21 @@ class BookingAdminController extends Controller
         return view('admin', compact('bookings'));
     }
 
+    public function updateStatus(Request $request, Booking $booking)
+    {
+        $action = $request->input('action');
+
+        if ($action == 'approved') {
+            $booking->status = 'approved';
+        } elseif ($action == 'rejected') {
+            $booking->status = 'rejected';
+        }
+
+        $booking->save();
+
+        return back()->with('success', 'Статус заявки обновлён');
+    }
+
     /**
      * Show the form for creating a new resource.
      */

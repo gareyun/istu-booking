@@ -1,14 +1,80 @@
 @props(['booking'])
 
-<div class="bg-white shadow-md rounded p-6 m-5 w-100">
-    <h3>ID: {{$booking->id}}</h3>
-    <h2 class="text-xl font-bold mb-2"><b>Аудитория:</b> {{$booking->classroom->room}}</h2>
-    <p class="text-black-600"><b>ФИО:</b> {{$booking->user->name}}</p>
-    <p class="text-black-600"><b>Группа:</b> {{$booking->user->group}}</p>
-    <p class="text-black-600"><b>Дата:</b> {{$booking->date}}</p>
-    <p class="text-black-600"><b>Время:</b> {{$booking->start_time}} - {{$booking->end_time}}</p>
-    <p class="text-black-600"><b>Цель:</b> {{$booking->purpose}}</p>
-    <p class="text-black-600"><b>Комментарий:</b> {{$booking->comment}}</p>
-    <button class="mt-4 bg-green-500 text-white px-3 py-1 rounded">Принять</button>
-    <button class="mt-4 bg-red-500 text-white px-3 py-1 rounded">Отклонить</button>
+@php
+    $status = '';
+
+    if ($booking->status === 'approved') {
+        $status = '✅ Одобрена';
+    } elseif ($booking->status === 'rejected') {
+        $status = '❌ Отклонена';
+    }
+@endphp
+
+<div class="application-card" data-id="{{$booking->id}}">
+    <div class="application-header">
+        <div class="application-id">ID: {{$booking->id}}</div>
+        <div class="status-badge">{{$status}}</div>
+    </div>
+    
+    <div class="application-title">
+        Аудитория: {{$booking->classroom->room}}
+    </div>
+    
+    <div class="application-detail">
+        <div class="label">ФИО:</div>
+        <div class="value">{{$booking->user->name}}</div>
+    </div>
+    
+    <div class="application-detail">
+        <div class="label">Группа:</div>
+        <div class="value">{{$booking->user->group}}</div>
+    </div>
+    
+    <div class="application-detail">
+        <div class="label">Дата:</div>
+        <div class="value">{{$booking->date}}</div>
+    </div>
+    
+    <div class="application-detail">
+        <div class="label">Время:</div>
+        <div class="value">{{$booking->start_time}} - {{$booking->end_time}}</div>
+    </div>
+    
+    <div class="application-detail">
+        <div class="label">Цель:</div>
+        <div class="value">{{$booking->purpose}}</div>
+    </div>
+
+    <div class="application-detail">
+        <div class="label">Оборудование:</div>
+        <div class="value">{{$booking->equipment}}</div>
+    </div>
+    
+    <div class="application-detail">
+        <div class="label">Технический специалист:</div>
+        <div class="value">{{$booking->is_tech_support}}</div>
+    </div>
+
+    <div class="application-detail">
+        <div class="label">Комментарий студента:</div>
+        <div class="value application-comment">{{$booking->comment}}</div>
+    </div>
+
+    @if ($booking->status == 'pending')
+
+        <div class="application-detail admin-message">
+            <textarea 
+                class="auto-resize-textarea admin-message__input"
+                placeholder="Оставить комментарий..."
+            ></textarea>
+        </div>
+
+        <form action="{{ route('booking.updateStatus', $booking) }}" method="POST">
+            @csrf
+
+            <button name="action" value="approved" class="action-btn approve-btn">Принять</button>
+            <button name="action" value="rejected" class="action-btn reject-btn">Отклонить</button>
+        </form>
+
+    @endif
 </div>

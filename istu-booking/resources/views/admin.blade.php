@@ -1,8 +1,7 @@
 <x-layout>
+    @vite('resources/css/admin.css')
 
-    <h2 class='text-2xl'>Входящие заявки</h2>
-
-    <div class="bookings-wrapper flex">
+    <div class="bookings-wrapper flex flex-wrap justify-start">
         @forelse ($bookings as $booking)
             <x-booking-card :booking="$booking"/>
         @empty

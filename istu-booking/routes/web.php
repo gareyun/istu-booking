@@ -10,3 +10,4 @@ Route::get('/admin', [BookingAdminController::class, 'index']);
 Route::get('/booking', [BookingUserController::class, 'index']);
 
 Route::post('/bookings', [BookingUserController::class, 'store']);
+Route::post('/bookings/{booking}/status', [BookingAdminController::class, 'updateStatus'])->name('booking.updateStatus');
