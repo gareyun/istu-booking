@@ -34,7 +34,7 @@ class BookingUserController extends Controller
 
         Booking::create([
             'user_id' => 1,
-            'classroom_id' => 1,
+            'classroom_id' => $request->classroom_id,
             'date' => $request->date,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,

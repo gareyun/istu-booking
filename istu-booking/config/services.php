@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'google_service_account' => [
+        'path' => env('GOOGLE_SERVICE_ACCOUNT_PATH'),
+    ],
+    'calendar_ids' => [
+        '9-2' => env('GOOGLE_CALENDAR_ROOM_9_2'),
+        'floor_2' => env('GOOGLE_CALENDAR_ROOM_floor_2'),
+    ],
+
 ];

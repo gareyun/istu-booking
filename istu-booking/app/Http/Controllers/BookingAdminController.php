@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use Illuminate\Http\Request;
+use App\Services\GoogleCalendarService;
 
 class BookingAdminController extends Controller
 {
@@ -12,7 +13,7 @@ class BookingAdminController extends Controller
      */
     public function index()
     {
-        $bookings = Booking::with(['classroom', 'user'])->get();
+        $bookings = Booking::with(['classroom', 'user'])->orderBy('id', 'desc')->get();
         return view('admin', compact('bookings'));
     }
 
@@ -22,6 +23,11 @@ class BookingAdminController extends Controller
 
         if ($action == 'approved') {
             $booking->status = 'approved';
+
+            $eventId = app(GoogleCalendarService::class)->createEvent($booking);
+
+            #$booking->google_event_id = $eventId;
+
         } elseif ($action == 'rejected') {
             $booking->status = 'rejected';
         }

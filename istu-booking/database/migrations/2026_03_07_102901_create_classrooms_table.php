@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('description', 255);
             $table->string('equipment', 255);
             $table->integer('capacity');
+            $table->string('google_calendar_id', 100);
             $table->timestamps();
         });
     }

@@ -10,24 +10,29 @@ class ClassroomSeeder extends Seeder
 {
     public function run(): void
     {
+        $calendars = config('services.calendar_ids');
+        
         $classrooms = Classroom::count() < 3 ? [
             Classroom::create([
                 'room' => '9-2',
                 'description' => 'Конференц-зал в Интеграле',
                 'equipment' => 'Ноутбук, проектор, флипчарт',
-                'capacity' => '30'
+                'capacity' => '30',
+                'google_calendar_id' => $calendars['9-2'] ?? null,
             ]),
             Classroom::create([
                 'room' => '106',
                 'description' => 'Волонтёрский кабинет',
                 'equipment' => 'Канцелярия, флипчарт',
-                'capacity' => '21'
+                'capacity' => '21',
+                'google_calendar_id' => $calendars['9-2'] ?? null,
             ]),
             Classroom::create([
                 'room' => 'Холл 2-го этажа',
                 'description' => 'Холл для проведения ярмарок или выступлений',
                 'equipment' => 'Ноутбук, аудиосистема, цифровой экран, микрофоны',
-                'capacity' => '100'
+                'capacity' => '100',
+                'google_calendar_id' => $calendars['floor_2'] ?? null,
             ])
         ] : Classroom::take(3)->get();
     }

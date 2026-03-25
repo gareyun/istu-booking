@@ -11,7 +11,8 @@ class Classroom extends Model
         'name',
         'description',
         'equipment',
-        'capacity'
+        'capacity',
+        'google_calendar_id'
     ];
 
     public function bookings()
