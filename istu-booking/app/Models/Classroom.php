@@ -8,7 +8,7 @@ use HasFactory;
 class Classroom extends Model
 {
     protected $fillable = [
-        'name',
+        'room',
         'description',
         'equipment',
         'capacity',

@@ -59,6 +59,11 @@
         <div class="value application-comment">{{$booking->user_comment}}</div>
     </div>
 
+    <div class="application-detail">
+        <div class="label">Комментарий администратора:</div>
+        <div class="value application-comment">{{$booking->admin_comment}}</div>
+    </div>
+
     @if ($booking->status == 'pending')
         <div class="admin-area">
             <form action="{{ route('booking.updateStatus', $booking) }}" method="POST">

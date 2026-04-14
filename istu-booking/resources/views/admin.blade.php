@@ -2,6 +2,11 @@
     @vite('resources/css/admin.css')
 
     <div class="main-content">
+        <h1 class="section-title">Заявки</h1>
+        
+        <div class="tabs">
+            <a href="{{ route('admin.classrooms') }}" class="btn">Аудитории</a>
+        </div>
 
         <div class="status-tabs">
             <a href="{{ route('admin') }}"
@@ -34,4 +39,5 @@
         </div>
 
     </div>
+
 </x-layout>
