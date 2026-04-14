@@ -90,7 +90,7 @@
                 <input type="number" name="capacity" placeholder="Вместимость" required>
                 <input type="text" name="google_calendar_id" placeholder="Ссылка на Google Calendar" required>
                 <div class="modal-actions">
-                    <button type="submit" class="btn">Сохранить</button>
+                    <button type="submit" class="btn">Добавить</button>
                     <button type="button" onclick="closeModal()" class="btn-reject">Отмена</button>
                 </div>
             </form>
