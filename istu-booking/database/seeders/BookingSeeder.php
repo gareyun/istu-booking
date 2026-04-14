@@ -25,7 +25,9 @@ class BookingSeeder extends Seeder
                 'purpose' => 'Собрание',
                 'equipment' => 'Проектор',
                 'is_tech_support' => true,
-                'comment' => 'Хотим устроить чаепитие'
+                'user_comment' => 'Хотим устроить чаепитие',
+                'admin_comment' => 'Не пролейте',
+                'google_event_id' => ''
             ]),
             Booking::create([
                 'user_id' => $users->random()->id,
@@ -36,7 +38,9 @@ class BookingSeeder extends Seeder
                 'purpose' => 'Собрание',
                 'equipment' => 'Проектор',
                 'is_tech_support' => true,
-                'comment' => 'Перевыборы волонтёрского центра'
+                'user_comment' => 'Перевыборы волонтёрского центра',
+                'admin_comment' => 'УМП тоже придёт посмотреть!',
+                'google_event_id' => ''
             ]),
             Booking::create([
                 'user_id' => $users->random()->id,
@@ -47,7 +51,9 @@ class BookingSeeder extends Seeder
                 'purpose' => 'Собрание',
                 'equipment' => '',
                 'is_tech_support' => true,
-                'comment' => 'Собрание студ совета'
+                'user_comment' => 'Собрание студ совета',
+                'admin_comment' => '',
+                'google_event_id' => ''
             ])
         ] : Booking::take(3)->get();
     }

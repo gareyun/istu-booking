@@ -19,10 +19,12 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->string('purpose', 255);
-            $table->string('equipment', 255);
+            $table->string('equipment', 255)->nullable();
             $table->boolean('is_tech_support');
-            $table->string('comment');
+            $table->string('user_comment')->nullable();
+            $table->string('admin_comment')->nullable();
             $table->enum('status', ['pending','approved','rejected'])->default('pending');
+            $table->string('google_event_id', 200)->nullable();;
             $table->timestamps();
         });
     }

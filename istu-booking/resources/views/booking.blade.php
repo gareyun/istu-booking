@@ -3,162 +3,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
 
-    <style>
-        :root {
-            --primary-color: #1A2A6C;
-            --secondary-color: #858796;
-            --success-color: #1cc88a;
-            --warning-color: #f6c23e;
-            --danger-color: #e74a3b;
-        }
-
-        body {
-            background-color: #f8f9fc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .booking-container {
-            max-width: 800px;
-            margin: 40px auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.1);
-            padding: 40px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 3px solid var(--primary-color);
-            padding-bottom: 20px;
-        }
-
-        .header h1 {
-            color: var(--primary-color);
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .header .subtitle {
-            color: var(--secondary-color);
-            font-size: 1.1rem;
-        }
-
-        .form-label {
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 8px;
-        }
-
-        .required::after {
-            content: " *";
-            color: var(--danger-color);
-        }
-
-        .form-control, .form-select {
-            border: 2px solid #e3e6f0;
-            border-radius: 8px;
-            padding: 12px 15px;
-            transition: all 0.3s;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
-        }
-
-        .time-inputs {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .time-inputs .form-control {
-            flex: 1;
-        }
-
-        .time-separator {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-
-        .equipment-section, .tech-support-section {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .form-check-input:checked {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-            padding: 12px 30px;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-
-        .btn-primary:hover {
-            background-color: #3a56c4;
-            border-color: #3a56c4;
-            transform: translateY(-2px);
-        }
-
-        .alert {
-            border-radius: 10px;
-            border: none;
-            padding: 15px;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .loading-spinner {
-            width: 3rem;
-            height: 3rem;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e3e6f0;
-            color: var(--secondary-color);
-            font-size: 0.9rem;
-        }
-
-        /* Кастомизация flatpickr */
-        .flatpickr-input {
-            background-color: white !important;
-        }
-
-        /* Адаптивность */
-        @media (max-width: 768px) {
-            .booking-container {
-                margin: 20px;
-                padding: 25px;
-            }
-
-            .time-inputs {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .time-separator {
-                transform: rotate(90deg);
-            }
-        }
-    </style>
-
     <div class="booking-container">
         <div class="header">
             <h1>Бронирование аудитории</h1>
@@ -178,13 +22,6 @@
                         <option value="{{$classroom->id}}">{{$classroom->room}}</option>
                     @endforeach
                 </select>
-                {{-- <input name="classroom" type="text" class="form-control" id="room"
-                       list="classrooms" placeholder="Выберите или введите аудиторию" required>
-                <datalist id="classrooms">
-                    @foreach ($classrooms as $classroom)
-                        <option value="{{$classroom->id}}">{{$classroom->room}}</option>
-                    @endforeach
-                </datalist> --}}
                 <small class="text-muted">Вы можете выбрать из списка или ввести свою аудиторию</small>
             </div>
 
@@ -239,7 +76,7 @@
 
             <div class="mb-4">
                 <label for="student_message" class="form-label">Комментарий для администратора</label>
-                <textarea name="comment" class="form-control" id="student_message" rows="3"
+                <textarea name="user_comment" class="form-control" id="student_message" rows="3"
                           placeholder="Дополнительная информация, пожелания, особенности мероприятия..."></textarea>
             </div>
 
@@ -263,7 +100,6 @@
             </div>
         </form>
 
-        <!-- Индикатор загрузки -->
         <div id="loading" class="loading">
             <div class="spinner-border text-primary loading-spinner" role="status">
                 <span class="visually-hidden">Загрузка...</span>
@@ -273,15 +109,122 @@
 
         <div class="footer">
             <p>По вопросам обращайтесь: 8 (3412) 77-60-55, доб. 1371</p>
-            <p>Также вы можете подать заявку через <a href="https://t.me/your_bot" target="_blank">Telegram бота</a></p>
+            <p>Также вы можете подать заявку через <a href="https://vk.com" target="_blank">VK бота</a></p>
         </div>
+
+        <div class='my-bookings mt-15'>
+            <h2 class="text-xl font-bold mb-4 text-center">📋 Мои заявки</h2>
+
+            @forelse($bookings as $booking)
+                <div class="bg-white rounded-xl shadow p-4 mb-4 border">
+
+                    <div class="flex justify-between mb-2">
+                        <span class="font-semibold">
+                            Аудитория {{ $booking->classroom->room }}
+                        </span>
+
+                        <span class="text-sm
+                            @if($booking->status === 'pending') text-yellow-600
+                            @elseif($booking->status === 'approved') text-green-600
+                            @elseif($booking->status === 'rejected') text-red-600
+                            @endif
+                        ">
+                            {{ match($booking->status) {
+                                'pending' => '⏳ Ожидает',
+                                'approved' => '✅ Одобрена',
+                                'rejected' => '❌ Отклонена',
+                            } }}
+                        </span>
+                    </div>
+
+                    <div class="text-sm text-gray-600">
+                        📅 {{ $booking->date }} |
+                        ⏰ {{ $booking->start_time }} - {{ $booking->end_time }}
+                    </div>
+
+                    <div class="mt-2">
+                        <b>Цель:</b> {{ $booking->purpose }}
+                    </div>
+
+                    @if($booking->user_comment)
+                        <div class="text-gray-500 text-sm mt-1">
+                            {{ $booking->user_comment }}
+                        </div>
+                    @endif
+
+                    @if($booking->admin_comment)
+                        <div class="text-gray-500 text-sm mt-1">
+                            <b>Комментарий администратора:</b> {{ $booking->admin_comment }}
+                        </div>
+                    @endif
+
+                </div>
+            @empty
+                <div class="text-gray-500">У вас пока нет заявок</div>
+            @endforelse
+        </div>
+
     </div>
+
+    @vite('resources/css/booking.css')
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
 
     <script>
+
+        const form = document.getElementById('bookingForm');
+        const loading = document.getElementById('loading');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorAlert = document.getElementById('errorAlert');
+        const successAlert = document.getElementById('successAlert');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            loading.classList.add('active');
+            submitBtn.disabled = true;
+
+            errorAlert.classList.add('d-none');
+            successAlert.classList.add('d-none');
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('[name=_token]').value
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    successAlert.textContent = data.message;
+                    successAlert.classList.remove('d-none');
+
+                    form.reset();
+
+                } else if (response.status === 422) {
+                    let errors = Object.values(data.errors).flat().join('\n');
+                    errorAlert.textContent = errors;
+                    errorAlert.classList.remove('d-none');
+
+                } else {
+                    throw new Error(data.message);
+                }
+
+            } catch (error) {
+                errorAlert.textContent = 'Произошла ошибка. Попробуйте позже.';
+                errorAlert.classList.remove('d-none');
+            }
+
+            loading.classList.remove('active');
+            submitBtn.disabled = false;
+        });
     
         flatpickr(".flatpickr", {
             dateFormat: "d.m.Y",

@@ -17,7 +17,9 @@ class Booking extends Model
         'purpose',
         'equipment',
         'is_tech_support',
-        'comment'
+        'user_comment',
+        'admin_comment',
+        'google_event_id'
     ];
 
     public function user()

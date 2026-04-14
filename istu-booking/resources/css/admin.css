@@ -130,6 +130,14 @@ body {
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
+.status-badge {
+    margin-top: 30px;
+    align-content: center;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
 .application-comment {
     text-align: right;
 }
@@ -167,13 +175,6 @@ body {
 .application-detail .label {
     font-weight: bold;
     color: #7f8c8d;
-}
-
-.status-badge {
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: bold;
 }
 
 .status-pending {

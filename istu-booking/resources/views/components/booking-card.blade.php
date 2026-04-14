@@ -13,7 +13,6 @@
 <div class="application-card" data-id="{{$booking->id}}">
     <div class="application-header">
         <div class="application-id">ID: {{$booking->id}}</div>
-        <div class="status-badge">{{$status}}</div>
     </div>
     
     <div class="application-title">
@@ -57,24 +56,26 @@
 
     <div class="application-detail">
         <div class="label">Комментарий студента:</div>
-        <div class="value application-comment">{{$booking->comment}}</div>
+        <div class="value application-comment">{{$booking->user_comment}}</div>
     </div>
 
     @if ($booking->status == 'pending')
+        <div class="admin-area">
+            <form action="{{ route('booking.updateStatus', $booking) }}" method="POST">
+                @csrf
+                <div class="application-detail admin-message">
+                    <textarea name="admin_comment"
+                        class="auto-resize-textarea admin-message__input"
+                        placeholder="Оставить комментарий..."
+                    ></textarea>
+                </div>
 
-        <div class="application-detail admin-message">
-            <textarea 
-                class="auto-resize-textarea admin-message__input"
-                placeholder="Оставить комментарий..."
-            ></textarea>
+                <button name="action" value="approved" class="action-btn approve-btn">Принять</button>
+                <button name="action" value="rejected" class="action-btn reject-btn">Отклонить</button>
+            </form>
         </div>
-
-        <form action="{{ route('booking.updateStatus', $booking) }}" method="POST">
-            @csrf
-
-            <button name="action" value="approved" class="action-btn approve-btn">Принять</button>
-            <button name="action" value="rejected" class="action-btn reject-btn">Отклонить</button>
-        </form>
-
+    @else
+        <div class="status-badge">{{$status}}</div>
     @endif
+
 </div>
