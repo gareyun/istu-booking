@@ -6,7 +6,7 @@ use App\Http\Controllers\ClassroomController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ClassroomController::class, 'index']);
-Route::get('/admin', [BookingAdminController::class, 'index']);
+Route::get('/admin', [BookingAdminController::class, 'index'])->name('admin');
 Route::get('/booking', [BookingUserController::class, 'index']);
 
 Route::post('/bookings', [BookingUserController::class, 'store']);

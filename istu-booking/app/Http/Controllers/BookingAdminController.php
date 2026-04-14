@@ -8,10 +8,25 @@ use App\Services\GoogleCalendarService;
 
 class BookingAdminController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $bookings = Booking::with(['classroom', 'user'])->orderBy('id', 'desc')->get();
+    //     return view('admin', compact('bookings'));
+    // }
+
+    public function index(Request $request)
     {
-        $bookings = Booking::with(['classroom', 'user'])->orderBy('id', 'desc')->get();
-        return view('admin', compact('bookings'));
+        $status = $request->get('status');
+
+        $query = Booking::with(['classroom', 'user'])->orderBy('id', 'desc');
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $bookings = $query->get();
+
+        return view('admin', compact('bookings', 'status'));
     }
 
     public function updateStatus(Request $request, Booking $booking)
