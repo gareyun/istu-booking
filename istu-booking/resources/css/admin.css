@@ -311,17 +311,6 @@ body {
     background: rgba(0,0,0,0.5);
 }
 
-.modal-content {
-    background: white;
-    margin: 10% auto;
-    padding: 20px;
-    width: 400px;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
 .tabs {
     margin-bottom: 20px;
 }
@@ -376,17 +365,10 @@ body {
     border-radius: 16px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     font-size: 1.4rem;
-
     display: flex;
     flex-direction: column;
-    gap: 15px;
 
     animation: modalFade 0.25s ease;
-}
-
-.modal-content input,
-.modal-content textarea {
-    margin-bottom: 10px;
 }
 
 @keyframes modalFade {
@@ -405,6 +387,7 @@ body {
     color: #1a2a6c;
     border-bottom: 2px solid #1a2a6c;
     padding-bottom: 8px;
+    margin-bottom: 20px;
 }
 
 .close {
@@ -452,4 +435,14 @@ body {
     justify-content: flex-end;
     gap: 10px;
     margin-top: 10px;
+}
+
+.modal-input-title {
+    margin-bottom: 5px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal-input {
+    margin-bottom: 15px;
 }
