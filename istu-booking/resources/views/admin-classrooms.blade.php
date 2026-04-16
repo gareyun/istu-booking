@@ -85,6 +85,29 @@
             <form method="POST" action="{{ route('classrooms.store') }}">
                 @csrf
                 <input type="text" name="room" placeholder="Номер аудитории" required>
+                
+                <select name="classroom_category_id">
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}">
+                            {{ $category->category }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <select name="building_id">
+                    @foreach($buildings as $building)
+                        <option value="{{ $building->id }}">
+                            {{ $building->name }} ({{ $building->type->type ?? '—' }})
+                        </option>
+                    @endforeach
+                </select>
+
+                <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+                    <button onclick="openBuildingModal()" class="btn">🏢 Добавить корпус</button>
+                    <button onclick="openCategoryModal()" class="btn">📚 Категория</button>
+                    <button onclick="openTypeModal()" class="btn">🏷 Тип корпуса</button>
+                </div>
+                
                 <textarea name="description" placeholder="Описание" required></textarea>
                 <textarea name="equipment" placeholder="Оборудование"></textarea>
                 <input type="number" name="capacity" placeholder="Вместимость" required>
@@ -94,6 +117,52 @@
                     <button type="button" onclick="closeModal()" class="btn-reject">Отмена</button>
                 </div>
             </form>
+        </div>
+
+        <div id="buildingModal" class="modal">
+            <div class="modal-content">
+                <h2 class="modal-title">Добавить корпус</h2>
+
+                <form method="POST" action="/admin/buildings">
+                    @csrf
+
+                    <input name="name" placeholder="Название">
+                    <input name="address" placeholder="Адрес">
+                    <textarea name="description" placeholder="Описание"></textarea>
+
+                    <select name="building_type_id">
+                        @foreach($buildingTypes as $type)
+                            <option value="{{ $type->id }}">{{ $type->type }}</option>
+                        @endforeach
+                    </select>
+
+                    <button class="btn">Сохранить</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="typeModal" class="modal">
+            <div class="modal-content">
+                <h2 class="modal-title">Тип корпуса</h2>
+
+                <form method="POST" action="/admin/building-types">
+                    @csrf
+                    <input name="type" placeholder="Тип">
+                    <button class="btn">Сохранить</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="categoryModal" class="modal">
+            <div class="modal-content">
+                <h2 class="modal-title">Категория аудитории</h2>
+
+                <form method="POST" action="/admin/categories">
+                    @csrf
+                    <input name="category" placeholder="Название категории">
+                    <button class="btn">Сохранить</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -120,6 +189,18 @@
 
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
+        }
+
+        function openBuildingModal() {
+            document.getElementById('buildingModal').style.display = 'block';
+        }
+
+        function openCategoryModal() {
+            document.getElementById('categoryModal').style.display = 'block';
+        }
+
+        function openTypeModal() {
+            document.getElementById('typeModal').style.display = 'block';
         }
 
         window.onclick = function(event) {

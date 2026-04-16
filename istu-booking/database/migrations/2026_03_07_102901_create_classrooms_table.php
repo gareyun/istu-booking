@@ -6,14 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('classrooms', function (Blueprint $table) {
             $table->id();
-            // $table->foreignId('classroom_id')->nullable()->constrained()->cascadeOnDelete();
+
+            $table->foreignId('classroom_category_id')
+                ->constrained('classroom_categories')
+                ->nullOnDelete();
+
+            $table->foreignId('building_id')
+                ->constrained('buildings')
+                ->nullOnDelete();
+
             $table->string('room', 50);
             $table->string('description', 255);
             $table->string('equipment', 255);
@@ -23,11 +28,14 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('classrooms');
+        Schema::table('classrooms', function (Blueprint $table) {
+
+            $table->dropForeign(['classroom_category_id']);
+            $table->dropForeign(['building_id']);
+
+            $table->dropColumn(['classroom_category_id', 'building_id']);
+        });
     }
 };
