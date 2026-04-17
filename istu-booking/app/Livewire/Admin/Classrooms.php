@@ -15,6 +15,18 @@ class Classrooms extends Component
     public $buildings;
     public $buildingTypes;
 
+    // формы
+    public $newCategory;
+    public $newBuildingName;
+    public $newBuildingAddress;
+    public $newBuildingDescription;
+    public $newBuildingTypeId;
+    public $newType;
+
+    public $showCategoryModal = false;
+    public $showBuildingModal = false;
+    public $showTypeModal = false;
+
     public $showCreateModal = false;
     public $showEditModal = false;
 
@@ -110,12 +122,85 @@ class Classrooms extends Component
         $this->showEditModal = false;
     }
 
+    public function closeBuildingModal()
+    {
+        $this->showBuildingModal = false;
+    }
+
     private function resetFields()
     {
         $this->reset([
             'room', 'description', 'equipment', 'capacity',
             'google_calendar_id', 'classroom_category_id', 'building_id'
         ]);
+    }
+
+    public function toggleCategoryModal() {
+        $this->showCategoryModal = !$this->showCategoryModal;
+    }
+
+    public function createCategory()
+    {
+        $this->validate([
+            'newCategory' => 'required|string|max:255',
+        ]);
+
+        ClassroomCategory::create([
+            'category' => $this->newCategory
+        ]);
+
+        $this->showCategoryModal = false;
+        $this->newCategory = null;
+        $this->loadData();
+    }
+
+    public function openBuildingModal()
+    {
+        $this->showBuildingModal = true;
+    }
+
+    public function toggleTypeModal() {
+        $this->showTypeModal = !$this->showTypeModal;
+    }
+
+    public function createBuildingType()
+    {
+        $this->validate([
+            'newType' => 'required|string|max:255',
+        ]);
+
+        BuildingType::create([
+            'type' => $this->newType
+        ]);
+
+        $this->showBuildingModal = false;
+        $this->newType = null;
+        $this->loadData();
+    }
+
+    public function createBuilding()
+    {
+        $this->validate([
+            'newBuildingName' => 'required|string|max:255',
+            'newBuildingAddress' => 'required|string|max:255',
+            'newBuildingTypeId' => 'required|exists:building_types,id',
+        ]);
+
+        Building::create([
+            'name' => $this->newBuildingName,
+            'address' => $this->newBuildingAddress,
+            'description' => $this->newBuildingDescription,
+            'building_type_id' => $this->newBuildingTypeId,
+        ]);
+
+        $this->reset([
+            'newBuildingName',
+            'newBuildingAddress',
+            'newBuildingDescription',
+            'newBuildingTypeId'
+        ]);
+
+        $this->loadData();
     }
 
     public function render()

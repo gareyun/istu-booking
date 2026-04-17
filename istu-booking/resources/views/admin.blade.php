@@ -30,7 +30,8 @@
             </a>
         </div>
 
-        <div class="bookings-wrapper flex flex-wrap justify-start">
+        {{-- <div class="bookings-wrapper flex flex-wrap justify-start"> --}}
+        <div class="bookings-wrapper">
             @forelse ($bookings as $booking)
                 <x-booking-card :booking="$booking"/>
             @empty

@@ -7,6 +7,10 @@
         <button wire:click="openCreateModal" class="btn">
             + Добавить аудиторию
         </button>
+
+        <button wire:click="openBuildingModal" class="btn">
+            + Добавить корпус
+        </button>
     </div>
 
     <div class="applications-list">
@@ -61,19 +65,40 @@
                 <p class="modal-input-title">Аудитория</p>
                 <input class="modal-input" wire:model="room" placeholder="Номер аудитории">
 
-                <select class="modal-input" wire:model="classroom_category_id">
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->category }}</option>
-                    @endforeach
-                </select>
+                <div class="list-with-add">
+                    <select class="modal-input" wire:model="classroom_category_id">
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->category }}</option>
+                        @endforeach
+                    </select>
 
-                <select class="modal-input" wire:model="building_id">
-                    @foreach($buildings as $building)
-                        <option value="{{ $building->id }}">
-                            {{ $building->name }}
-                        </option>
-                    @endforeach
-                </select>
+                    <button class="btn btn-list-with-add" wire:click="toggleCategoryModal">
+                        @if($showCategoryModal)
+                            &times;
+                        @else
+                            +
+                        @endif
+                    </button>
+                </div>
+
+                @if($showCategoryModal)
+                    <div class="new-category-input">
+                        <input wire:model="newCategory" placeholder="Категория" class="input-with-list">
+                        <button wire:click="createCategory" class="btn btn-with-list-save">Сохранить</button>
+                    </div>
+                @endif
+                
+                <div class="list-with-add">
+                    <select class="modal-input" wire:model="building_id">
+                        @foreach($buildings as $building)
+                            <option value="{{ $building->id }}">
+                                {{ $building->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <button class="btn btn-list-with-add" wire:click="openBuildingModal">+</button>
+                </div>
 
                 <p class="modal-input-title">Описание</p>
                 <textarea class="modal-input" wire:model="description" placeholder="Описание"></textarea>
@@ -82,11 +107,55 @@
                 <p class="modal-input-title">Вместимость</p>
                 <input class="modal-input" wire:model="capacity" type="number" placeholder="Количество человек">
                 <p class="modal-input-title">Идентификатор Google Calendar</p>
-                <input class="modal-input" wire:model="google_calendar_id" placeholder="Ссылка">
+                <input class="modal-input" wire:model="google_calendar_id" placeholder="Ссылка на календарь">
 
                 <div class="modal-actions">
                     <button wire:click="save" class="btn">Сохранить</button>
                     <button wire:click="closeModal" class="btn-reject">Отмена</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if($showBuildingModal)
+        <div class="modal" style="display:block">
+            <div class="modal-content">
+                <h2 class="modal-title">Добавить корпус</h2>
+
+                <p class="modal-input-title">Корпус</p>
+                <input class="modal-input" wire:model="newBuildingName" placeholder="Название">
+                
+                <div class="list-with-add">
+                    <select class="modal-input" wire:model="newBuildingTypeId">
+                        @foreach($buildingTypes as $type)
+                            <option value="{{ $type->id }}">{{ $type->type }}</option>
+                        @endforeach
+                    </select>
+
+                    <button class="btn btn-list-with-add" wire:click="toggleTypeModal">
+                        @if($showTypeModal)
+                            <span>&times;</span>
+                        @else
+                            +
+                        @endif
+                    </button>
+                </div>
+
+                @if($showTypeModal)
+                    <div class="new-category-input">
+                        <input wire:model="newType" placeholder="Тип корпуса" class="input-with-list">
+                        <button wire:click="createBuildingType" class="btn btn-with-list-save">Сохранить</button>
+                    </div>
+                @endif
+
+                <p class="modal-input-title">Адрес</p>
+                <input class="modal-input" wire:model="newBuildingAddress" placeholder="ул. Студенческая">
+                <p class="modal-input-title">Описание</p>
+                <textarea class="modal-input" wire:model="newBuildingDescription" placeholder="Корпус IT технологий"></textarea>
+
+                <div class="modal-actions">
+                    <button wire:click="createBuilding" class="btn">Сохранить</button>
+                    <button wire:click="closeBuildingModal" class="btn-reject">Отмена</button>
                 </div>
             </div>
         </div>
