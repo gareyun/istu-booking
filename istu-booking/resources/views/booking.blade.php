@@ -43,6 +43,8 @@
                 </div>
             </div>
 
+            <div id="busySlots" class="alert alert-info d-none"></div>
+
             <div class="mb-4">
                 <label for="purpose" class="form-label required">Цель бронирования</label>
                 <textarea name="purpose" class="form-control" id="purpose" rows="3"
@@ -191,6 +193,18 @@
 
             const formData = new FormData(form);
 
+            const start = formData.get('start_time');
+            const end = formData.get('end_time');
+
+            if (await isTimeBusy(start, end)) {
+                errorAlert.textContent = 'Выбранное время уже занято';
+                errorAlert.classList.remove('d-none');
+
+                loading.classList.remove('active');
+                submitBtn.disabled = false;
+                return;
+            }
+
             try {
                 const response = await fetch('/bookings', {
                     method: 'POST',
@@ -253,6 +267,46 @@
 
         setupTimeMask(document.getElementById('start_time'));
         setupTimeMask(document.getElementById('end_time'));
+
+        async function isTimeBusy(start, end) {
+            const classroomId = document.querySelector('[name="classroom_id"]').value;
+            const date = document.getElementById('event_date').value;
+
+            const response = await fetch(`/bookings/busy-slots?classroom_id=${classroomId}&date=${date}`);
+            const data = await response.json();
+
+            return data.some(b => start < b.end_time && end > b.start_time);
+        }
+
+        async function loadBusySlots() {
+            const classroomId = document.querySelector('[name="classroom_id"]').value;
+            const date = document.getElementById('event_date').value;
+
+            if (!classroomId || !date) return;
+
+            const response = await fetch(`/bookings/busy-slots?classroom_id=${classroomId}&date=${date}`);
+            const data = await response.json();
+
+            const container = document.getElementById('busySlots');
+
+            if (data.length === 0) {
+                container.classList.add('d-none');
+                return;
+            }
+
+            container.classList.remove('d-none');
+
+            container.innerHTML = `
+                <b>⛔ Занятые слоты:</b><br>
+                ${data.map(b => `
+                    ${b.start_time} - ${b.end_time}
+                    ${b.status === 'pending' ? '(на рассмотрении)' : '(занято)'}
+                `).join('<br>')}
+            `;
+        }
+
+        document.getElementById('event_date').addEventListener('change', loadBusySlots);
+        document.querySelector('[name="classroom_id"]').addEventListener('change', loadBusySlots);
     
     </script>
 

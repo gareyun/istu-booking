@@ -25,9 +25,19 @@ class BookingUserController extends Controller
         ]);
     }
 
-    public function create()
+    public function getBusySlots(Request $request)
     {
+        $request->validate([
+            'classroom_id' => 'required|exists:classrooms,id',
+            'date' => 'required',
+        ]);
 
+        $bookings = Booking::where('classroom_id', $request->classroom_id)
+            ->where('date', $request->date)
+            ->whereIn('status', ['pending', 'approved'])
+            ->get(['start_time', 'end_time', 'status']);
+
+        return response()->json($bookings);
     }
 
     public function store(Request $request)
@@ -43,6 +53,22 @@ class BookingUserController extends Controller
                 'is_tech_support' => 'required|boolean',
                 'user_comment' => 'nullable|string',
             ]);
+
+            $exists = Booking::where('classroom_id', $validated['classroom_id'])
+                ->where('date', $validated['date'])
+                ->where(function ($query) use ($validated) {
+                    $query->where('start_time', '<', $validated['end_time'])
+                        ->where('end_time', '>', $validated['start_time']);
+                })
+                ->whereIn('status', ['pending', 'approved'])
+                ->exists();
+
+            if ($exists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Это время уже занято другой заявкой'
+                ], 409);
+            }
 
             $booking = Booking::create([
                 'user_id' => 1,
@@ -66,25 +92,5 @@ class BookingUserController extends Controller
                 'message' => 'Ошибка сервера'
             ], 500);
         }
-    }
-
-    public function show(string $id)
-    {
-
-    }
-
-    public function edit(string $id)
-    {
-
-    }
-
-    public function update(Request $request, string $id)
-    {
-
-    }
-
-    public function destroy(string $id)
-    {
-
     }
 }
