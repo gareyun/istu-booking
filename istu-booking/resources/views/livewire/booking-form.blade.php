@@ -1,17 +1,15 @@
-<div>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<div class="min-h-screen bg-[#f8f9fc] font-sans py-10 px-4">
     <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
 
-    <div class="booking-container">
-        <div class="header">
-            <h1>Бронирование аудитории</h1>
-            <p class="subtitle">
-                Заполните форму, отправьте заявку и мы её рассмотрим
-            </p>
+    <div class="max-w-[800px] mx-auto bg-white rounded-[15px] shadow-[0_0_30px_rgba(0,0,0,0.1)] p-6 md:p-10">
+        
+        <div class="text-center mb-10 border-b-[3px] border-primary pb-5">
+            <h1 class="text-primary font-bold text-3xl md:text-4xl mb-2">Бронирование аудитории</h1>
+            <p class="text-secondary text-[1.1rem]">Заполните форму, отправьте заявку и мы её рассмотрим</p>
         </div>
 
         @if ($errors->any())
-            <div class="alert alert-danger" role="alert">
+            <div class="bg-red-100 text-red-700 rounded-[10px] p-4 mb-4">
                 @foreach ($errors->all() as $error)
                     <div>{{ $error }}</div>
                 @endforeach
@@ -19,7 +17,7 @@
         @endif
 
         @if (session()->has('success'))
-            <div class="alert alert-success" role="alert">
+            <div class="bg-green-100 text-green-700 rounded-[10px] p-4 mb-4">
                 {{ session('success') }}
             </div>
         @endif
@@ -27,8 +25,22 @@
         <form wire:submit.prevent="submit">
 
             <div class="mb-4">
-                <label class="form-label">Аудитория</label>
-                <select wire:model.live="classroom_id" class="form-control" required>
+                <label class="block font-semibold text-[#495057] mb-2">
+                    Аудитория
+                    <span class="text-danger">*</span>
+                </label>
+
+                <select
+                    wire:model.live="classroom_id"
+                    class="w-full border-2 border-[#e3e6f0] rounded-[8px]
+                           px-[15px] py-[12px]
+                           transition-all duration-300
+                           focus:border-primary
+                           focus:ring-4
+                           focus:ring-[rgba(78,115,223,0.25)]
+                           outline-none bg-white"
+                    required>
+
                     <option value="">Выберите аудиторию</option>
 
                     @foreach ($classrooms as $classroom)
@@ -38,39 +50,65 @@
                     @endforeach
                 </select>
 
-                <small class="text-muted">Выберите из списка</small>
+                <small class="text-secondary text-sm">Выберите из списка</small>
             </div>
 
-            <div class="row mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                 
-                <div class="col-md-6">
-                    <label class="form-label required">Дата бронирования</label>
+                <div>
+                    <label class="block font-semibold text-[#495057] mb-2">
+                        Дата бронирования
+                        <span class="text-danger">*</span>
+                    </label>
+
                     <div wire:ignore>
                         <input
                             type="text"
                             id="event_date"
-                            class="form-control flatpickr"
+                            class="w-full border-2 border-[#e3e6f0] rounded-[8px]
+                                   px-[15px] py-[12px]
+                                   transition-all duration-300
+                                   focus:border-primary
+                                   focus:ring-4
+                                   focus:ring-[rgba(78,115,223,0.25)]
+                                   outline-none bg-white"
                             placeholder="ДД.ММ.ГГГГ"
                             required>
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="form-label required">Время бронирования</label>
-                    <div class="time-inputs">
+                <div>
+                    <label class="block font-semibold text-[#495057] mb-2">
+                        Время бронирования
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <div class="flex flex-col md:flex-row gap-5 items-center">
                         <input
                             type="text"
                             id="start_time"
-                            class="form-control"
+                            class="w-full border-2 border-[#e3e6f0] rounded-[8px]
+                                   px-[15px] py-[12px]
+                                   transition-all duration-300
+                                   focus:border-primary
+                                   focus:ring-4
+                                   focus:ring-[rgba(78,115,223,0.25)]
+                                   outline-none bg-white"
                             placeholder="14:30"
                             required>
 
-                        <span class="time-separator">—</span>
+                        <span class="text-2xl font-bold text-secondary rotate-90 md:rotate-0">—</span>
 
                         <input
                             type="text"
                             id="end_time"
-                            class="form-control"
+                            class="w-full border-2 border-[#e3e6f0] rounded-[8px]
+                                   px-[15px] py-[12px]
+                                   transition-all duration-300
+                                   focus:border-primary
+                                   focus:ring-4
+                                   focus:ring-[rgba(78,115,223,0.25)]
+                                   outline-none bg-white"
                             placeholder="16:00"
                             required>
                     </div>
@@ -78,87 +116,114 @@
             </div>
 
             @if(count($busySlots))
-                <div class="alert alert-info">
+                <div class="bg-blue-100 text-blue-800 rounded-[10px] p-4 mb-4">
                     <b>⛔ Занятые слоты:</b>
-                    <br>
+                    <div class="mt-2 space-y-1">
+                        @foreach($busySlots as $slot)
+                            <div>
+                                {{ $slot['start_time'] }}
+                                -
+                                {{ $slot['end_time'] }}
 
-                    @foreach($busySlots as $slot)
-                        <div>
-                            {{ $slot['start_time'] }} - {{ $slot['end_time'] }}
-
-                            @if($slot['status'] === 'pending')
-                                (на рассмотрении)
-                            @else
-                                (занято)
-                            @endif
-                        </div>
-                    @endforeach
+                                @if($slot['status'] === 'pending')
+                                    (на рассмотрении)
+                                @else
+                                    (занято)
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             @endif
 
             <div class="mb-4">
-                <label class="form-label required">Цель бронирования</label>
+                <label class="block font-semibold text-[#495057] mb-2">
+                    Цель бронирования
+                    <span class="text-danger">*</span>
+                </label>
+
                 <textarea
                     wire:model="purpose"
-                    class="form-control"
                     rows="3"
+                    class="w-full border-2 border-[#e3e6f0] rounded-[8px]
+                           px-[15px] py-[12px]
+                           transition-all duration-300
+                           focus:border-primary
+                           focus:ring-4
+                           focus:ring-[rgba(78,115,223,0.25)]
+                           outline-none bg-white"
                     placeholder="Собрание студсовета, репетиция, занятие..."
-                    required>
-                </textarea>
+                    required></textarea>
             </div>
 
-            <div class="equipment-section mb-4">
-               
-                <h5 class="mb-3">🔧 Оборудование</h5>
-                <div class="mb-3">
-                    <label class="form-label">Необходимое оборудование</label>
+            <div class="bg-[#f8f9fa] p-5 rounded-[10px] mb-4">
+                <h5 class="font-[600] text-lg mb-4">🔧 Оборудование</h5>
+                
+                <div class="mb-4">
+                    <label class="block font-semibold text-[#495057] mb-2">Необходимое оборудование</label>
                     <textarea
                         wire:model="equipment"
-                        class="form-control"
                         rows="2"
-                        placeholder="Проектор, микрофоны, стулья...">
-                    </textarea>
-                    <small class="text-muted">Оставьте пустым, если оборудование не требуется</small>
+                        class="w-full border-2 border-[#e3e6f0] rounded-[8px]
+                               px-[15px] py-[12px]
+                               transition-all duration-300
+                               focus:border-primary
+                               focus:ring-4
+                               focus:ring-[rgba(78,115,223,0.25)]
+                               outline-none bg-white"
+                        placeholder="Проектор, микрофоны, стулья..."
+                    ></textarea>
+
+                    <small class="text-secondary text-sm">Оставьте пустым, если оборудование не требуется</small>
                 </div>
 
-                <div class="tech-support-section">
-                    <label class="form-label d-block mb-2">Нужен ли технический специалист?</label>
-                    <div class="form-check form-check-inline">
-                        <input
-                            wire:model="is_tech_support"
-                            class="form-check-input"
-                            type="radio"
-                            id="tech_support_yes"
-                            value="1">
-                        <label class="form-check-label" for="tech_support_yes">Да</label>
-                    </div>
+                <div class="bg-[#f8f9fa] rounded-[10px]">
+                    <label class="block font-semibold text-[#495057] mb-3">Нужен ли технический специалист?</label>
+                    <div class="flex gap-6">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input
+                                wire:model="is_tech_support"
+                                type="radio"
+                                value="1"
+                                class="w-4 h-4 text-primary accent-primary border-gray-300 focus:ring-primary">
 
-                    <div class="form-check form-check-inline">
-                        <input
-                            wire:model="is_tech_support"
-                            class="form-check-input"
-                            type="radio"
-                            id="tech_support_no"
-                            value="0">
+                            <span>Да</span>
+                        </label>
 
-                        <label class="form-check-label" for="tech_support_no">Нет</label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input
+                                wire:model="is_tech_support"
+                                type="radio"
+                                value="0"
+                                class="w-4 h-4 text-primary accent-primary border-gray-300 focus:ring-primary">
+
+                            <span>Нет</span>
+                        </label>
                     </div>
                 </div>
             </div>
 
             <div class="mb-4">
-                <label class="form-label">Комментарий для администратора</label>
+                <label class="block font-semibold text-[#495057] mb-2">Комментарий для администратора</label>
+
                 <textarea
                     wire:model="user_comment"
-                    class="form-control"
                     rows="3"
-                    placeholder="Дополнительная информация, пожелания, особенности мероприятия...">
-                </textarea>
+                    class="w-full border-2 border-[#e3e6f0] rounded-[8px]
+                           px-[15px] py-[12px]
+                           transition-all duration-300
+                           focus:border-primary
+                           focus:ring-4
+                           focus:ring-[rgba(78,115,223,0.25)]
+                           outline-none bg-white"
+                    placeholder="Дополнительная информация, пожелания, особенности мероприятия..."
+                ></textarea>
             </div>
 
-            <div class="alert alert-warning mb-4">
-                <h5>📋 Правила бронирования</h5>
-                <ul class="mb-0">
+            <div class="bg-warning text-[#684F06] rounded-[10px] p-5 mb-4">
+                <h5 class="font-bold text-lg mb-3">📋 Правила бронирования</h5>
+
+                <ul class="space-y-1 list-disc pl-5">
                     <li>Бронирование возможно только минимум за 24 часа до мероприятия</li>
                     <li>При использовании танцевального зала обязательна сменная обувь</li>
                     <li>Необходимо поддерживать чистоту после мероприятия</li>
@@ -167,42 +232,66 @@
                 </ul>
             </div>
 
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <div class="flex flex-col md:flex-row gap-3 md:justify-end">
                 <button
                     type="button"
-                    class="btn btn-outline-secondary me-md-2"
-                    onclick="window.location.href='/'">
+                    onclick="window.location.href='/'"
+                    class="border border-gray-300
+                           hover:bg-gray-100
+                           text-gray-700
+                           px-6 py-3
+                           rounded-[8px]
+                           transition-all duration-300">
                     На главную
                 </button>
 
                 <button
                     type="submit"
-                    class="btn btn-primary"
-                    wire:loading.attr="disabled">
+                    wire:loading.attr="disabled"
+                    class="bg-primary
+                           hover:bg-[#3a56c4]
+                           text-white
+                           font-semibold
+                           px-8 py-3
+                           rounded-[8px]
+                           transition-all duration-300
+                           hover:-translate-y-[2px]">
                     Отправить заявку
                 </button>
             </div>
+
         </form>
 
-        <div wire:loading class="loading">
-            <div class="spinner-border text-primary loading-spinner" role="status">
-                <span class="visually-hidden">Загрузка...</span>
-            </div>
-            <p class="mt-3">Отправка заявки...</p>
+        <div wire:loading.flex class="fixed inset-0 bg-[rgba(255,255,255,0.7)] z-[9999] flex-col justify-center items-center">
+            <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <p class="mt-3 text-primary font-semibold">Загрузка...</p>
         </div>
 
-        <div class="footer">
-            <p>По вопросам обращайтесь: 8 (3412) 77-60-55, доб. 1371 </p>
-            <p>Также вы можете подать заявку через <a href="https://vk.com" target="_blank">VK бота</a></p>
+        <div class="text-center mt-[30px] pt-5 border-t border-[#e3e6f0] text-secondary text-[0.9rem]">
+            <p>По вопросам обращайтесь: 8 (3412) 77-60-55, доб. 1371</p>
+            <p class="mt-2">
+                Также вы можете подать заявку через
+                <a href="https://vk.com" target="_blank" class="text-primary hover:underline">
+                    VK бота
+                </a>
+            </p>
         </div>
 
-        <div class="card p-4 mb-4">
-            <h5 class="mb-3">🔍 Фильтрация заявок</h5>
-            <div class="row">
+        <div class="bg-white border border-[#e3e6f0] rounded-[10px] p-5 mt-8 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <div>
+                    <label class="block font-semibold text-[#495057] mb-2">Статус</label>
+                    <select
+                        wire:model.live="filterStatus"
+                        class="w-full border-2 border-[#e3e6f0] rounded-[8px]
+                               px-[15px] py-[12px]
+                               transition-all duration-300
+                               focus:border-primary
+                               focus:ring-4
+                               focus:ring-[rgba(78,115,223,0.25)]
+                               outline-none bg-white">
 
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Статус</label>
-                    <select wire:model.live="filterStatus" class="form-control">
                         <option value="">Все статусы</option>
                         <option value="pending">⏳ Ожидает</option>
                         <option value="approved">✅ Одобрена</option>
@@ -210,47 +299,81 @@
                     </select>
                 </div>
 
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Дата</label>
-                    <input type="text" id="filter_date" class="form-control" placeholder="ДД.ММ.ГГГГ">
+                <div>
+                    <label class="block font-semibold text-[#495057] mb-2">Дата</label>
+                    <input
+                        type="text"
+                        id="filter_date"
+                        placeholder="ДД.ММ.ГГГГ"
+                        class="w-full border-2 border-[#e3e6f0] rounded-[8px]
+                               px-[15px] py-[12px]
+                               transition-all duration-300
+                               focus:border-primary
+                               focus:ring-4
+                               focus:ring-[rgba(78,115,223,0.25)]
+                               outline-none bg-white">
                 </div>
 
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Аудитория</label>
+                <div>
+                    <label class="block font-semibold text-[#495057] mb-2">Аудитория</label>
+                    <select
+                        wire:model.live="filterClassroom"
+                        class="w-full border-2 border-[#e3e6f0] rounded-[8px]
+                               px-[15px] py-[12px]
+                               transition-all duration-300
+                               focus:border-primary
+                               focus:ring-4
+                               focus:ring-[rgba(78,115,223,0.25)]
+                               outline-none bg-white">
 
-                    <select wire:model.live="filterClassroom" class="form-control">
                         <option value="">Все аудитории</option>
+
                         @foreach($classrooms as $classroom)
-                            <option value="{{ $classroom->id }}">{{ $classroom->room }}</option>
+                            <option value="{{ $classroom->id }}">
+                                {{ $classroom->room }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
             </div>
 
-            <div class="mt-2">
-                <button wire:click="resetFilters" class="btn btn-outline-secondary btn-sm" type="button">
+            <div class="mt-4">
+                <button
+                    wire:click="resetFilters"
+                    type="button"
+                    class="border border-gray-300
+                           hover:bg-gray-100
+                           text-gray-700
+                           px-4 py-2
+                           rounded-[8px]
+                           transition-all duration-300">
                     Сбросить фильтры
                 </button>
             </div>
         </div>
 
-        <div class='my-bookings mt-15'>
-            <h2 class="text-xl font-bold mb-4 text-center">📋 Мои заявки</h2>
+        <div class="mt-10">
+            <h2 class="text-2xl font-bold mb-6 text-center">📋 Мои заявки</h2>
 
             @forelse($bookings as $booking)
-                <div class="bg-white rounded-xl shadow p-4 mb-4 border">
-                    <div class="flex justify-between mb-2">
-                        <span class="font-semibold">Аудитория {{ $booking->classroom->room }}</span>
+                <div class="bg-white rounded-xl shadow p-4 mb-4 border border-[#e3e6f0]">
+                    
+                    <div class="flex flex-col md:flex-row md:justify-between gap-2 mb-2">
+                        <span class="font-semibold">
+                            Аудитория
+                            {{ $booking->classroom->room }}
+                        </span>
 
-                        <span class="text-sm
+                        <span
+                            class="text-sm font-semibold
+
                             @if($booking->status === 'pending')
                                 text-yellow-600
                             @elseif($booking->status === 'approved')
                                 text-green-600
                             @elseif($booking->status === 'rejected')
                                 text-red-600
-                            @endif
-                            ">
+                            @endif">
 
                             {{ match($booking->status) {
                                 'pending' => '⏳ Ожидает',
@@ -268,31 +391,29 @@
                         {{ $booking->end_time }}
                     </div>
 
-                    <div class="mt-2">
-                        <b>Цель:</b>
-                        {{ $booking->purpose }}
+                    <div class="mt-3">
+                        <b>Цель:</b> {{ $booking->purpose }}
                     </div>
 
                     @if($booking->user_comment)
-                        <div class="text-gray-500 text-sm mt-1">
+                        <div class="text-gray-500 text-sm mt-2">
                             {{ $booking->user_comment }}
                         </div>
                     @endif
 
                     @if($booking->admin_comment)
-                        <div class="text-gray-500 text-sm mt-1">
+                        <div class="text-gray-500 text-sm mt-2">
                             <b>Комментарий администратора:</b>
                             {{ $booking->admin_comment }}
                         </div>
                     @endif
                 </div>
             @empty
-                <div class="text-gray-500">У вас пока нет заявок</div>
+                <div class="text-gray-500 text-center">Заявок не найдено</div>
             @endforelse
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
 
@@ -334,7 +455,6 @@
                             value.substring(0, 2)
                             + ':'
                             + value.substring(2, 4);
-
                     } else if (value.length >= 1) {
                         if (parseInt(value) > 23) {
                             value = '23';
@@ -356,7 +476,6 @@
                 document.getElementById('end_time'),
                 'end_time'
             );
-
         });
     </script>
 </div>

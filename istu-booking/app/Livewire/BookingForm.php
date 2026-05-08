@@ -85,16 +85,6 @@ class BookingForm extends Component
         $this->dispatch('resetFilterDate');
     }
 
-    // public function updatedClassroomId()
-    // {
-    //     $this->loadBusySlots();
-    // }
-
-    // public function updatedDate()
-    // {
-    //     $this->loadBusySlots();
-    // }
-
     public function loadBusySlots()
     {
         if (!$this->classroom_id || !$this->date) {
