@@ -6,7 +6,7 @@
     <div class="booking-container">
         <div class="header">
             <h1>Бронирование аудитории</h1>
-            <p class="subtitle">Заполните форму для бронирования аудитории</p>
+            <p class="subtitle">Заполните форму, отправьте заявку и мы её рассмотрим</p>
         </div>
 
         <div id="errorAlert" class="alert alert-danger d-none" role="alert"></div>
@@ -22,7 +22,7 @@
                         <option value="{{$classroom->id}}">{{$classroom->room}}</option>
                     @endforeach
                 </select>
-                <small class="text-muted">Вы можете выбрать из списка или ввести свою аудиторию</small>
+                <small class="text-muted">Выберите из списка</small>
             </div>
 
             <div class="row mb-4">
@@ -48,7 +48,7 @@
             <div class="mb-4">
                 <label for="purpose" class="form-label required">Цель бронирования</label>
                 <textarea name="purpose" class="form-control" id="purpose" rows="3"
-                          placeholder="Опишите цель мероприятия (собрание студсовета, репетиция, занятие и т.д.)"
+                          placeholder="Собрание студсовета, репетиция, занятие..."
                           required></textarea>
             </div>
 
@@ -57,7 +57,7 @@
                 <div class="mb-3">
                     <label for="equipment" class="form-label">Необходимое оборудование</label>
                     <textarea name="equipment" class="form-control" id="equipment" rows="2"
-                              placeholder="Опишите необходимое оборудование (проектор, микрофоны, стулья и т.д.)"></textarea>
+                              placeholder="Проектор, микрофоны, стулья..."></textarea>
                     <small class="text-muted">Оставьте пустым, если оборудование не требуется</small>
                 </div>
 

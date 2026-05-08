@@ -173,7 +173,7 @@ class Classrooms extends Component
             'type' => $this->newType
         ]);
 
-        $this->showBuildingModal = false;
+        $this->showTypeModal = false;
         $this->newType = null;
         $this->loadData();
     }
@@ -200,6 +200,7 @@ class Classrooms extends Component
             'newBuildingTypeId'
         ]);
 
+        $this->showBuildingModal = false;
         $this->loadData();
     }
 

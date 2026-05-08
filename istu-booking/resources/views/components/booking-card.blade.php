@@ -69,7 +69,13 @@
 
         <div class="application-detail">
             <div class="label">Комментарий студента:</div>
-            <div class="value application-comment">{{$booking->user_comment}}</div>
+            <div class="value application-comment">
+                @if($booking->user_comment)
+                    {{$booking->user_comment}}
+                @else
+                    -
+                @endif
+            </div>
         </div>
 
         <div class="application-detail">
