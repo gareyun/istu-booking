@@ -19,7 +19,8 @@ class Booking extends Model
         'is_tech_support',
         'user_comment',
         'admin_comment',
-        'google_event_id'
+        'google_event_id',
+        'vk_link'
     ];
 
     public function user()

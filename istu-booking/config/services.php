@@ -43,4 +43,9 @@ return [
         'floor_2' => env('GOOGLE_CALENDAR_ROOM_floor_2'),
     ],
 
+    'vk' => [
+        'access_token' => env('VK_ACCESS_TOKEN'),
+        'community_id' => env('VK_COMMUNITY_ID'),
+    ],
+
 ];

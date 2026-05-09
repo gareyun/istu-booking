@@ -20,6 +20,7 @@ class BookingForm extends Component
     public $equipment;
     public $is_tech_support = 0;
     public $user_comment;
+    public $vk_link;
 
     public $busySlots = [];
 
@@ -120,6 +121,7 @@ class BookingForm extends Component
             'equipment' => 'nullable|string',
             'is_tech_support' => 'required|boolean',
             'user_comment' => 'nullable|string',
+            'vk_link' => 'nullable|string|max:255',
         ]);
 
         $exists = Booking::where('classroom_id', $validated['classroom_id'])
@@ -151,6 +153,7 @@ class BookingForm extends Component
             'purpose',
             'equipment',
             'user_comment',
+            'vk_link'
         ]);
 
         $this->is_tech_support = 0;

@@ -203,6 +203,24 @@
                 ></textarea>
             </div>
 
+            <div class="mb-4">
+                <label class="block font-semibold text-[#495057] mb-2">
+                    Ссылка на VK (для уведомлений)
+                </label>
+                
+                <input
+                    type="text"
+                    wire:model="vk_link"
+                    class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] 
+                        transition-all duration-300 focus:border-primary focus:ring-4 
+                        focus:ring-[rgba(78,115,223,0.25)] outline-none bg-white"
+                    placeholder="https://vk.com/id123456789 или https://vk.com/username">
+                
+                <small class="text-secondary text-sm mt-1 block">
+                    Укажите ссылку на вашу страницу ВКонтакте, чтобы получать уведомления о статусе заявки
+                </small>
+            </div>
+
             <div class="bg-warning text-[#684F06] rounded-[10px] p-5 mb-4">
                 <h5 class="font-bold text-lg mb-3">📋 Правила бронирования</h5>
 

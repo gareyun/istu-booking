@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Booking;
 use App\Models\Classroom;
 use App\Services\GoogleCalendarService;
+use App\Services\VkNotificationService;
 
 class BookingAdminPanel extends Component
 {
@@ -27,9 +28,13 @@ class BookingAdminPanel extends Component
         if ($action === 'approved') {
             $booking->status = 'approved';
 
-            $eventId = app(GoogleCalendarService::class)->createEvent($booking);
-
-            $booking->google_event_id = $eventId;
+            try {
+                $eventId = app(GoogleCalendarService::class)->createEvent($booking);
+                $booking->google_event_id = $eventId;
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Google Calendar error: ' . $e->getMessage());
+            }
+            
 
         } elseif ($action === 'rejected') {
             $booking->status = 'rejected';
@@ -38,6 +43,12 @@ class BookingAdminPanel extends Component
         $booking->admin_comment = $this->adminComments[$bookingId] ?? null;
 
         $booking->save();
+
+        try {
+            app(VkNotificationService::class)->notifyStatusChange($booking);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('VK notification error: ' . $e->getMessage());
+        }
 
         session()->flash(
             'success',
