@@ -195,14 +195,14 @@
                             <div class="flex gap-[10px] mt-[15px]">
                                 <button
                                     wire:click="updateStatus({{ $booking->id }}, 'approved')"
-                                    class="flex-1 px-[15px] py-[8px] rounded-[5px] font-bold
+                                    class="flex-1 px-[15px] py-[8px] rounded-[5px] font-bold cursor-pointer
                                            transition-all duration-200 bg-[#27ae60] text-white hover:opacity-90">
                                     Принять
                                 </button>
 
                                 <button
                                     wire:click="updateStatus({{ $booking->id }}, 'rejected')"
-                                    class="flex-1 px-[15px] py-[8px] rounded-[5px] font-bold
+                                    class="flex-1 px-[15px] py-[8px] rounded-[5px] font-bold cursor-pointer
                                            transition-all duration-200 bg-[#e74c3c] text-white hover:opacity-90">
                                     Отклонить
                                 </button>

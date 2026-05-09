@@ -22,6 +22,10 @@
             </div>
         @endif
 
+        <a href="{{ route('schedule') }}" class="btn...">
+            📅 Расписание
+        </a>
+
         <form wire:submit.prevent="submit">
 
             <div class="mb-4">

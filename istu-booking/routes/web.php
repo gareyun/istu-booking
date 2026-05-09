@@ -5,6 +5,7 @@ use App\Http\Controllers\BookingUserController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\AdminPanelController;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\ClassroomSchedule;
 
 Route::get('/', [ClassroomController::class, 'index']);
 
@@ -26,3 +27,7 @@ Route::get('/booking', function () {
 Route::get('/admin', function() {
     return view('admin');
 })->name('admin');
+
+Route::get('/schedule', function() {
+    return view('schedule');
+})->name('schedule');
