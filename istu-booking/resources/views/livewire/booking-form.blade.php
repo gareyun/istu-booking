@@ -30,27 +30,32 @@
                     <span class="text-danger">*</span>
                 </label>
 
-                <select
-                    wire:model.live="classroom_id"
-                    class="w-full border-2 border-[#e3e6f0] rounded-[8px]
-                           px-[15px] py-[12px]
-                           transition-all duration-300
-                           focus:border-primary
-                           focus:ring-4
-                           focus:ring-[rgba(78,115,223,0.25)]
-                           outline-none bg-white"
-                    required>
+                <div class="select-block relative">
+                    <select
+                        wire:model.live="classroom_id"
+                        class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
+                            focus:border-primary focus:ring-4 appearance-none focus:ring-[rgba(78,115,223,0.25)]
+                            outline-none bg-white cursor-pointer"
+                        required>
 
-                    <option value="">Выберите аудиторию</option>
+                        <option value="">Выберите аудиторию</option>
 
-                    @foreach ($classrooms as $classroom)
-                        <option value="{{ $classroom->id }}">
-                            {{ $classroom->room }}
-                        </option>
-                    @endforeach
-                </select>
+                        @foreach ($classrooms as $classroom)
+                            <option value="{{ $classroom->id }}">
+                                {{ $classroom->room }}
+                            </option>
+                        @endforeach
+                    </select>
 
-                <small class="text-secondary text-sm">Выберите из списка</small>
+                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </div>
+                
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
@@ -65,12 +70,8 @@
                         <input
                             type="text"
                             id="event_date"
-                            class="w-full border-2 border-[#e3e6f0] rounded-[8px]
-                                   px-[15px] py-[12px]
-                                   transition-all duration-300
-                                   focus:border-primary
-                                   focus:ring-4
-                                   focus:ring-[rgba(78,115,223,0.25)]
+                            class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
+                                   focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
                                    outline-none bg-white"
                             placeholder="ДД.ММ.ГГГГ"
                             required>
@@ -87,27 +88,21 @@
                         <input
                             type="text"
                             id="start_time"
-                            class="w-full border-2 border-[#e3e6f0] rounded-[8px]
-                                   px-[15px] py-[12px]
-                                   transition-all duration-300
-                                   focus:border-primary
-                                   focus:ring-4
-                                   focus:ring-[rgba(78,115,223,0.25)]
+                            wire:model="start_time"
+                            class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
+                                   focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
                                    outline-none bg-white"
                             placeholder="14:30"
                             required>
 
-                        <span class="text-2xl font-bold text-secondary rotate-90 md:rotate-0">—</span>
+                        <span class="text-xl font-bold text-secondary">—</span>
 
                         <input
                             type="text"
                             id="end_time"
-                            class="w-full border-2 border-[#e3e6f0] rounded-[8px]
-                                   px-[15px] py-[12px]
-                                   transition-all duration-300
-                                   focus:border-primary
-                                   focus:ring-4
-                                   focus:ring-[rgba(78,115,223,0.25)]
+                            wire:model="end_time"
+                            class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
+                                   focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
                                    outline-none bg-white"
                             placeholder="16:00"
                             required>
@@ -145,13 +140,9 @@
                 <textarea
                     wire:model="purpose"
                     rows="3"
-                    class="w-full border-2 border-[#e3e6f0] rounded-[8px]
-                           px-[15px] py-[12px]
-                           transition-all duration-300
-                           focus:border-primary
-                           focus:ring-4
-                           focus:ring-[rgba(78,115,223,0.25)]
-                           outline-none bg-white"
+                    class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
+                        focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
+                        outline-none bg-white"
                     placeholder="Собрание студсовета, репетиция, занятие..."
                     required></textarea>
             </div>
@@ -164,12 +155,8 @@
                     <textarea
                         wire:model="equipment"
                         rows="2"
-                        class="w-full border-2 border-[#e3e6f0] rounded-[8px]
-                               px-[15px] py-[12px]
-                               transition-all duration-300
-                               focus:border-primary
-                               focus:ring-4
-                               focus:ring-[rgba(78,115,223,0.25)]
+                        class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
+                               focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
                                outline-none bg-white"
                         placeholder="Проектор, микрофоны, стулья..."
                     ></textarea>
@@ -209,12 +196,8 @@
                 <textarea
                     wire:model="user_comment"
                     rows="3"
-                    class="w-full border-2 border-[#e3e6f0] rounded-[8px]
-                           px-[15px] py-[12px]
-                           transition-all duration-300
-                           focus:border-primary
-                           focus:ring-4
-                           focus:ring-[rgba(78,115,223,0.25)]
+                    class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
+                        focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
                            outline-none bg-white"
                     placeholder="Дополнительная информация, пожелания, особенности мероприятия..."
                 ></textarea>
@@ -236,26 +219,16 @@
                 <button
                     type="button"
                     onclick="window.location.href='/'"
-                    class="border border-gray-300
-                           hover:bg-gray-100
-                           text-gray-700
-                           px-6 py-3
-                           rounded-[8px]
-                           transition-all duration-300">
+                    class="border border-gray-300 hover:bg-gray-100 text-gray-700 px-6 py-3
+                           rounded-[8px] transition-all duration-300 cursor-pointer">
                     На главную
                 </button>
 
                 <button
                     type="submit"
                     wire:loading.attr="disabled"
-                    class="bg-primary
-                           hover:bg-[#3a56c4]
-                           text-white
-                           font-semibold
-                           px-8 py-3
-                           rounded-[8px]
-                           transition-all duration-300
-                           hover:-translate-y-[2px]">
+                    class="bg-primary hover:bg-[#3a56c4] text-white font-semibold px-8 py-3
+                           rounded-[8px] transition-all duration-300 hover:-translate-y-[2px] cursor-pointer">
                     Отправить заявку
                 </button>
             </div>
@@ -282,21 +255,28 @@
                 
                 <div>
                     <label class="block font-semibold text-[#495057] mb-2">Статус</label>
-                    <select
-                        wire:model.live="filterStatus"
-                        class="w-full border-2 border-[#e3e6f0] rounded-[8px]
-                               px-[15px] py-[12px]
-                               transition-all duration-300
-                               focus:border-primary
-                               focus:ring-4
-                               focus:ring-[rgba(78,115,223,0.25)]
-                               outline-none bg-white">
 
-                        <option value="">Все статусы</option>
-                        <option value="pending">⏳ Ожидает</option>
-                        <option value="approved">✅ Одобрена</option>
-                        <option value="rejected">❌ Отклонена</option>
-                    </select>
+                    <div class="select-block relative">
+                        <select
+                            wire:model.live="filterStatus"
+                            class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
+                                focus:border-primary focus:ring-4 appearance-none focus:ring-[rgba(78,115,223,0.25)]
+                                outline-none bg-white cursor-pointer">
+
+                            <option value="">Все статусы</option>
+                            <option value="pending">⏳ Ожидает</option>
+                            <option value="approved">✅ Одобрена</option>
+                            <option value="rejected">❌ Отклонена</option>
+                        </select>
+
+                        <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24">
+
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
                 </div>
 
                 <div>
@@ -305,35 +285,38 @@
                         type="text"
                         id="filter_date"
                         placeholder="ДД.ММ.ГГГГ"
-                        class="w-full border-2 border-[#e3e6f0] rounded-[8px]
-                               px-[15px] py-[12px]
-                               transition-all duration-300
-                               focus:border-primary
-                               focus:ring-4
-                               focus:ring-[rgba(78,115,223,0.25)]
+                        class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
+                               focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
                                outline-none bg-white">
                 </div>
 
                 <div>
                     <label class="block font-semibold text-[#495057] mb-2">Аудитория</label>
-                    <select
-                        wire:model.live="filterClassroom"
-                        class="w-full border-2 border-[#e3e6f0] rounded-[8px]
-                               px-[15px] py-[12px]
-                               transition-all duration-300
-                               focus:border-primary
-                               focus:ring-4
-                               focus:ring-[rgba(78,115,223,0.25)]
-                               outline-none bg-white">
 
-                        <option value="">Все аудитории</option>
+                    <div class="select-block relative">
+                        <select
+                            wire:model.live="filterClassroom"
+                            class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
+                                focus:border-primary focus:ring-4 appearance-none focus:ring-[rgba(78,115,223,0.25)]
+                                outline-none bg-white cursor-pointer">
 
-                        @foreach($classrooms as $classroom)
-                            <option value="{{ $classroom->id }}">
-                                {{ $classroom->room }}
-                            </option>
-                        @endforeach
-                    </select>
+                            <option value="">Все аудитории</option>
+
+                            @foreach($classrooms as $classroom)
+                                <option value="{{ $classroom->id }}">
+                                    {{ $classroom->room }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24">
+
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
                 </div>
             </div>
 
@@ -341,13 +324,13 @@
                 <button
                     wire:click="resetFilters"
                     type="button"
-                    class="border border-gray-300
-                           hover:bg-gray-100
-                           text-gray-700
-                           px-4 py-2
-                           rounded-[8px]
-                           transition-all duration-300">
-                    Сбросить фильтры
+                    class="px-6 py-3 text-white rounded-[10px] text-[16px]
+                        font-semibold transition-all duration-300
+                        shadow-[0_4px_15px_rgba(231,76,60,0.3)]
+                        bg-gradient-to-br from-[#c2433a] to-[#EB4C42]
+                        hover:-translate-y-[2px] cursor-pointer
+                        hover:shadow-[0_6px_20px_rgba(231,76,60,0.45)]">
+                    Сбросить
                 </button>
             </div>
         </div>
@@ -446,7 +429,7 @@
                 }
             });
 
-            function setupTimeMask(element, field) {
+            function setupTimeMask(element) {
                 element.addEventListener('input', function(e) {
                     let value = e.target.value.replace(/\D/g, '');
 
@@ -462,19 +445,15 @@
                     }
 
                     e.target.value = value.substring(0, 5);
-                    @this.set(field, e.target.value);
                 });
-
             }
 
             setupTimeMask(
-                document.getElementById('start_time'),
-                'start_time'
+                document.getElementById('start_time')
             );
 
             setupTimeMask(
-                document.getElementById('end_time'),
-                'end_time'
+                document.getElementById('end_time')
             );
         });
     </script>

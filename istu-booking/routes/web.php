@@ -7,8 +7,6 @@ use App\Http\Controllers\AdminPanelController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ClassroomController::class, 'index']);
-Route::get('/admin', [BookingAdminController::class, 'index'])->name('admin');
-Route::get('/booking', [BookingUserController::class, 'index']);
 
 Route::post('/bookings/{booking}/status', [BookingAdminController::class, 'updateStatus'])->name('booking.updateStatus');
 Route::post('/admin/classrooms', [AdminPanelController::class, 'store'])->name('classrooms.store');
@@ -24,3 +22,7 @@ Route::post('/admin/categories', [AdminPanelController::class, 'storeCategory'])
 Route::get('/booking', function () {
     return view('booking');
 });
+
+Route::get('/admin', function() {
+    return view('admin');
+})->name('admin');

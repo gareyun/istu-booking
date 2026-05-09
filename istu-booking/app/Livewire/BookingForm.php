@@ -57,6 +57,16 @@ class BookingForm extends Component
             ->get();
     }
 
+    public function updatedClassroomId()
+    {
+        $this->loadBusySlots();
+    }
+
+    public function updatedDate()
+    {
+        $this->loadBusySlots();
+    }
+
     public function updatedFilterStatus()
     {
         $this->loadBookings();

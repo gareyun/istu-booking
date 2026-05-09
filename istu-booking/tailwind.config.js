@@ -15,7 +15,7 @@ export default {
                 danger: '#e74a3b',
                 success: '#1cc88a',
                 warning: '#FFF3CD',
-            }
+            },
         },
     },
     plugins: [],
