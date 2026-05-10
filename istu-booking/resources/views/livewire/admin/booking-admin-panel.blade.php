@@ -127,6 +127,9 @@
                             <div class="text-[0.9rem] text-[#7f8c8d]">
                                 ID: {{ $booking->id }}
                             </div>
+                            @if(!$booking->user_id && $booking->vk_user_id)
+                                <div class="text-xs text-gray-400 mt-2">через VK бота</div>
+                            @endif
                         </div>
 
                         <div class="text-[1.3rem] font-bold text-[#1a2a6c] mb-[15px]">
@@ -136,12 +139,24 @@
                         <div class="space-y-[8px]">
                             <div class="flex justify-between">
                                 <div class="font-bold text-[#7f8c8d]">ФИО: </div>
-                                <div>{{ $booking->user->name }}</div>
+                                <div>
+                                    @if($booking->user)
+                                        {{ $booking->user->name }}
+                                    @else
+                                        {{ $booking->name ?? '—' }}
+                                    @endif
+                                </div>
                             </div>
 
                             <div class="flex justify-between">
                                 <div class="font-bold text-[#7f8c8d]">Группа: </div>
-                                <div>{{ $booking->user->group }}</div>
+                                <div>
+                                    @if($booking->user)
+                                        {{ $booking->user->group ?? '—' }}
+                                    @else
+                                        {{ $booking->group ?? '—' }}
+                                    @endif
+                                </div>
                             </div>
 
                             <div class="flex justify-between">

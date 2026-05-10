@@ -12,7 +12,7 @@
             <select
                 wire:model.live="selectedClassroom"
                 class="w-full md:w-64 border-2 border-gray-300 rounded-lg px-4 py-2
-                        focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400">
+                        focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 cursor-pointer">
                 <option value="">-- Выберите аудиторию --</option>
                 @foreach($classrooms as $classroom)
                     <option value="{{ $classroom->id }}">{{ $classroom->room }}</option>
@@ -23,7 +23,7 @@
         @if($selectedClassroom)
         <div class="flex items-center gap-3">
             <button wire:click="prevWeek"
-                class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition cursor-pointer">
                 ← Пред. неделя
             </button>
             <span class="text-gray-800 font-semibold whitespace-nowrap">
@@ -32,7 +32,7 @@
                 {{ \Carbon\Carbon::parse($weekDays[6]['date'])->format('d.m.Y') }}
             </span>
             <button wire:click="nextWeek"
-                class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition cursor-pointer">
                 След. неделя →
             </button>
         </div>

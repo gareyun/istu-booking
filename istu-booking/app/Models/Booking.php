@@ -20,7 +20,11 @@ class Booking extends Model
         'user_comment',
         'admin_comment',
         'google_event_id',
-        'vk_link'
+        'vk_link',
+        'vk_user_id',
+        'name',
+        'faculty',
+        'group',
     ];
 
     public function user()
