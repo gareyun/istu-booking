@@ -12,21 +12,21 @@ class UserSeeder extends Seeder
     {
         $users = User::count() < 3 ? [
             User::create([
-                'name' => 'Иванов Иван',
+                'name' => 'Иванов Александр Михайлович',
                 'email' => 'mail1@example.com',
                 'group' => 'Б22-191-2',
                 'password' => bcrypt('password')
             ]),
             User::create([
-                'name' => 'Александров Александр',
+                'name' => 'Александров Иван Алексеевич',
                 'email' => 'mail2@example.com',
                 'group' => 'Б22-191-1',
                 'password' => bcrypt('password')
             ]),
             User::create([
-                'name' => 'Джонов Джон',
+                'name' => 'Алексеев Анатолий Юрьевич',
                 'email' => 'mail3@example.com',
-                'group' => 'Б22',
+                'group' => 'Б22-191-3',
                 'password' => bcrypt('password')
             ])
         ] : User::get();

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->boolean('is_tech_support');
             $table->string('user_comment')->nullable();
             $table->string('admin_comment')->nullable();
-            $table->enum('status', ['pending','approved','rejected'])->default('pending');
+            $table->enum('status', ['pending','approved','rejected', 'cancelled'])->default('pending');
             $table->string('google_event_id', 200)->nullable();
             $table->string('vk_link')->nullable();
             $table->string('vk_user_id')->nullable();

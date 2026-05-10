@@ -22,9 +22,9 @@
             </div>
         @endif
 
-        <a href="{{ route('schedule') }}" class="btn...">
+        {{-- <a href="{{ route('schedule') }}" class="btn...">
             📅 Расписание
-        </a>
+        </a> --}}
 
         <form wire:submit.prevent="submit">
 
@@ -209,7 +209,7 @@
 
             <div class="mb-4">
                 <label class="block font-semibold text-[#495057] mb-2">
-                    Ссылка на VK (для уведомлений)
+                    Страница ВКонтакте
                 </label>
                 
                 <input
@@ -218,7 +218,7 @@
                     class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] 
                         transition-all duration-300 focus:border-primary focus:ring-4 
                         focus:ring-[rgba(78,115,223,0.25)] outline-none bg-white"
-                    placeholder="https://vk.com/id123456789 или https://vk.com/username">
+                    placeholder="Ссылка или username">
                 
                 <small class="text-secondary text-sm mt-1 block">
                     Укажите ссылку на вашу страницу ВКонтакте, чтобы получать уведомления о статусе заявки
@@ -238,14 +238,6 @@
             </div>
 
             <div class="flex flex-col md:flex-row gap-3 md:justify-end">
-                <button
-                    type="button"
-                    onclick="window.location.href='/'"
-                    class="border border-gray-300 hover:bg-gray-100 text-gray-700 px-6 py-3
-                           rounded-[8px] transition-all duration-300 cursor-pointer">
-                    На главную
-                </button>
-
                 <button
                     type="submit"
                     wire:loading.attr="disabled"
@@ -289,6 +281,7 @@
                             <option value="pending">⏳ Ожидает</option>
                             <option value="approved">✅ Одобрена</option>
                             <option value="rejected">❌ Отклонена</option>
+                            <option value="cancelled">🚫 Отменена</option>
                         </select>
 
                         <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
@@ -376,7 +369,7 @@
                                 text-yellow-600
                             @elseif($booking->status === 'approved')
                                 text-green-600
-                            @elseif($booking->status === 'rejected')
+                            @elseif($booking->status === 'rejected' || $booking->status === 'cancelled')
                                 text-red-600
                             @endif">
 
@@ -384,6 +377,7 @@
                                 'pending' => '⏳ Ожидает',
                                 'approved' => '✅ Одобрена',
                                 'rejected' => '❌ Отклонена',
+                                'cancelled' => '❌ Отменена',
                             } }}
                         </span>
                     </div>

@@ -136,12 +136,14 @@ class VkNotificationService
         $statusEmoji = match($booking->status) {
             'approved' => '✅',
             'rejected' => '❌',
+            'cancelled' => '❌',
             default => '📋'
         };
 
         $statusText = match($booking->status) {
             'approved' => 'ОДОБРЕНА',
             'rejected' => 'ОТКЛОНЕНА',
+            'cancelled' => 'ОТМЕНЕНА',
             default => 'ОБНОВЛЁН'
         };
 
@@ -160,6 +162,8 @@ class VkNotificationService
             $message .= "\n\nПожалуйста, ознакомьтесь с правилами использования аудитории.";
         } elseif ($booking->status === 'rejected') {
             $message .= "\n\nВы можете подать новую заявку на другую дату или аудиторию.";
+        } elseif ($booking->status === 'cancelled') {
+            $message .= "\n\nБронь была отменена администратором. Вы можете подать новую заявку.";
         }
 
         return $this->sendMessage($userId, $message);

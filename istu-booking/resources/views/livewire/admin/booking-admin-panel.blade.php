@@ -11,6 +11,12 @@
             </div>
         @endif
 
+        @if(session()->has('error'))
+            <div class="mb-5 bg-red-500 text-white px-5 py-4 rounded-[10px] shadow">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <div class="mb-5">
             <a href="{{ route('admin.classrooms') }}"
                class="inline-block mr-[10px] px-6 py-3 text-white rounded-[10px] text-[16px] font-semibold
@@ -24,19 +30,17 @@
         <div class="bg-white rounded-[10px] shadow-[0_4px_15px_rgba(0,0,0,0.08)] p-5 mb-5">
             <div class="flex flex-wrap gap-4 items-end mb-[20px]">
 
-                <div class="flex flex-col">
+                <div class="flex flex-col min-w-[220px]">
                     <label class="mb-2 font-semibold text-[#1a2a6c]">
                         Дата
                     </label>
 
                     <div wire:ignore>
-                        <input
-                            type="text"
-                            id="admin_filter_date"
-                            placeholder="ДД.ММ.ГГГГ"
-                            class="px-4 py-3 border-2 border-[#e0e0e0] rounded-[10px]
+                        <input type="text" id="admin_filter_date" placeholder="ДД.ММ.ГГГГ"
+                                class="px-4 py-3 border-2 border-[#e0e0e0] rounded-[10px]
                                 focus:outline-none focus:border-[#3456db]
-                                transition-all duration-300 bg-white min-w-[220px]">
+                                font-medium transition-all duration-300 bg-white min-w-[220px]
+                                focus:shadow-[0_0_0_4px_rgba(52,86,219,0.12)] hover:border-[#c7c7c7] cursor-pointer">
                     </div>
                 </div>
 
@@ -45,20 +49,53 @@
                         Аудитория
                     </label>
 
-                    <select
-                        wire:model.live="selectedClassroom"
-                        class="px-4 py-3 border-2 border-[#e0e0e0] rounded-[10px]
-                            focus:outline-none focus:border-[#3456db]
-                            transition-all duration-300">
+                    <div class="relative">
+                        <select wire:model.live="selectedClassroom"
+                                class="w-full appearance-none px-4 py-3 pr-10
+                                border-2 border-[#e0e0e0]  rounded-[10px]  bg-white  text-[#333]
+                                font-medium transition-all duration-300 focus:outline-none focus:border-[#3456db]
+                                focus:shadow-[0_0_0_4px_rgba(52,86,219,0.12)] hover:border-[#c7c7c7] cursor-pointer">
 
-                        <option value="">Все аудитории</option>
+                            <option value="">Все аудитории</option>
 
-                        @foreach($classrooms as $classroom)
-                            <option value="{{ $classroom->id }}">
-                                {{ $classroom->room }}
-                            </option>
-                        @endforeach
-                    </select>
+                            @foreach($classrooms as $classroom)
+                                <option value="{{ $classroom->id }}">
+                                    {{ $classroom->room }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4
+                            text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="flex flex-col min-w-[220px]">
+                    <label class="mb-2 font-semibold text-[#1a2a6c]">
+                        Статус заявки
+                    </label>
+
+                    <div class="relative">
+                        <select wire:model.live="status"
+                                class="w-full appearance-none px-4 py-3 pr-10
+                                border-2 border-[#e0e0e0]  rounded-[10px]  bg-white  text-[#333]
+                                font-medium transition-all duration-300 focus:outline-none focus:border-[#3456db]
+                                focus:shadow-[0_0_0_4px_rgba(52,86,219,0.12)] hover:border-[#c7c7c7] cursor-pointer">
+
+                            <option value="">Все статусы</option>
+                            <option value="pending">⏳ В ожидании</option>
+                            <option value="approved">✅ Одобренные</option>
+                            <option value="rejected">❌ Отклонённые</option>
+                            <option value="cancelled">🚫 Отменённые</option>
+                        </select>
+
+                        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4
+                            text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
                 </div>
 
                 <button
@@ -70,48 +107,6 @@
                         hover:-translate-y-[2px] cursor-pointer
                         hover:shadow-[0_6px_20px_rgba(231,76,60,0.45)]">
                     Сбросить
-                </button>
-            </div>
-
-            <div class="flex flex-wrap gap-[10px] mb-5">
-                <button
-                    wire:click="setStatus('')"
-                    class="px-5 py-[10px] rounded-[5px] font-bold transition-all duration-300 cursor-pointer
-                        {{ !$status
-                            ? 'bg-[#1a2a6c] text-white'
-                            : 'bg-[#e0e0e0] text-black'
-                        }}">
-                    Все
-                </button>
-
-                <button
-                    wire:click="setStatus('pending')"
-                    class="px-5 py-[10px] rounded-[5px] font-bold transition-all duration-300 cursor-pointer
-                        {{ $status === 'pending'
-                            ? 'bg-[#1a2a6c] text-white'
-                            : 'bg-[#e0e0e0] text-black'
-                        }}">
-                    В ожидании
-                </button>
-
-                <button
-                    wire:click="setStatus('approved')"
-                    class="px-5 py-[10px] rounded-[5px] font-bold transition-all duration-300 cursor-pointer
-                        {{ $status === 'approved'
-                            ? 'bg-[#1a2a6c] text-white'
-                            : 'bg-[#e0e0e0] text-black'
-                        }}">
-                    Одобренные
-                </button>
-
-                <button
-                    wire:click="setStatus('rejected')"
-                    class="px-5 py-[10px] rounded-[5px] font-bold transition-all duration-300 cursor-pointer
-                        {{ $status === 'rejected'
-                            ? 'bg-[#1a2a6c] text-white'
-                            : 'bg-[#e0e0e0] text-black'
-                        }}">
-                    Отклонённые
                 </button>
             </div>
         </div>
@@ -136,7 +131,7 @@
                             Аудитория: {{ $booking->classroom->room }}
                         </div>
 
-                        <div class="space-y-[8px]">
+                        <div class="space-y-[7px]">
                             <div class="flex justify-between">
                                 <div class="font-bold text-[#7f8c8d]">ФИО: </div>
                                 <div>
@@ -210,15 +205,25 @@
                             <div class="flex gap-[10px] mt-[15px]">
                                 <button
                                     wire:click="updateStatus({{ $booking->id }}, 'approved')"
-                                    class="flex-1 px-[15px] py-[8px] rounded-[5px] font-bold cursor-pointer
-                                           transition-all duration-200 bg-[#27ae60] text-white hover:opacity-90">
+                                    class="flex-1 py-2
+                                        bg-gradient-to-br from-[#1f9d55] to-[#27ae60]
+                                        transition-all duration-300
+                                        shadow-[0_4px_15px_rgba(39,174,96,0.3)]
+                                        text-white rounded-lg cursor-pointer
+                                        font-semibold
+                                        hover:shadow-[0_6px_20px_rgba(39,174,96,0.45)]">
                                     Принять
                                 </button>
 
                                 <button
                                     wire:click="updateStatus({{ $booking->id }}, 'rejected')"
-                                    class="flex-1 px-[15px] py-[8px] rounded-[5px] font-bold cursor-pointer
-                                           transition-all duration-200 bg-[#e74c3c] text-white hover:opacity-90">
+                                    class="flex-1 py-2
+                                        bg-gradient-to-br from-[#c2433a] to-[#EB4C42]
+                                        transition-all duration-300
+                                        shadow-[0_4px_15px_rgba(231,76,60,0.3)]
+                                        text-white rounded-lg cursor-pointer
+                                        font-semibold
+                                        hover:shadow-[0_6px_20px_rgba(231,76,60,0.45)]">
                                     Отклонить
                                 </button>
                             </div>
@@ -226,12 +231,24 @@
                     @else
                         <div class="mt-[30px] text-center text-[18px] font-bold">
                             @if($booking->status === 'approved')
-                                <div class="py-3">
-                                    ✅ Одобрена
+                                <div class="py-3 flex justify-center items-center gap-3">
+                                    <div class="text-green-600 font-bold text-[18px]">✅ Одобрена</div>
+                                    |
+                                    <button wire:click="openCancelModal({{ $booking->id }})"
+                                            class="group inline-flex items-center gap-2
+                                            text-[#d64545] text-[14px] font-semibold
+                                            transition-all duration-200 hover:text-[#bb2d2d]
+                                            active:scale-[0.98] cursor-pointer">
+                                        Отменить бронь
+                                    </button>
                                 </div>
                             @elseif($booking->status === 'rejected')
                                 <div class="py-3">
                                     ❌ Отклонена
+                                </div>
+                            @elseif($booking->status === 'cancelled')
+                                <div class="py-3">
+                                    🚫 Отменена
                                 </div>
                             @endif
                         </div>
@@ -241,6 +258,29 @@
                 <div class="text-2xl font-bold">Заявок нет</div>
             @endforelse
         </div>
+
+        @if($showCancelModal)
+            <div class="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(26,42,108,0.35)] backdrop-blur-[4px] backdrop-blur-sm">
+                <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Подтверждение отмены</h3>
+                    <p class="text-gray-600 mb-6">Вы уверены, что хотите отменить эту бронь? Действие нельзя будет отменить.</p>
+                    <div class="flex justify-end gap-3">
+                        <button wire:click="cancelBooking"
+                                class="px-5 py-2.5 bg-gradient-to-br from-[#c2433a] to-[#EB4C42]
+                                transition-all duration-300 shadow-[0_4px_15px_rgba(231,76,60,0.3)]
+                                text-white rounded-lg cursor-pointer
+                                transition-colors font-semibold hover:shadow-[0_6px_20px_rgba(231,76,60,0.45)]">
+                            Да, отменить
+                        </button>
+                        <button wire:click="closeCancelModal"
+                                class="px-5 py-2.5 border border-gray-300 text-gray-700 cursor-pointer
+                                rounded-lg hover:bg-gray-50 transition-colors font-semibold">
+                            Нет, оставить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
