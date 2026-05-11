@@ -14,20 +14,23 @@ class UserSeeder extends Seeder
             User::create([
                 'name' => 'Иванов Александр Михайлович',
                 'email' => 'mail1@example.com',
-                'group' => 'Б22-191-2',
-                'password' => bcrypt('password')
+                'password' => bcrypt('password'),
+                'faculty' => 'ФИТ',
+                'group' => 'Б22-191-2'
             ]),
             User::create([
                 'name' => 'Александров Иван Алексеевич',
                 'email' => 'mail2@example.com',
-                'group' => 'Б22-191-1',
-                'password' => bcrypt('password')
+                'password' => bcrypt('password'),
+                'faculty' => 'ФИТ',
+                'group' => 'Б22-191-1'
             ]),
             User::create([
                 'name' => 'Алексеев Анатолий Юрьевич',
                 'email' => 'mail3@example.com',
-                'group' => 'Б22-191-3',
-                'password' => bcrypt('password')
+                'password' => bcrypt('password'),
+                'faculty' => 'ФСАиД',
+                'group' => 'Б23-131-1'
             ])
         ] : User::get();
     }

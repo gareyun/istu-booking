@@ -17,9 +17,12 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('faculty');
+            $table->string('group');
+            $table->string('vk_link')->nullable();
+            $table->enum('role', ['student','admin','tech_specialist'])->default('student');
             $table->rememberToken();
             $table->timestamps();
-            $table->string('group');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

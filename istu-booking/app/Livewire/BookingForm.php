@@ -20,7 +20,6 @@ class BookingForm extends Component
     public $equipment;
     public $is_tech_support = 0;
     public $user_comment;
-    public $vk_link;
 
     public $busySlots = [];
 
@@ -28,11 +27,19 @@ class BookingForm extends Component
     public $filterDate = '';
     public $filterClassroom = '';
 
+    public $showSettingsModal = false;
+    public $settingsVkLink = '';
+
     public function mount()
     {
         $this->classrooms = Classroom::all();
 
         $this->loadBookings();
+
+        $user = User::find(1);
+        if ($user) {
+            $this->settingsVkLink = $user->vk_link ?? '';
+        }
     }
 
     public function loadBookings()
@@ -110,6 +117,31 @@ class BookingForm extends Component
             ->toArray();
     }
 
+    public function openSettingsModal()
+    {
+        $this->showSettingsModal = true;
+    }
+
+    public function closeSettingsModal()
+    {
+        $this->showSettingsModal = false;
+    }
+
+    public function saveSettings()
+    {
+        $this->validate([
+            'settingsVkLink' => 'nullable|string|max:255',
+        ]);
+
+        $user = User::find(1);
+        if ($user) {
+            $user->update(['vk_link' => $this->settingsVkLink]);
+            session()->flash('success', 'Ссылка ВКонтакте сохранена.');
+        }
+
+        $this->closeSettingsModal();
+    }
+
     public function submit()
     {
         $validated = $this->validate([
@@ -120,9 +152,11 @@ class BookingForm extends Component
             'purpose' => 'required|string|max:255',
             'equipment' => 'nullable|string',
             'is_tech_support' => 'required|boolean',
-            'user_comment' => 'nullable|string',
-            'vk_link' => 'nullable|string|max:255',
+            'user_comment' => 'nullable|string'
         ]);
+
+        $user = User::find(1);
+        $vkLink = $user ? $user->vk_link : null;
 
         $exists = Booking::where('classroom_id', $validated['classroom_id'])
             ->where('date', $validated['date'])
@@ -140,7 +174,8 @@ class BookingForm extends Component
 
         Booking::create([
             'user_id' => 1,
-            ...$validated
+            ...$validated,
+            'vk_link' => $vkLink
         ]);
 
         session()->flash('success', 'Заявка успешно создана');
@@ -152,10 +187,8 @@ class BookingForm extends Component
             'end_time',
             'purpose',
             'equipment',
-            'user_comment',
-            'vk_link'
+            'user_comment'
         ]);
-
         $this->is_tech_support = 0;
 
         $this->loadBookings();

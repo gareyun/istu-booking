@@ -2,8 +2,7 @@
     <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
 
     <div class="max-w-[800px] mx-auto bg-white rounded-[15px] shadow-[0_0_30px_rgba(0,0,0,0.1)] p-6 md:p-10">
-        
-        <div class="text-center mb-10 border-b-[3px] border-primary pb-5">
+        <div class="text-center mb-4 border-b-[3px] border-primary pb-5">
             <h1 class="text-primary font-bold text-3xl md:text-4xl mb-2">Бронирование аудитории</h1>
             <p class="text-secondary text-[1.1rem]">Заполните форму, отправьте заявку и мы её рассмотрим</p>
         </div>
@@ -22,9 +21,19 @@
             </div>
         @endif
 
-        {{-- <a href="{{ route('schedule') }}" class="btn...">
-            📅 Расписание
-        </a> --}}
+        <div class="mb-8">
+            <button wire:click="openSettingsModal" type="button"
+                    class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100
+                    transition-colors font-semibold cursor-pointer">
+                ⚙️ Настройки
+            </button>
+
+            <a href="{{ route('schedule') }}"
+                class="inline-block px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100
+                        transition-colors font-semibold">
+                📅 Расписание
+            </a>
+        </div>
 
         <form wire:submit.prevent="submit">
 
@@ -207,24 +216,6 @@
                 ></textarea>
             </div>
 
-            <div class="mb-4">
-                <label class="block font-semibold text-[#495057] mb-2">
-                    Страница ВКонтакте
-                </label>
-                
-                <input
-                    type="text"
-                    wire:model="vk_link"
-                    class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] 
-                        transition-all duration-300 focus:border-primary focus:ring-4 
-                        focus:ring-[rgba(78,115,223,0.25)] outline-none bg-white"
-                    placeholder="Ссылка или username">
-                
-                <small class="text-secondary text-sm mt-1 block">
-                    Укажите ссылку на вашу страницу ВКонтакте, чтобы получать уведомления о статусе заявки
-                </small>
-            </div>
-
             <div class="bg-warning text-[#684F06] rounded-[10px] p-5 mb-4">
                 <h5 class="font-bold text-lg mb-3">📋 Правила бронирования</h5>
 
@@ -241,8 +232,10 @@
                 <button
                     type="submit"
                     wire:loading.attr="disabled"
-                    class="bg-primary hover:bg-[#3a56c4] text-white font-semibold px-8 py-3
-                           rounded-[8px] transition-all duration-300 hover:-translate-y-[2px] cursor-pointer">
+                    class="text-white font-semibold px-8 py-3
+                           rounded-[10px] transition-all duration-300 hover:-translate-y-[2px] cursor-pointer
+                           bg-gradient-to-br from-[#1A2A6C] to-[#3456DB]
+                           hover:shadow-[0_6px_20px_rgba(37,117,252,0.6)]">
                     Отправить заявку
                 </button>
             </div>
@@ -411,6 +404,48 @@
                 <div class="text-gray-500 text-center">Заявок не найдено</div>
             @endforelse
         </div>
+
+        @if($showSettingsModal)
+            <div class="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(26,42,108,0.35)] backdrop-blur-[4px]">
+                <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Настройки уведомлений</h3>
+                    <label class="block font-semibold text-[#495057] mb-2">
+                        Привязать страницу ВКонтакте для уведомлений
+                    </label>
+                    <input
+                        type="text"
+                        wire:model="settingsVkLink"
+                        class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] 
+                            transition-all duration-300 focus:border-primary focus:ring-4 
+                            focus:ring-[rgba(78,115,223,0.25)] outline-none bg-white"
+                        placeholder="https://vk.com/username или @username">
+
+                    @if($settingsVkLink)
+                        <small class="inline-block text-sm text-green-600">Страница привязана</small>
+                    @endif
+
+                    <small class="text-gray-500 text-sm block mb-6 mt-4">
+                        Укажите ссылку один раз – она будет автоматически прикрепляться ко всем вашим заявкам.
+                    </small>
+
+                    <div class="flex justify-end gap-3">
+                        <button wire:click="saveSettings"
+                                class="px-5 py-2.5 rounded-[10px] transition-all duration-300
+                                bg-gradient-to-br from-[#1A2A6C] to-[#3456DB]
+                                transition-colors font-semibold cursor-pointer text-white
+                                hover:shadow-[0_6px_20px_rgba(37,117,252,0.4)]">
+                            Сохранить
+                        </button>
+                        <button wire:click="closeSettingsModal"
+                                class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg
+                                hover:bg-gray-50 transition-colors font-semibold cursor-pointer">
+                            Отмена
+                        </button>
+                    </div>
+                </div>
+            </div>
+            @endif
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
