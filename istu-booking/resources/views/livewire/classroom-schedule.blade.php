@@ -101,17 +101,119 @@
                                 ($endMin - $startMin) * $pixelsPerMinute
                             );
                         @endphp
-                        <div class="absolute z-20 rounded-md p-1 text-xs text-white bg-indigo-500 hover:bg-indigo-600
-                                    transition overflow-hidden"
-                            style="top: {{ $topPx }}px;
-                                    height: {{ $heightPx }}px;
-                                    left: calc(60px + (100% - 60px) / 7 * {{ $index }} + 2px);
-                                    width: calc((100% - 60px) / 7 - 4px);">
+                        <div wire:click="openBookingModal({{ $booking->id }})"
+                                class="absolute z-20 rounded-md p-1 text-xs text-white bg-indigo-500 hover:bg-indigo-600
+                                transition overflow-hidden cursor-pointer shadow-md hover:shadow-lg"
+                                style="top: {{ $topPx }}px;
+                                height: {{ $heightPx }}px;
+                                left: calc(60px + (100% - 60px) / 7 * {{ $index }} + 2px);
+                                width: calc((100% - 60px) / 7 - 4px);">
                             <div class="font-semibold truncate">{{ $booking->purpose }}</div>
                             <div>{{ $booking->start_time }}–{{ $booking->end_time }}</div>
                         </div>
                     @endforeach
                 @endforeach
+            </div>
+        </div>
+    @endif
+
+    @if($showBookingModal && $selectedBooking)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                    <div>
+                        <h2 class="text-2xl font-bold text-[#1a2a6c]">Информация о бронировании</h2>
+                        <p class="text-sm text-gray-500 mt-1">ID заявки: {{ $selectedBooking->id }}</p>
+                    </div>
+
+                    <button
+                        wire:click="closeBookingModal"
+                        class="text-gray-400 hover:text-gray-600 text-2xl font-bold transition cursor-pointer">
+                        &times;
+                    </button>
+                </div>
+
+                <div class="p-6 space-y-4 text-[15px]">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-gray-500 font-semibold">Аудитория</div>
+                            <div class="text-gray-900">{{ $selectedBooking->classroom->room }}</div>
+                        </div>
+
+                        <div>
+                            <div class="text-gray-500 font-semibold">Дата</div>
+                            <div class="text-gray-900">{{ $selectedBooking->date }}</div>
+                        </div>
+
+                        <div>
+                            <div class="text-gray-500 font-semibold">Время</div>
+                            <div class="text-gray-900">
+                                {{ $selectedBooking->start_time }}
+                                –
+                                {{ $selectedBooking->end_time }}
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="text-gray-500 font-semibold">Статус</div>
+                            <div class="font-semibold">
+                                @if($selectedBooking->status === 'approved')
+                                    <span class="text-green-600">✅ Одобрена</span>
+                                @elseif($selectedBooking->status === 'rejected')
+                                    <span class="text-red-600">❌ Отклонена</span>
+                                @elseif($selectedBooking->status === 'cancelled')
+                                    <span class="text-gray-600">🚫 Отменена</span>
+                                @else
+                                    <span class="text-yellow-600">⏳ В ожидании</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <div class="text-gray-500 font-semibold mb-1">Студент</div>
+                        <div>{{ $selectedBooking->user->name ?? 'Не указан' }}</div>
+                        <div class="text-sm text-gray-500">{{ $selectedBooking->user->group ?? '' }}</div>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <div class="text-gray-500 font-semibold mb-1">Цель бронирования</div>
+                        <div class="text-gray-900 whitespace-pre-line">{{ $selectedBooking->purpose }}</div>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <div class="text-gray-500 font-semibold mb-1">Оборудование</div>
+                        <div class="text-gray-900">{{ $selectedBooking->equipment ?: 'Не требуется' }}</div>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <div class="text-gray-500 font-semibold mb-1">Технический специалист</div>
+                        <div class="text-gray-900">{{ $selectedBooking->is_tech_support ? 'Да' : 'Нет' }}</div>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <div class="text-gray-500 font-semibold mb-1">Комментарий пользователя</div>
+                        <div class="text-gray-900 whitespace-pre-line">{{ $selectedBooking->user_comment ?: '–' }}</div>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <div class="text-gray-500 font-semibold mb-1">Комментарий администратора</div>
+                        <div class="text-gray-900 whitespace-pre-line">{{ $selectedBooking->admin_comment ?: '–' }}</div>
+                    </div>
+                </div>
+
+                <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+                    <button
+                        wire:click="closeBookingModal"
+                        class="px-5 py-2.5 bg-gradient-to-br
+                            from-[#1A2A6C] to-[#3456DB]
+                            text-white rounded-lg font-semibold
+                            shadow-[0_4px_15px_rgba(52,86,219,0.3)]
+                            hover:shadow-[0_6px_20px_rgba(52,86,219,0.45)]
+                            transition-all duration-300 cursor-pointer">
+                        Закрыть
+                    </button>
+                </div>
             </div>
         </div>
     @endif

@@ -15,6 +15,9 @@ class ClassroomSchedule extends Component
 
     protected $queryString = ['selectedClassroom', 'weekStart'];
 
+    public $showBookingModal = false;
+    public $selectedBooking = null;
+
     public function mount()
     {
         $this->classrooms = Classroom::orderBy('room')->get();
@@ -78,6 +81,20 @@ class ClassroomSchedule extends Component
             ->orderBy('date')
             ->orderBy('start_time')
             ->get();
+    }
+
+    public function openBookingModal($bookingId)
+    {
+        $this->selectedBooking = Booking::with(['classroom', 'user'])
+            ->findOrFail($bookingId);
+
+        $this->showBookingModal = true;
+    }
+
+    public function closeBookingModal()
+    {
+        $this->showBookingModal = false;
+        $this->selectedBooking = null;
     }
 
     public function render()
