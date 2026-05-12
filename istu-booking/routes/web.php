@@ -6,6 +6,7 @@ use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\AdminPanelController;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\ClassroomSchedule;
+use App\Livewire\TechSupportPanel;
 
 Route::get('/', [ClassroomController::class, 'index']);
 
@@ -31,3 +32,7 @@ Route::get('/admin', function() {
 Route::get('/schedule', function() {
     return view('schedule');
 })->name('schedule');
+
+Route::get('/tech-support', function() {
+    return view('tech-support');
+})->name('tech-support');
