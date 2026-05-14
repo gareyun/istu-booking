@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('bookings', function (Blueprint $table) {
@@ -23,15 +20,17 @@ return new class extends Migration
             $table->boolean('is_tech_support');
             $table->string('user_comment')->nullable();
             $table->string('admin_comment')->nullable();
-            $table->enum('status', ['pending','approved','rejected'])->default('pending');
-            $table->string('google_event_id', 200)->nullable();;
+            $table->enum('status', ['pending','approved','rejected', 'cancelled'])->default('pending');
+            $table->string('google_event_id', 200)->nullable();
+            $table->string('vk_link')->nullable();
+            $table->string('vk_user_id')->nullable();
+            $table->string('name')->nullable();
+            $table->string('faculty')->nullable();
+            $table->string('group')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('bookings');
