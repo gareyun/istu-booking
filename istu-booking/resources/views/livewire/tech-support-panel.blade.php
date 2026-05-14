@@ -17,23 +17,32 @@
                             id="tech_filter_date"
                             placeholder="ДД.ММ.ГГГГ"
                             class="px-4 py-3 border-2 border-[#e0e0e0] rounded-[10px]
-                                focus:outline-none focus:border-[#3456db]
+                                focus:outline-none focus:border-[#3456db] font-medium
                                 transition-all duration-300 bg-white min-w-[220px]">
                     </div>
                 </div>
 
                 <div class="flex flex-col min-w-[220px]">
                     <label class="mb-2 font-semibold text-[#1a2a6c]">Аудитория</label>
-                    <select
-                        wire:model.live="selectedClassroom"
-                        class="px-4 py-3 border-2 border-[#e0e0e0] rounded-[10px]
-                            focus:outline-none focus:border-[#3456db]
-                            transition-all duration-300 cursor-pointer">
-                        <option value="">Все аудитории</option>
-                        @foreach($classrooms as $classroom)
-                            <option value="{{ $classroom->id }}">{{ $classroom->room }}</option>
-                        @endforeach
-                    </select>
+
+                    <div class="relative">
+                        <select
+                            wire:model.live="selectedClassroom"
+                            class="w-full appearance-none px-4 py-3 pr-10
+                                border-2 border-[#e0e0e0]  rounded-[10px]  bg-white  text-[#333]
+                                font-medium transition-all duration-300 focus:outline-none focus:border-[#3456db]
+                                focus:shadow-[0_0_0_4px_rgba(52,86,219,0.12)] hover:border-[#c7c7c7] cursor-pointer">
+                            <option value="">Все аудитории</option>
+                            @foreach($classrooms as $classroom)
+                                <option value="{{ $classroom->id }}">{{ $classroom->room }}</option>
+                            @endforeach
+                        </select>
+
+                        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4
+                            text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
                 </div>
 
                 <button
@@ -101,7 +110,9 @@
                             </div>
                             <div class="flex justify-between gap-5">
                                 <div class="font-bold text-[#7f8c8d]">Оборудование: </div>
-                                <div class="text-right font-semibold text-blue-700">{{ $booking->equipment }}</div>
+                                <div class="text-right font-semibold text-blue-700">
+                                {{ $booking->equipment ? $booking->equipment : 'Нет' }}
+                                </div>
                             </div>
                             <div class="flex justify-between gap-5">
                                 <div class="font-bold text-[#7f8c8d]">Технический специалист: </div>
