@@ -10,13 +10,10 @@ use App\Livewire\TechSupportPanel;
 
 Route::get('/', [ClassroomController::class, 'index']);
 
-Route::post('/bookings/{booking}/status', [BookingAdminController::class, 'updateStatus'])->name('booking.updateStatus');
-Route::post('/admin/classrooms', [AdminPanelController::class, 'store'])->name('classrooms.store');
-
 Route::get('/admin/classrooms', [AdminPanelController::class, 'classrooms'])->name('admin.classrooms');
 Route::put('/admin/classrooms/{classroom}', [AdminPanelController::class, 'updateClassroom'])->name('classrooms.update');
 Route::delete('/admin/classrooms/{classroom}', [AdminPanelController::class, 'destroyClassroom'])->name('classrooms.destroy');
-
+Route::post('/admin/classrooms', [AdminPanelController::class, 'store'])->name('classrooms.store');
 Route::post('/admin/buildings', [AdminPanelController::class, 'storeBuilding']);
 Route::post('/admin/building-types', [AdminPanelController::class, 'storeBuildingType']);
 Route::post('/admin/categories', [AdminPanelController::class, 'storeCategory']);
