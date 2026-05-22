@@ -17,14 +17,11 @@ class VkDialogService
         $this->vk = $vk;
     }
 
-    /**
-     * Обработка входящего сообщения от пользователя.
-     */
     public function handleMessage(int $userId, string $text): void
     {
         $text = trim($text);
 
-        // Команда сброса
+        // сброс
         if (in_array(mb_strtolower($text), ['/start', 'начать', 'старт', 'начать заново'])) {
             Cache::forget("vk_bot_state_{$userId}");
             $this->sendStepClassroom($userId, false);
@@ -33,13 +30,11 @@ class VkDialogService
 
         $state = Cache::get("vk_bot_state_{$userId}");
 
-        // Если состояния нет – предлагаем начать
         if (!$state) {
             $this->sendStepClassroom($userId, false);
             return;
         }
 
-        // Маршрутизация по текущему шагу
         switch ($state['step']) {
             case 'classroom':
                 $this->processClassroom($userId, $text, $state);
@@ -84,13 +79,8 @@ class VkDialogService
         }
     }
 
-    // -------------------------------------------------
-    // Шаги (каждый формирует state и отправляет следующее сообщение с кнопками/без)
-    // -------------------------------------------------
-
     protected function sendStepClassroom(int $userId, bool $error = false): void
     {
-        // Подготавливаем кнопки – список аудиторий (по 2 в ряд)
         $classrooms = Classroom::orderBy('room')->get();
         $buttons = [];
         $row = [];
@@ -101,7 +91,7 @@ class VkDialogService
                 $row = [];
             }
         }
-        // Добавим строку с кнопкой отмены
+
         $buttons[] = [['text' => 'Отмена', 'color' => 'negative']];
 
         $message = ($error ? "❌ Не удалось распознать аудиторию.\n" : "📅 ")
@@ -124,7 +114,6 @@ class VkDialogService
             ->first();
 
         if (!$classroom) {
-            // повторяем выбор
             $this->sendStepClassroom($userId, true);
             return;
         }
@@ -193,7 +182,6 @@ class VkDialogService
             return;
         }
 
-        // Проверка конфликтов
         $busy = Booking::where('classroom_id', $state['classroom_id'])
             ->where('date', $state['date'])
             ->whereIn('status', ['pending', 'approved'])
@@ -230,7 +218,6 @@ class VkDialogService
         $state['step'] = 'name';
         Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
 
-        // Кнопки для оборудования
         $buttons = [
             [['text' => 'Нет', 'color' => 'negative']],
             [['text' => 'Проектор'], ['text' => 'Звук']],
@@ -298,7 +285,6 @@ class VkDialogService
         $state['step'] = 'tech_support';
         Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
 
-        // Кнопки Да/Нет для техподдержки
         $buttons = [
             [['text' => 'Да', 'color' => 'positive'], ['text' => 'Нет', 'color' => 'negative']],
         ];
@@ -320,7 +306,6 @@ class VkDialogService
         $state['step'] = 'comment';
         Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
 
-        // Кнопки для комментария
         $buttons = [
             [['text' => 'Нет', 'color' => 'negative']],
         ];
@@ -338,7 +323,6 @@ class VkDialogService
         $state['step'] = 'confirm';
         Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
 
-        // Сводка и кнопки подтверждения
         $summary = "📋 Проверьте данные заявки:\n\n"
             . "👤 ФИО: {$state['name']}\n"
             . "🏛 Факультет: {$state['faculty']}\n"
@@ -372,7 +356,6 @@ class VkDialogService
             return;
         }
 
-        // Сохраняем заявку
         Booking::create([
             'classroom_id'    => $state['classroom_id'],
             'date'            => $state['date'],
@@ -394,7 +377,5 @@ class VkDialogService
 
         $this->vk->sendMessage($userId, "✅ Заявка успешно создана! Ожидайте подтверждения администратора. "
             . "О статусе заявки пришлём уведомление.");
-
-        // Автоматическое уведомление: при решении заявки vk_link уже заполнен, поэтому админка отправит уведомление.
     }
 }

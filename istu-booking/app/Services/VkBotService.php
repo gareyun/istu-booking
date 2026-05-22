@@ -34,16 +34,11 @@ class VkBotService
         ]);
     }
 
-    /**
-     * Отправка сообщения с клавиатурой (reply‑кнопки).
-     * $buttons – массив кнопок, каждая кнопка: ['text' => '...', 'color' => 'default'|'positive'|'negative']
-     */
     public function sendMessageWithKeyboard($userId, $message, array $buttons, bool $oneTime = false)
     {
         $keyboard = [
             'one_time' => $oneTime,
             'buttons' => array_map(function ($row) {
-                // каждая строка – массив кнопок
                 return array_map(function ($btn) {
                     $action = [
                         'type' => 'text',
