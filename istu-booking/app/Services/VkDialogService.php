@@ -151,7 +151,40 @@ class VkDialogService
         $state['step'] = 'start_time';
         Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
 
+        $this->sendBusySlots(
+            $userId,
+            $state['classroom_id'],
+            $text
+        );
+
         $this->vk->sendMessage($userId, "⏰ Введите время начала (ЧЧ:ММ, например 14:00):");
+    }
+
+    protected function sendBusySlots(int $userId, int $classroomId, string $date): void
+    {
+        $busySlots = Booking::query()
+            ->where('classroom_id', $classroomId)
+            ->where('date', $date)
+            ->whereIn('status', ['approved', 'pending'])
+            ->orderBy('start_time')
+            ->get(['start_time', 'end_time']);
+
+        if ($busySlots->isEmpty()) {
+            $this->vk->sendMessage(
+                $userId,
+                "🟢 На выбранную дату занятых слотов нет.\nМожно выбрать любое свободное время."
+            );
+
+            return;
+        }
+
+        $message = "📌 Занятые слоты:\n\n";
+
+        foreach ($busySlots as $slot) {
+            $message .= "• {$slot->start_time} – {$slot->end_time}\n";
+        }
+
+        $this->vk->sendMessage($userId, $message);
     }
 
     protected function processStartTime(int $userId, string $text, array $state): void
@@ -159,6 +192,43 @@ class VkDialogService
         $text = trim($text);
         if (!preg_match('/^\d{2}:\d{2}$/', $text)) {
             $this->vk->sendMessage($userId, "❌ Формат должен быть ЧЧ:ММ (например, 14:00). Повторите:");
+            return;
+        }
+
+        try {
+            $bookingDateTime = Carbon::createFromFormat(
+                'd.m.Y H:i',
+                "{$state['date']} {$text}"
+            );
+
+            if ($bookingDateTime->lt(now()->addHours(24))) {
+                $this->vk->sendMessage(
+                    $userId,
+                    "❌ Аудиторию можно бронировать не позднее чем за 24 часа до начала.\n"
+                    . "Выберите другую дату или время."
+                );
+
+                $state['step'] = 'date';
+
+                Cache::put(
+                    "vk_bot_state_{$userId}",
+                    $state,
+                    now()->addMinutes(30)
+                );
+
+                $this->vk->sendMessage(
+                    $userId,
+                    "📅 Введите новую дату (ДД.ММ.ГГГГ):"
+                );
+
+                return;
+            }
+        } catch (\Exception $e) {
+            $this->vk->sendMessage(
+                $userId,
+                "❌ Не удалось обработать дату и время. Попробуйте снова."
+            );
+
             return;
         }
 
@@ -236,7 +306,7 @@ class VkDialogService
         $state['name'] = $text;
         $state['step'] = 'faculty';
         Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
-        $this->vk->sendMessage($userId, "🏛 Введите ваш факультет (или институт):");
+        $this->vk->sendMessage($userId, "🏛 Введите ваш факультет/институт):");
     }
 
     protected function processFaculty(int $userId, string $text, array $state): void
@@ -249,7 +319,7 @@ class VkDialogService
         $state['faculty'] = $text;
         $state['step'] = 'group';
         Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
-        $this->vk->sendMessage($userId, "👥 Введите вашу группу (например, ИС-21-01):");
+        $this->vk->sendMessage($userId, "👥 Введите вашу группу (например, Б-22-191-2):");
     }
 
     protected function processGroup(int $userId, string $text, array $state): void
@@ -288,7 +358,8 @@ class VkDialogService
         $buttons = [
             [['text' => 'Да', 'color' => 'positive'], ['text' => 'Нет', 'color' => 'negative']],
         ];
-        $this->vk->sendMessageWithKeyboard($userId, "👨‍💻 Нужен ли технический специалист?", $buttons, true);
+        $this->vk->sendMessageWithKeyboard($userId, "👨‍💻 Нужен ли технический специалист для помощи в подключении оборудования?",
+                                            $buttons, true);
     }
 
     protected function processTechSupport(int $userId, string $text, array $state): void

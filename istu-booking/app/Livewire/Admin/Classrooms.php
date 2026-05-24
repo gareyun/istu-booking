@@ -8,6 +8,8 @@ use App\Models\Building;
 use App\Models\BuildingType;
 use App\Models\ClassroomCategory;
 
+use Illuminate\Support\Facades\Session;
+
 class Classrooms extends Component
 {
     public $classrooms;
@@ -26,6 +28,16 @@ class Classrooms extends Component
     public $showCategoryModal = false;
     public $showBuildingModal = false;
     public $showTypeModal = false;
+
+    public $showBuildingListModal = false;
+    public $showBuildingEditModal = false;
+
+    public $editingBuildingId = null;
+
+    public $editBuildingName;
+    public $editBuildingAddress;
+    public $editBuildingDescription;
+    public $editBuildingTypeId;
 
     public $showCreateModal = false;
     public $showEditModal = false;
@@ -183,6 +195,7 @@ class Classrooms extends Component
         $this->validate([
             'newBuildingName' => 'required|string|max:255',
             'newBuildingAddress' => 'required|string|max:255',
+            'newBuildingDescription' => 'nullable|string',
             'newBuildingTypeId' => 'required|exists:building_types,id',
         ]);
 
@@ -193,6 +206,13 @@ class Classrooms extends Component
             'building_type_id' => $this->newBuildingTypeId,
         ]);
 
+        session()->flash(
+            'success',
+            'Корпус успешно создан'
+        );
+
+        $this->closeBuildingModal();
+
         $this->reset([
             'newBuildingName',
             'newBuildingAddress',
@@ -200,7 +220,85 @@ class Classrooms extends Component
             'newBuildingTypeId'
         ]);
 
-        $this->showBuildingModal = false;
+        $this->loadData();
+    }
+
+    public function openBuildingListModal()
+    {
+        $this->loadData();
+
+        $this->showBuildingListModal = true;
+    }
+
+    public function closeBuildingListModal()
+    {
+        $this->showBuildingListModal = false;
+    }
+
+    public function openBuildingEditModal($id)
+    {
+        $building = Building::findOrFail($id);
+
+        $this->editingBuildingId = $id;
+
+        $this->editBuildingName = $building->name;
+        $this->editBuildingAddress = $building->address;
+        $this->editBuildingDescription = $building->description;
+        $this->editBuildingTypeId = $building->building_type_id;
+
+        $this->showBuildingEditModal = true;
+    }
+
+    public function closeBuildingEditModal()
+    {
+        $this->showBuildingEditModal = false;
+
+        $this->reset([
+            'editingBuildingId',
+            'editBuildingName',
+            'editBuildingAddress',
+            'editBuildingDescription',
+            'editBuildingTypeId'
+        ]);
+    }
+
+    public function updateBuilding()
+    {
+        $this->validate([
+            'editBuildingName' => 'required',
+            'editBuildingAddress' => 'required',
+            'editBuildingTypeId' => 'required',
+        ]);
+
+        Building::findOrFail(
+            $this->editingBuildingId
+        )->update([
+            'name' => $this->editBuildingName,
+            'address' => $this->editBuildingAddress,
+            'description' => $this->editBuildingDescription,
+            'building_type_id' => $this->editBuildingTypeId,
+        ]);
+
+        $this->closeBuildingEditModal();
+
+        $this->loadData();
+    }
+
+    public function deleteBuilding($id)
+    {
+        $building = Building::findOrFail($id);
+
+        if ($building->classrooms()->exists()) {
+            session()->flash(
+                'error',
+                'Нельзя удалить корпус с аудиториями.'
+            );
+
+            return;
+        }
+
+        $building->delete();
+
         $this->loadData();
     }
 
