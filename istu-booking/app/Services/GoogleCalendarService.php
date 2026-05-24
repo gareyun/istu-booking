@@ -46,4 +46,24 @@ class GoogleCalendarService
 
         return $event->id;
     }
+
+    public function deleteEvent($booking): void
+    {
+        if (empty($booking->google_event_id) || empty($booking->classroom?->google_calendar_id)) {
+            return;
+        }
+
+        $service = new Google_Service_Calendar($this->client());
+
+        try {
+            $service->events->delete(
+                $booking->classroom->google_calendar_id,
+                $booking->google_event_id
+            );
+        } catch (\Google_Service_Exception $e) {
+            if ($e->getCode() !== 404) {
+                throw $e;
+            }
+        }
+    }
 }

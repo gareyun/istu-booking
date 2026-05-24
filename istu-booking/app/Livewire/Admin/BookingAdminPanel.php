@@ -96,6 +96,20 @@ class BookingAdminPanel extends Component
             return;
         }
 
+        try {
+            app(GoogleCalendarService::class)->deleteEvent($booking);
+            $booking->google_event_id = null;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error(
+                'Google Calendar delete error: ' . $e->getMessage()
+            );
+
+            session()->flash('error', 'Не удалось удалить событие из Google Календаря.');
+
+            $this->closeCancelModal();
+            return;
+        }
+
         $booking->status = 'cancelled';
         $booking->save();
 
