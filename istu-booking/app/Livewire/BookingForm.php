@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Booking;
 use App\Models\Classroom;
 use App\Models\User;
+use Carbon\Carbon;
 
 class BookingForm extends Component
 {
@@ -157,6 +158,22 @@ class BookingForm extends Component
 
         $user = User::find(1);
         $vkLink = $user ? $user->vk_link : null;
+
+        // бронь минимум за 24 часа
+        try {
+            $bookingStart = Carbon::createFromFormat(
+                'd.m.Y H:i',
+                trim($validated['date']) . ' ' . trim($validated['start_time'])
+            );
+        } catch (\Exception $e) {
+            $this->addError('date', 'Некорректный формат даты или времени.');
+            return;
+        }
+
+        if ($bookingStart->lessThanOrEqualTo(now()->addHours(24))) {
+            $this->addError('date', 'Забронировать аудиторию можно не позднее чем за 24 часа до начала мероприятия.');
+            return;
+        }
 
         $exists = Booking::where('classroom_id', $validated['classroom_id'])
             ->where('date', $validated['date'])
