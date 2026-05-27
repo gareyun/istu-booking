@@ -6,6 +6,9 @@ use Livewire\Component;
 use App\Models\Booking;
 use App\Models\Classroom;
 
+use Livewire\Attributes\Layout;
+#[Layout('components.layout')]
+
 class TechSupportPanel extends Component
 {
     public $selectedDate = '';

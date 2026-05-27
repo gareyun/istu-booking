@@ -8,6 +8,9 @@ use App\Models\Classroom;
 use App\Models\User;
 use Carbon\Carbon;
 
+use Livewire\Attributes\Layout;
+#[Layout('components.layout')]
+
 class BookingForm extends Component
 {
     public $classrooms = [];

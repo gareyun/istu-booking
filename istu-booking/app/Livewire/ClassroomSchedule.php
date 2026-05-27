@@ -7,6 +7,9 @@ use App\Models\Classroom;
 use App\Models\Booking;
 use Carbon\Carbon;
 
+use Livewire\Attributes\Layout;
+#[Layout('components.layout')]
+
 class ClassroomSchedule extends Component
 {
     public $selectedClassroom = null;

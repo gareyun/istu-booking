@@ -8,6 +8,9 @@ use App\Models\Building;
 use App\Models\BuildingType;
 use App\Models\ClassroomCategory;
 
+use Livewire\Attributes\Layout;
+#[Layout('components.layout')]
+
 class Classrooms extends Component
 {
     public $classrooms;
