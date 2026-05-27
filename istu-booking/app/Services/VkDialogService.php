@@ -319,7 +319,7 @@ class VkDialogService
         $state['faculty'] = $text;
         $state['step'] = 'group';
         Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
-        $this->vk->sendMessage($userId, "👥 Введите вашу группу (например, Б-22-191-2):");
+        $this->vk->sendMessage($userId, "👥 Введите вашу группу (например, Б22-191-2):");
     }
 
     protected function processGroup(int $userId, string $text, array $state): void

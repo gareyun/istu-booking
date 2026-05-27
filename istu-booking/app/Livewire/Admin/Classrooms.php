@@ -8,8 +8,6 @@ use App\Models\Building;
 use App\Models\BuildingType;
 use App\Models\ClassroomCategory;
 
-use Illuminate\Support\Facades\Session;
-
 class Classrooms extends Component
 {
     public $classrooms;
@@ -47,6 +45,9 @@ class Classrooms extends Component
     public $room, $description, $equipment, $capacity, $google_calendar_id;
     public $classroom_category_id, $building_id;
 
+    public $successMessage = null;
+    public $errorMessage = null;
+
     public function mount()
     {
         $this->loadData();
@@ -63,6 +64,12 @@ class Classrooms extends Component
     public function openCreateModal()
     {
         $this->resetFields();
+
+        $this->classroom_category_id = $this->categories->first()->id ?? null;
+        $this->building_id = $this->buildings->first()->id ?? null;
+
+        $this->successMessage = null;
+        $this->errorMessage = null;
         $this->showCreateModal = true;
     }
 
@@ -79,28 +86,47 @@ class Classrooms extends Component
         $this->classroom_category_id = $classroom->classroom_category_id;
         $this->building_id = $classroom->building_id;
 
+        $this->successMessage = null;
+        $this->errorMessage = null;
         $this->showEditModal = true;
     }
 
     public function save()
     {
-        $this->validate([
-            'room' => 'required',
-            'capacity' => 'required|integer',
+        $validated = $this->validate([
+            'room' => 'required|string|max:50',
+            'description' => 'required|string|max:255',
+            'equipment' => 'nullable|string|max:255',
+            'capacity' => 'required|integer|min:1',
+            'google_calendar_id' => 'required|string|max:100',
+            'classroom_category_id' => 'required|exists:classroom_categories,id',
+            'building_id' => 'required|exists:buildings,id',
         ]);
 
-        Classroom::create($this->getData());
+        Classroom::create($validated);
 
         $this->closeModal();
         $this->loadData();
+        $this->successMessage = 'Аудитория добавлена';
     }
 
     public function update()
     {
-        Classroom::find($this->editingId)->update($this->getData());
+        $validated = $this->validate([
+            'room' => 'required|string|max:50',
+            'description' => 'required|string|max:255',
+            'equipment' => 'nullable|string|max:255',
+            'capacity' => 'required|integer|min:1',
+            'google_calendar_id' => 'required|string|max:100',
+            'classroom_category_id' => 'required|exists:classroom_categories,id',
+            'building_id' => 'required|exists:buildings,id',
+        ]);
+
+        Classroom::findOrFail($this->editingId)->update($validated);
 
         $this->closeModal();
         $this->loadData();
+        $this->successMessage = 'Аудитория обновлена';
     }
 
     public function delete($id)
@@ -113,19 +139,6 @@ class Classrooms extends Component
 
         $classroom->delete();
         $this->loadData();
-    }
-
-    private function getData()
-    {
-        return [
-            'room' => $this->room,
-            'description' => $this->description,
-            'equipment' => $this->equipment,
-            'capacity' => $this->capacity,
-            'google_calendar_id' => $this->google_calendar_id,
-            'classroom_category_id' => $this->classroom_category_id,
-            'building_id' => $this->building_id,
-        ];
     }
 
     public function closeModal()
@@ -168,6 +181,10 @@ class Classrooms extends Component
 
     public function openBuildingModal()
     {
+        $this->newBuildingTypeId = $this->buildingTypes->first()->id ?? null;
+
+        $this->successMessage = null;
+        $this->errorMessage = null;
         $this->showBuildingModal = true;
     }
 
@@ -206,10 +223,7 @@ class Classrooms extends Component
             'building_type_id' => $this->newBuildingTypeId,
         ]);
 
-        session()->flash(
-            'success',
-            'Корпус успешно создан'
-        );
+        $this->successMessage = 'Корпус успешно создан';
 
         $this->closeBuildingModal();
 
@@ -227,6 +241,8 @@ class Classrooms extends Component
     {
         $this->loadData();
 
+        $this->successMessage = null;
+        $this->errorMessage = null;
         $this->showBuildingListModal = true;
     }
 
@@ -246,6 +262,8 @@ class Classrooms extends Component
         $this->editBuildingDescription = $building->description;
         $this->editBuildingTypeId = $building->building_type_id;
 
+        $this->successMessage = null;
+        $this->errorMessage = null;
         $this->showBuildingEditModal = true;
     }
 
@@ -289,11 +307,7 @@ class Classrooms extends Component
         $building = Building::findOrFail($id);
 
         if ($building->classrooms()->exists()) {
-            session()->flash(
-                'error',
-                'Нельзя удалить корпус с аудиториями.'
-            );
-
+            $this->errorMessage = 'Нельзя удалить аудиторию, есть связанные заявки';
             return;
         }
 
