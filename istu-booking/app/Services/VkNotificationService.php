@@ -163,4 +163,49 @@ class VkNotificationService
 
         return $this->sendMessage($userId, $message);
     }
+
+    public function notifyBookingCreated($booking, bool $skipVkBot = false): bool
+    {
+        if ($skipVkBot && $booking->vk_user_id) {
+            return false;
+        }
+
+        if (empty($booking->vk_link)) {
+            Log::info('VK notification skipped: no vk_link');
+            return false;
+        }
+
+        $userId = $this->extractUserId($booking->vk_link);
+
+        if (!$userId) {
+            Log::warning('VK: Не удалось извлечь ID пользователя', [
+                'vk_link' => $booking->vk_link
+            ]);
+
+            return false;
+        }
+
+        $message = "📨 Ваша заявка на бронирование получена!\n\n";
+
+        $message .= "🏫 Аудитория: {$booking->classroom->room}\n";
+        $message .= "📅 Дата: {$booking->date}\n";
+        $message .= "⏰ Время: {$booking->start_time} - {$booking->end_time}\n";
+        $message .= "🎯 Цель: {$booking->purpose}\n";
+
+        if (!empty($booking->equipment)) {
+            $message .= "🔧 Оборудование: {$booking->equipment}\n";
+        }
+
+        $message .= "👨‍💻 Тех. специалист: "
+            . ($booking->is_tech_support ? 'нужен' : 'не нужен') . "\n";
+
+        if (!empty($booking->user_comment)) {
+            $message .= "💬 Комментарий: {$booking->user_comment}\n";
+        }
+
+        $message .= "\n⏳ Сейчас заявка находится на рассмотрении администратора.";
+        $message .= "\nО результате рассмотрения придёт отдельное уведомление.";
+
+        return $this->sendMessage($userId, $message);
+    }
 }

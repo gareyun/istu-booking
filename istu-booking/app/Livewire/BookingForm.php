@@ -235,11 +235,21 @@ class BookingForm extends Component
             return;
         }
 
-        Booking::create([
+        $booking = Booking::create([
             'user_id' => 1,
             ...$validated,
             'vk_link' => $vkLink
         ]);
+
+        $booking->load('classroom');
+
+        try {
+            app(\App\Services\VkNotificationService::class)->notifyBookingCreated($booking);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error(
+                'VK notification create booking error: ' . $e->getMessage()
+            );
+        }
 
         session()->flash('success', 'Заявка успешно создана');
         $this->submitted = true; 
