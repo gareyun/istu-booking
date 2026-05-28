@@ -36,9 +36,11 @@ class BookingForm extends Component
     public $settingsPhone = '';
 
     public $submitted = false;
-    
+
     public $perPage = 5;
     public $hasMoreBookings = false;
+
+    public $loadError = false;
 
     public function mount()
     {
@@ -55,28 +57,42 @@ class BookingForm extends Component
 
     public function loadBookings()
     {
-        $query = User::find(1)
-            ->bookings()
-            ->with('classroom');
+        try {
+            $query = User::find(1)
+                ->bookings()
+                ->with('classroom');
 
-        if ($this->filterStatus) {
-            $query->where('status', $this->filterStatus);
+            if ($this->filterStatus) {
+                $query->where('status', $this->filterStatus);
+            }
+
+            if ($this->filterDate) {
+                $query->where('date', $this->filterDate);
+            }
+
+            if ($this->filterClassroom) {
+                $query->where('classroom_id', $this->filterClassroom);
+            }
+
+            $this->bookings = $query
+                ->latest()
+                ->take($this->perPage)
+                ->get();
+
+            $this->hasMoreBookings = $query->count() > $this->perPage;
+
+            $this->loadError = false;
+        } catch (\Exception $e) {
+
+            \Illuminate\Support\Facades\Log::error(
+                'Booking load error: ' . $e->getMessage()
+            );
+
+            $this->bookings = [];
+            $this->hasMoreBookings = false;
+            $this->loadError = true;
         }
-
-        if ($this->filterDate) {
-            $query->where('date', $this->filterDate);
-        }
-
-        if ($this->filterClassroom) {
-            $query->where('classroom_id', $this->filterClassroom);
-        }
-
-        $this->bookings = $query
-            ->latest()
-            ->take($this->perPage)
-            ->get();
-
-        $this->hasMoreBookings = $query->count() > $this->perPage;
+        
     }
 
     public function loadMore()

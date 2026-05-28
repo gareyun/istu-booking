@@ -5,6 +5,12 @@
 
         <h1 class="text-[1.5rem] mb-5 pb-[10px] border-b-2 border-[#1a2a6c] text-[#1a2a6c] font-bold">Заявки</h1>
 
+        @if($loadError)
+            <div class="mb-5 bg-red-100 border border-red-300 text-red-700 px-5 py-4 rounded-[10px]">
+                ❌ Не удалось загрузить данные. Попробуйте позже.
+            </div>
+        @endif
+
         @if(session()->has('success'))
             <div class="mb-5 bg-green-500 text-white px-5 py-4 rounded-[10px] shadow">
                 {{ session('success') }}

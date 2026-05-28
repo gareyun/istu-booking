@@ -25,6 +25,8 @@ class BookingAdminPanel extends Component
     public $perPage = 10;
     public $hasMoreBookings = false;
 
+    public $loadError = false;
+
     public function setStatus($status = '')
     {
         $this->status = $status;
@@ -136,23 +138,36 @@ class BookingAdminPanel extends Component
 
     public function getBookingsProperty()
     {
-        $query = Booking::with(['classroom', 'user'])
-            ->when($this->status, function ($query) {
-                $query->where('status', $this->status);
-            })
-            ->when($this->selectedDate, function ($query) {
-                $query->where('date', $this->selectedDate);
-            })
-            ->when($this->selectedClassroom, function ($query) {
-                $query->where('classroom_id', $this->selectedClassroom);
-            })
-            ->orderByDesc('id');
+        try {
+            $query = Booking::with(['classroom', 'user'])
+                ->when($this->status, function ($query) {
+                    $query->where('status', $this->status);
+                })
+                ->when($this->selectedDate, function ($query) {
+                    $query->where('date', $this->selectedDate);
+                })
+                ->when($this->selectedClassroom, function ($query) {
+                    $query->where('classroom_id', $this->selectedClassroom);
+                })
+                ->orderByDesc('id');
 
-        $this->hasMoreBookings = $query->count() > $this->perPage;
+            $this->hasMoreBookings = $query->count() > $this->perPage;
 
-        return $query
-            ->take($this->perPage)
-            ->get();
+            $this->loadError = false;
+
+            return $query
+                ->take($this->perPage)
+                ->get();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error(
+                'Admin booking load error: ' . $e->getMessage()
+            );
+
+            $this->loadError = true;
+            $this->hasMoreBookings = false;
+
+            return collect();
+        }
     }
 
     public function resetFilters()

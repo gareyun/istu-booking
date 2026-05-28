@@ -357,6 +357,12 @@
             </div>
         </div>
 
+        @if($loadError)
+            <div class="bg-red-100 border border-red-300 text-red-700 rounded-[10px] p-4 mb-6">
+                ❌ Не удалось загрузить данные. Попробуйте позже.
+            </div>
+        @endif
+
         <div class="mt-10">
             <h2 class="text-2xl font-bold mb-6 text-center">📋 Мои заявки</h2>
 
