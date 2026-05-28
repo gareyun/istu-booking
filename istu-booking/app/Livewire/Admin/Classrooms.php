@@ -319,6 +319,50 @@ class Classrooms extends Component
         $this->loadData();
     }
 
+    public function deleteCategory($id)
+    {
+        $category = ClassroomCategory::findOrFail($id);
+
+        if ($category->classrooms()->exists()) {
+            $this->errorMessage = 'Нельзя удалить категорию, так как есть связанные аудитории';
+            return;
+        }
+
+        $category->delete();
+
+        if ($this->classroom_category_id == $id) {
+            $this->classroom_category_id = $this->categories
+                ->where('id', '!=', $id)
+                ->first()?->id;
+        }
+
+        $this->successMessage = 'Категория удалена';
+
+        $this->loadData();
+    }
+
+    public function deleteBuildingType($id)
+    {
+        $type = BuildingType::findOrFail($id);
+
+        if ($type->buildings()->exists()) {
+            $this->errorMessage = 'Нельзя удалить тип корпуса, так как есть связанные корпуса';
+            return;
+        }
+
+        $type->delete();
+
+        if ($this->newBuildingTypeId == $id) {
+            $this->newBuildingTypeId = $this->buildingTypes
+                ->where('id', '!=', $id)
+                ->first()?->id;
+        }
+
+        $this->successMessage = 'Тип корпуса удалён';
+
+        $this->loadData();
+    }
+
     public function render()
     {
         return view('livewire.admin.classrooms');
