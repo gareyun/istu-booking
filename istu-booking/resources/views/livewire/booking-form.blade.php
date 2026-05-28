@@ -2,6 +2,20 @@
     <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
 
     <div class="max-w-[800px] mx-auto bg-white rounded-[15px] shadow-[0_0_30px_rgba(0,0,0,0.1)] p-6 md:p-10">
+
+        @if($submitted)
+            <div class="text-center py-12">
+                <div class="text-7xl mb-6">✅</div>
+                <h2 class="text-2xl font-bold text-green-600 mb-4">Мы получили вашу заявку!</h2>
+                <p class="text-gray-600 mb-8">Скоро мы её рассмотрим. Ожидайте уведомления.</p>
+                <button wire:click="resetForm" type="button"
+                        class="px-6 py-3 bg-gradient-to-br from-[#1A2A6C] to-[#3456DB] cursor-pointer
+                        text-white font-semibold rounded-[10px] hover:shadow-lg transition hover:-translate-y-[2px]">
+                    Подать новую заявку
+                </button>
+            </div>
+        @else
+
         <div class="text-center mb-4 border-b-[3px] border-primary pb-5">
             <h1 class="text-primary font-bold text-3xl md:text-4xl mb-2">Бронирование аудитории</h1>
             <p class="text-secondary text-[1.1rem]">Заполните форму, отправьте заявку и мы её рассмотрим</p>
@@ -241,7 +255,7 @@
             </div>
 
         </form>
-
+        @endif
         <div wire:loading.flex class="fixed inset-0 bg-[rgba(255,255,255,0.7)] z-[9999] flex-col justify-center items-center">
             <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             <p class="mt-3 text-primary font-semibold">Загрузка...</p>
@@ -348,12 +362,13 @@
 
             @forelse($bookings as $booking)
                 <div class="bg-white rounded-xl shadow p-4 mb-4 border border-[#e3e6f0]">
-                    
                     <div class="flex flex-col md:flex-row md:justify-between gap-2 mb-2">
-                        <span class="font-semibold">
-                            Аудитория
-                            {{ $booking->classroom->room }}
-                        </span>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            
+                            <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 border border-gray-200">
+                                ID: {{ $booking->id }}
+                            </span>
+                        </div>
 
                         <span
                             class="text-sm font-semibold
@@ -375,7 +390,11 @@
                         </span>
                     </div>
 
-                    <div class="text-sm text-gray-600">
+                    <div class="font-semibold">
+                        Аудитория {{ $booking->classroom->room }}
+                    </div>
+
+                    <div class="text-sm text-gray-600 mt-2">
                         📅 {{ $booking->date }}
                         |
                         ⏰ {{ $booking->start_time }}
@@ -403,11 +422,33 @@
             @empty
                 <div class="text-gray-500 text-center">Заявок не найдено</div>
             @endforelse
+
+            @if($hasMoreBookings)
+                <div class="flex justify-center mt-6">
+                    <button
+                        wire:click="loadMore"
+                        type="button"
+                        class="px-6 py-3 rounded-[10px] text-white font-semibold
+                            bg-gradient-to-br from-[#1A2A6C] to-[#3456DB]
+                            hover:-translate-y-[2px] transition-all duration-300
+                            hover:shadow-[0_6px_20px_rgba(37,117,252,0.45)]
+                            cursor-pointer">
+                        Показать ещё
+                    </button>
+                </div>
+            @endif
         </div>
 
         @if($showSettingsModal)
             <div class="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(26,42,108,0.35)] backdrop-blur-[4px]">
                 <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
+                    @if ($errors->any())
+                        <div class="bg-[#FFF3CD] text-[#684F06]-700 rounded-[10px] p-4 mb-4">
+                            @foreach ($errors->all() as $error)
+                                <div>{{ $error }}</div>
+                            @endforeach
+                        </div>
+                    @endif
                     <h3 class="text-xl font-bold text-gray-800 mb-4">Настройки уведомлений</h3>
                     <label class="block font-semibold text-[#495057] mb-2">
                         Привязать страницу ВКонтакте для уведомлений

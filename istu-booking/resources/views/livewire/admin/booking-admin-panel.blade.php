@@ -279,6 +279,21 @@
             @empty
                 <div class="text-2xl font-bold">Заявок нет</div>
             @endforelse
+
+            @if($hasMoreBookings)
+                <div class="col-span-full flex justify-center mt-2">
+                    <button
+                        wire:click="loadMore"
+                        class="px-6 py-3 text-white rounded-[10px] text-[16px]
+                            font-semibold transition-all duration-300
+                            shadow-[0_4px_15px_rgba(37,117,252,0.3)]
+                            bg-gradient-to-br from-[#1A2A6C] to-[#3456DB]
+                            hover:-translate-y-[2px] cursor-pointer
+                            hover:shadow-[0_6px_20px_rgba(37,117,252,0.45)]">
+                        Показать ещё
+                    </button>
+                </div>
+            @endif
         </div>
 
         @if($showCancelModal)

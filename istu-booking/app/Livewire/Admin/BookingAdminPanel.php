@@ -22,9 +22,17 @@ class BookingAdminPanel extends Component
     public $showCancelModal = false;
     public $bookingToCancel = null;
 
+    public $perPage = 10;
+    public $hasMoreBookings = false;
+
     public function setStatus($status = '')
     {
         $this->status = $status;
+    }
+
+    public function loadMore()
+    {
+        $this->perPage += 10;
     }
 
     public function updateStatus($bookingId, $action)
@@ -128,7 +136,7 @@ class BookingAdminPanel extends Component
 
     public function getBookingsProperty()
     {
-        return Booking::with(['classroom', 'user'])
+        $query = Booking::with(['classroom', 'user'])
             ->when($this->status, function ($query) {
                 $query->where('status', $this->status);
             })
@@ -138,7 +146,12 @@ class BookingAdminPanel extends Component
             ->when($this->selectedClassroom, function ($query) {
                 $query->where('classroom_id', $this->selectedClassroom);
             })
-            ->orderByDesc('id')
+            ->orderByDesc('id');
+
+        $this->hasMoreBookings = $query->count() > $this->perPage;
+
+        return $query
+            ->take($this->perPage)
             ->get();
     }
 
@@ -147,6 +160,7 @@ class BookingAdminPanel extends Component
         $this->status = '';
         $this->selectedDate = '';
         $this->selectedClassroom = '';
+        $this->perPage = 10;
         $this->dispatch('resetFilterDate');
     }
 

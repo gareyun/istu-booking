@@ -35,6 +35,11 @@ class BookingForm extends Component
     public $settingsVkLink = '';
     public $settingsPhone = '';
 
+    public $submitted = false;
+    
+    public $perPage = 5;
+    public $hasMoreBookings = false;
+
     public function mount()
     {
         $this->classrooms = Classroom::all();
@@ -68,7 +73,16 @@ class BookingForm extends Component
 
         $this->bookings = $query
             ->latest()
+            ->take($this->perPage)
             ->get();
+
+        $this->hasMoreBookings = $query->count() > $this->perPage;
+    }
+
+    public function loadMore()
+    {
+        $this->perPage += 5;
+        $this->loadBookings();
     }
 
     public function updatedClassroomId()
@@ -212,6 +226,7 @@ class BookingForm extends Component
         ]);
 
         session()->flash('success', 'Заявка успешно создана');
+        $this->submitted = true; 
 
         $this->reset([
             'classroom_id',
@@ -225,6 +240,12 @@ class BookingForm extends Component
         $this->is_tech_support = 0;
 
         $this->loadBookings();
+        $this->loadBusySlots();
+    }
+
+    public function resetForm()
+    {
+        $this->submitted = false;
         $this->loadBusySlots();
     }
 
