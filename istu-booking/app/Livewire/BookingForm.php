@@ -33,6 +33,7 @@ class BookingForm extends Component
 
     public $showSettingsModal = false;
     public $settingsVkLink = '';
+    public $settingsPhone = '';
 
     public function mount()
     {
@@ -43,6 +44,7 @@ class BookingForm extends Component
         $user = User::find(1);
         if ($user) {
             $this->settingsVkLink = $user->vk_link ?? '';
+            $this->settingsPhone = $user->phone ?? '';
         }
     }
 
@@ -135,12 +137,16 @@ class BookingForm extends Component
     {
         $this->validate([
             'settingsVkLink' => 'nullable|string|max:255',
+            'settingsPhone'  => 'required|string|max:20'
         ]);
 
         $user = User::find(1);
         if ($user) {
-            $user->update(['vk_link' => $this->settingsVkLink]);
-            session()->flash('success', 'Ссылка ВКонтакте сохранена.');
+            $user->update([
+                'vk_link' => $this->settingsVkLink,
+                'phone'   => $this->settingsPhone
+                ]);
+            session()->flash('success', 'Настройки сохранены.');
         }
 
         $this->closeSettingsModal();
@@ -148,6 +154,14 @@ class BookingForm extends Component
 
     public function submit()
     {
+        $user = User::find(1);
+        
+        if (!$user || !$user->phone) {
+            $this->addError('phone', 'Для отправки заявки необходимо указать номер телефона в настройках.');
+            $this->openSettingsModal();
+            return;
+        }
+
         $validated = $this->validate([
             'classroom_id' => 'required|exists:classrooms,id',
             'date' => 'required',
@@ -159,7 +173,6 @@ class BookingForm extends Component
             'user_comment' => 'nullable|string'
         ]);
 
-        $user = User::find(1);
         $vkLink = $user ? $user->vk_link : null;
 
         // бронь минимум за 24 часа

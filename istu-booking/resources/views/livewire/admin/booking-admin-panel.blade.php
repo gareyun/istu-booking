@@ -144,12 +144,34 @@
                             </div>
 
                             <div class="flex justify-between">
+                                <div class="font-bold text-[#7f8c8d]">Факультет: </div>
+                                <div>
+                                    @if($booking->user)
+                                        {{ $booking->user->faculty ?? '—' }}
+                                    @else
+                                        {{ $booking->faculty ?? '—' }}
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between">
                                 <div class="font-bold text-[#7f8c8d]">Группа: </div>
                                 <div>
                                     @if($booking->user)
                                         {{ $booking->user->group ?? '—' }}
                                     @else
                                         {{ $booking->group ?? '—' }}
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between">
+                                <div class="font-bold text-[#7f8c8d]">Номер телефона: </div>
+                                <div>
+                                    @if($booking->user)
+                                        {{ $booking->user->phone ?? '—' }}
+                                    @else
+                                        {{ $booking->phone ?? '—' }}
                                     @endif
                                 </div>
                             </div>

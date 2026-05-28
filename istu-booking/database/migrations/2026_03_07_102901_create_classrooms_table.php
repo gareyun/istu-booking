@@ -19,7 +19,7 @@ return new class extends Migration
                 ->constrained('buildings')
                 ->nullOnDelete();
 
-            $table->string('room', 50);
+            $table->string('room', 50)->unique();
             $table->string('description', 255);
             $table->string('equipment', 255);
             $table->integer('capacity');

@@ -428,6 +428,24 @@
                         Укажите ссылку один раз – она будет автоматически прикрепляться ко всем вашим заявкам.
                     </small>
 
+                    <label class="block font-semibold text-[#495057] mb-2 mt-4">
+                        Номер телефона <span class="text-danger">*</span>
+                    </label>
+                    <input
+                        type="tel"
+                        wire:model="settingsPhone"
+                        class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] 
+                            transition-all duration-300 focus:border-primary focus:ring-4 
+                            focus:ring-[rgba(78,115,223,0.25)] outline-none bg-white"
+                        placeholder="+7 (999) 123-45-67">
+                    @error('settingsPhone')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+
+                    <small class="text-gray-500 text-sm block mb-6 mt-4">
+                        Укажите номер телефона один раз – он будет обязателен для всех ваших заявок.
+                    </small>
+
                     <div class="flex justify-end gap-3">
                         <button wire:click="saveSettings"
                                 class="px-5 py-2.5 rounded-[10px] transition-all duration-300

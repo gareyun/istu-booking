@@ -18,6 +18,12 @@
                     <option value="{{ $classroom->id }}">{{ $classroom->room }}</option>
                 @endforeach
             </select>
+
+            <a href="{{ route('booking') }}"
+                class="inline-block px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100
+                        transition-colors font-semibold">
+                📝 Забронировать
+            </a>
         </div>
 
         @if($selectedClassroom)
@@ -123,7 +129,12 @@
                 <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                     <div>
                         <h2 class="text-2xl font-bold text-[#1a2a6c]">Информация о бронировании</h2>
-                        <p class="text-sm text-gray-500 mt-1">ID заявки: {{ $selectedBooking->id }}</p>
+                        <p class="text-sm text-gray-500 mt-1">
+                            ID заявки: {{ $selectedBooking->id }}
+                            @if(!$selectedBooking->user_id && $selectedBooking->vk_user_id)
+                                (через VK бота)
+                            @endif
+                        </p>
                     </div>
 
                     <button
@@ -169,11 +180,20 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="border-t pt-4">
-                        <div class="text-gray-500 font-semibold mb-1">Студент</div>
-                        <div>{{ $selectedBooking->user->name ?? 'Не указан' }}</div>
-                        <div class="text-sm text-gray-500">{{ $selectedBooking->user->group ?? '' }}</div>
+                    
+                    <div class="grid grid-cols-2 gap-4 border-t pt-4">
+                        <div>
+                            <div class="text-gray-500 font-semibold mb-1">Студент</div>
+                            <div>{{ optional($selectedBooking->user)->name ?? $selectedBooking->name ?? 'Не указан' }}</div>
+                            <div class="text-sm text-gray-500">
+                                {{ optional($selectedBooking->user)->faculty ?? $selectedBooking->faculty ?? '' }}, 
+                                {{ optional($selectedBooking->user)->group ?? $selectedBooking->group ?? '' }}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-gray-500 font-semibold mb-1">Номер телефона</div>
+                            <div>{{ optional($selectedBooking->user)->phone ?? $selectedBooking->phone ?? 'Не указан' }}</div>
+                        </div>
                     </div>
 
                     <div class="border-t pt-4">

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('vk_link')->nullable();
             $table->string('vk_user_id')->nullable();
             $table->string('name')->nullable();
+            $table->string('phone')->nullable();
             $table->string('faculty')->nullable();
             $table->string('group')->nullable();
             $table->timestamps();
