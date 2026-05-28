@@ -1,6 +1,17 @@
 <div class="flex-1 p-[30px] overflow-y-auto">
     <h1 class="text-2xl mb-5 pb-2.5 border-b-2 border-[#1a2a6c] text-[#1a2a6c]">Аудитории</h1>
 
+    @if ($successMessage)
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            {{ $successMessage }}
+        </div>
+    @endif
+    @if ($errorMessage)
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {{ $errorMessage }}
+        </div>
+    @endif
+
     <div class="mb-5">
         <a href="{{ route('admin') }}"
             class="inline-block mr-2.5 px-6 py-3
@@ -95,6 +106,15 @@
     {{-- CREATE MODAL --}}
     @if($showCreateModal)
         <div class="fixed inset-0 z-[1000] bg-[rgba(26,42,108,0.35)] backdrop-blur-[4px]">
+            @if ($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-[500px] max-w-full p-[25px]
                     rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] flex flex-col text-2xl animate-modalFade">
                 <h2 class="font-bold text-[#1a2a6c] border-b-2 border-[#1a2a6c] pb-2 mb-5">Добавить аудиторию</h2>
@@ -204,6 +224,16 @@
     {{-- BUILDING MODAL --}}
     @if($showBuildingModal)
         <div class="fixed inset-0 z-[1000] bg-[rgba(26,42,108,0.35)] backdrop-blur-[4px]">
+            @if ($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-[500px] max-w-full p-[25px]
                     rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] flex flex-col text-2xl animate-modalFade">
                 <h2 class="font-bold text-[#1a2a6c] border-b-2 border-[#1a2a6c] pb-2 mb-5">Добавить корпус</h2>

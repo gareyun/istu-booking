@@ -277,7 +277,7 @@
                                 rounded-lg hover:bg-gray-50 transition-colors font-semibold">
                             Нет, оставить
                         </button>
-                    </div>
+                	</div>
                 </div>
             </div>
         @endif

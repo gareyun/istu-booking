@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use HasFactory;
 
 class Booking extends Model
 {
@@ -19,6 +18,7 @@ class Booking extends Model
         'is_tech_support',
         'user_comment',
         'admin_comment',
+        'status',
         'google_event_id',
         'vk_link',
         'vk_user_id',

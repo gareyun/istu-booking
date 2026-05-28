@@ -18,14 +18,6 @@ class VkNotificationService
     public function extractUserId(string $vkLink): ?string
     {
         $vkLink = trim($vkLink);
-        
-        // Форматы ссылок:
-        // https://vk.com/id123456789
-        // https://vk.com/username
-        // vk.com/username
-        // @username
-        // username
-        
         $vkLink = ltrim($vkLink, '@');
         
         // извлекаем идентификатор из URL

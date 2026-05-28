@@ -9,6 +9,9 @@ use App\Services\GoogleCalendarService;
 use App\Services\VkNotificationService;
 use Carbon\Carbon;
 
+use Livewire\Attributes\Layout;
+#[Layout('components.layout')]
+
 class BookingAdminPanel extends Component
 {
     public $status = '';
