@@ -25,6 +25,7 @@ class Booking extends Model
         'name',
         'faculty',
         'group',
+        'phone'
     ];
 
     public function user()

@@ -60,6 +60,9 @@ class VkDialogService
             case 'group':
                 $this->processGroup($userId, $text, $state);
                 break;
+            case 'phone':
+                $this->processPhone($userId, $text, $state);
+                break;
             case 'equipment':
                 $this->processEquipment($userId, $text, $state);
                 break;
@@ -330,6 +333,23 @@ class VkDialogService
             return;
         }
         $state['group'] = $text;
+        $state['step'] = 'phone';
+        Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
+
+        $this->vk->sendMessage($userId, "📱 Введите ваш номер телефона:");
+    }
+
+    protected function processPhone(int $userId, string $text, array $state): void
+    {
+        $text = trim($text);
+
+        $digits = preg_replace('/\D/', '', $text);
+        if (strlen($digits) < 10) {
+            $this->vk->sendMessage($userId, "❌ Неверный формат номера. Введите корректный номер телефона (минимум 10 цифр):");
+            return;
+        }
+
+        $state['phone'] = $text;
         $state['step'] = 'equipment';
         Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
 
@@ -398,6 +418,7 @@ class VkDialogService
             . "👤 ФИО: {$state['name']}\n"
             . "🏛 Факультет: {$state['faculty']}\n"
             . "👥 Группа: {$state['group']}\n"
+            . "📱 Телефон: {$state['phone']}\n"
             . "🏫 Аудитория: {$state['classroom_name']}\n"
             . "📅 Дата: {$state['date']}\n"
             . "⏰ Время: {$state['start_time']} – {$state['end_time']}\n"
@@ -436,6 +457,7 @@ class VkDialogService
             'name'            => $state['name'],
             'faculty'         => $state['faculty'],
             'group'           => $state['group'],
+            'phone'           => $state['phone'],
             'equipment'       => $state['equipment'],
             'is_tech_support' => $state['is_tech_support'],
             'user_comment'    => $state['user_comment'],

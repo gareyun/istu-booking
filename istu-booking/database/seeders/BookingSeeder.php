@@ -19,7 +19,7 @@ class BookingSeeder extends Seeder
             Booking::create([
                 'user_id' => $users->random()->id,
                 'classroom_id' => $classrooms->random()->id,
-                'date' => '2026-03-10',
+                'date' => '03.10.2026',
                 'start_time' => '10:00',
                 'end_time' => '12:00',
                 'purpose' => 'Собрание',
@@ -27,12 +27,13 @@ class BookingSeeder extends Seeder
                 'is_tech_support' => true,
                 'user_comment' => 'Хотим устроить чаепитие',
                 'admin_comment' => 'Не пролейте',
-                'google_event_id' => ''
+                'google_event_id' => '',
+                'status' => 'approved'
             ]),
             Booking::create([
                 'user_id' => $users->random()->id,
                 'classroom_id' => $classrooms->random()->id,
-                'date' => '2026-03-10',
+                'date' => '03.10.2026',
                 'start_time' => '14:00',
                 'end_time' => '16:00',
                 'purpose' => 'Собрание',
@@ -40,12 +41,13 @@ class BookingSeeder extends Seeder
                 'is_tech_support' => true,
                 'user_comment' => 'Перевыборы волонтёрского центра',
                 'admin_comment' => 'УМП тоже придёт посмотреть!',
-                'google_event_id' => ''
+                'google_event_id' => '',
+                'status' => 'approved'
             ]),
             Booking::create([
                 'user_id' => $users->random()->id,
                 'classroom_id' => $classrooms->random()->id,
-                'date' => '2026-03-10',
+                'date' => '03.10.2026',
                 'start_time' => '17:30',
                 'end_time' => '19:00',
                 'purpose' => 'Собрание',

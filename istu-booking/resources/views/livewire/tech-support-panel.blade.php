@@ -97,6 +97,16 @@
                                 </div>
                             </div>
                             <div class="flex justify-between">
+                                <div class="font-bold text-[#7f8c8d]">Номер телефона: </div>
+                                <div>
+                                    @if($booking->user)
+                                        {{ $booking->user->phone ?? '—' }}
+                                    @else
+                                        {{ $booking->phone ?? '—' }}
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="flex justify-between">
                                 <div class="font-bold text-[#7f8c8d]">Дата: </div>
                                 <div>{{ $booking->date }}</div>
                             </div>

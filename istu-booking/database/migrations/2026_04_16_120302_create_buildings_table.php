@@ -16,7 +16,7 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->string('name');
+            $table->string('name')->unique();;
             $table->string('address');
             $table->text('description')->nullable();
             $table->timestamps();
