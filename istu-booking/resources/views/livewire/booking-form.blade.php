@@ -69,7 +69,7 @@
 
                         @foreach ($classrooms as $classroom)
                             <option value="{{ $classroom->id }}">
-                                {{ $classroom->room }}
+                                {{ $classroom->room }} ({{ $classroom->category->category }})
                             </option>
                         @endforeach
                     </select>

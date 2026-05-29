@@ -324,6 +324,12 @@
                 </div>
             </div>
         @endif
+
+        <div wire:loading.flex wire:target="updateStatus, cancelBooking"
+            class="fixed inset-0 bg-[rgba(255,255,255,0.7)] z-[9999] flex-col justify-center items-center">
+            <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <p class="mt-3 text-primary font-semibold">Загрузка...</p>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

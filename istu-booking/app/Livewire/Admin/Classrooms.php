@@ -136,12 +136,19 @@ class Classrooms extends Component
     {
         $classroom = Classroom::find($id);
 
-        if ($classroom->bookings()->exists()) {
+        if (!$classroom) {
+            $this->errorMessage = 'Аудитория не найдена.';
+            return;
+        }
+
+        if ($classroom->bookings()->whereIn('status', ['approved', 'pending'])->exists()) {
+            $this->errorMessage = 'Нельзя удалить аудиторию – есть связанные заявки.';
             return;
         }
 
         $classroom->delete();
         $this->loadData();
+        $this->successMessage = 'Аудитория успешно удалена.';
     }
 
     public function closeModal()
