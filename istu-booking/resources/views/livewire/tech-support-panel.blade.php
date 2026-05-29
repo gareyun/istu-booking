@@ -12,48 +12,21 @@
                 <div class="flex flex-col">
                     <label class="mb-2 font-semibold text-[#1a2a6c]">Дата</label>
                     <div wire:ignore>
-                        <input
-                            type="text"
-                            id="tech_filter_date"
-                            placeholder="ДД.ММ.ГГГГ"
-                            class="px-4 py-3 border-2 border-[#e0e0e0] rounded-[10px]
-                                focus:outline-none focus:border-[#3456db] font-medium
-                                transition-all duration-300 bg-white min-w-[220px]">
+                        <x-input id="tech_filter_date" placeholder="ДД.ММ.ГГГГ" class="font-semibold"/>
                     </div>
                 </div>
 
                 <div class="flex flex-col min-w-[220px]">
                     <label class="mb-2 font-semibold text-[#1a2a6c]">Аудитория</label>
-
-                    <div class="relative">
-                        <select
-                            wire:model.live="selectedClassroom"
-                            class="w-full appearance-none px-4 py-3 pr-10
-                                border-2 border-[#e0e0e0]  rounded-[10px]  bg-white  text-[#333]
-                                font-medium transition-all duration-300 focus:outline-none focus:border-[#3456db]
-                                focus:shadow-[0_0_0_4px_rgba(52,86,219,0.12)] hover:border-[#c7c7c7] cursor-pointer">
-                            <option value="">Все аудитории</option>
-                            @foreach($classrooms as $classroom)
-                                <option value="{{ $classroom->id }}">{{ $classroom->room }}</option>
-                            @endforeach
-                        </select>
-
-                        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4
-                            text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </div>
+                    <x-select wire:model.live="selectedClassroom">
+                        <option value="">Все аудитории</option>
+                        @foreach($classrooms as $classroom)
+                            <option value="{{ $classroom->id }}">{{ $classroom->room }}</option>
+                        @endforeach
+                    </x-select>
                 </div>
 
-                <button
-                    wire:click="resetFilters"
-                    class="px-6 py-3 text-white rounded-[10px] text-[16px] font-semibold
-                        transition-all duration-300 shadow-[0_4px_15px_rgba(231,76,60,0.3)]
-                        bg-gradient-to-br from-[#c2433a] to-[#EB4C42]
-                        hover:-translate-y-[2px] cursor-pointer
-                        hover:shadow-[0_6px_20px_rgba(231,76,60,0.45)]">
-                    Сбросить
-                </button>
+                <x-button wire:click="resetFilters" color="red">Сбросить</x-button>
             </div>
         </div>
 

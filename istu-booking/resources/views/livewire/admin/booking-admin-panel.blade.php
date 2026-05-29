@@ -2,7 +2,6 @@
     <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
     
     <div class="flex-1 p-[30px] overflow-y-auto">
-
         <h1 class="text-[1.5rem] mb-5 pb-[10px] border-b-2 border-[#1a2a6c] text-[#1a2a6c] font-bold">Заявки</h1>
 
         @if($loadError)
@@ -24,96 +23,43 @@
         @endif
 
         <div class="mb-5">
-            <a href="{{ route('admin.classrooms') }}"
-               class="inline-block mr-[10px] px-6 py-3 text-white rounded-[10px] text-[16px] font-semibold
-                      transition-all duration-300 shadow-[0_4px_15px_rgba(37,117,252,0.4)] bg-gradient-to-br
-                      from-[#1A2A6C] to-[#3456DB]
-                      hover:-translate-y-[2px] hover:shadow-[0_6px_20px_rgba(37,117,252,0.6)]">
-                Аудитории
-            </a>
+            <x-button onclick="window.location.href='{{ route('admin.classrooms') }}'">Аудитории</x-button>
         </div>
 
         <div class="bg-white rounded-[10px] shadow-[0_4px_15px_rgba(0,0,0,0.08)] p-5 mb-5">
             <div class="flex flex-wrap gap-4 items-end mb-[20px]">
 
                 <div class="flex flex-col min-w-[220px]">
-                    <label class="mb-2 font-semibold text-[#1a2a6c]">
-                        Дата
-                    </label>
-
+                    <label class="mb-2 font-semibold text-[#1a2a6c]">Дата</label>
                     <div wire:ignore>
-                        <input type="text" id="admin_filter_date" placeholder="ДД.ММ.ГГГГ"
-                                class="px-4 py-3 border-2 border-[#e0e0e0] rounded-[10px]
-                                focus:outline-none focus:border-[#3456db]
-                                font-medium transition-all duration-300 bg-white min-w-[220px]
-                                focus:shadow-[0_0_0_4px_rgba(52,86,219,0.12)] hover:border-[#c7c7c7] cursor-pointer">
+                        <x-input wire:model="description" id="admin_filter_date" placeholder="ДД.ММ.ГГГГ" class="font-medium "/>
                     </div>
                 </div>
 
                 <div class="flex flex-col min-w-[220px]">
-                    <label class="mb-2 font-semibold text-[#1a2a6c]">
-                        Аудитория
-                    </label>
-
-                    <div class="relative">
-                        <select wire:model.live="selectedClassroom"
-                                class="w-full appearance-none px-4 py-3 pr-10
-                                border-2 border-[#e0e0e0]  rounded-[10px]  bg-white  text-[#333]
-                                font-medium transition-all duration-300 focus:outline-none focus:border-[#3456db]
-                                focus:shadow-[0_0_0_4px_rgba(52,86,219,0.12)] hover:border-[#c7c7c7] cursor-pointer">
-
-                            <option value="">Все аудитории</option>
-
-                            @foreach($classrooms as $classroom)
-                                <option value="{{ $classroom->id }}">
-                                    {{ $classroom->room }}
-                                </option>
-                            @endforeach
-                        </select>
-
-                        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4
-                            text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </div>
+                    <label class="mb-2 font-semibold text-[#1a2a6c]">Аудитория</label>
+                    <x-select wire:model.live="selectedClassroom">
+                        <option value="">Все аудитории</option>
+                        @foreach($classrooms as $classroom)
+                            <option value="{{ $classroom->id }}">
+                                {{ $classroom->room }}
+                            </option>
+                        @endforeach
+                    </x-select>
                 </div>
 
                 <div class="flex flex-col min-w-[220px]">
-                    <label class="mb-2 font-semibold text-[#1a2a6c]">
-                        Статус заявки
-                    </label>
-
-                    <div class="relative">
-                        <select wire:model.live="status"
-                                class="w-full appearance-none px-4 py-3 pr-10
-                                border-2 border-[#e0e0e0]  rounded-[10px]  bg-white  text-[#333]
-                                font-medium transition-all duration-300 focus:outline-none focus:border-[#3456db]
-                                focus:shadow-[0_0_0_4px_rgba(52,86,219,0.12)] hover:border-[#c7c7c7] cursor-pointer">
-
-                            <option value="">Все статусы</option>
-                            <option value="pending">⏳ В ожидании</option>
-                            <option value="approved">✅ Одобренные</option>
-                            <option value="rejected">❌ Отклонённые</option>
-                            <option value="cancelled">🚫 Отменённые</option>
-                        </select>
-
-                        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4
-                            text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </div>
+                    <label class="mb-2 font-semibold text-[#1a2a6c]">Статус заявки</label>
+                    <x-select wire:model.live="status">
+                        <option value="">Все статусы</option>
+                        <option value="pending">⏳ В ожидании</option>
+                        <option value="approved">✅ Одобренные</option>
+                        <option value="rejected">❌ Отклонённые</option>
+                        <option value="cancelled">🚫 Отменённые</option>
+                    </x-select>
                 </div>
 
-                <button
-                    wire:click="resetFilters"
-                    class="px-6 py-3 text-white rounded-[10px] text-[16px]
-                        font-semibold transition-all duration-300
-                        shadow-[0_4px_15px_rgba(231,76,60,0.3)]
-                        bg-gradient-to-br from-[#c2433a] to-[#EB4C42]
-                        hover:-translate-y-[2px] cursor-pointer
-                        hover:shadow-[0_6px_20px_rgba(231,76,60,0.45)]">
-                    Сбросить
-                </button>
+                <x-button wire:click="resetFilters" color="red">Сбросить</x-button>
             </div>
         </div>
 
@@ -125,9 +71,7 @@
 
                     <div>
                         <div class="flex justify-between items-center mb-[15px]">
-                            <div class="text-[0.9rem] text-[#7f8c8d]">
-                                ID: {{ $booking->id }}
-                            </div>
+                            <div class="text-[0.9rem] text-[#7f8c8d]">ID: {{ $booking->id }}</div>
                             @if(!$booking->user_id && $booking->vk_user_id)
                                 <div class="text-xs text-gray-400 mt-2">через VK бота</div>
                             @endif
@@ -221,37 +165,23 @@
 
                     @if($booking->status === 'pending')
                         <div class="mt-5">
-                            <textarea
-                                wire:model.live="adminComments.{{ $booking->id }}"
-                                placeholder="Оставить комментарий..."
-                                class="w-full
-                                       min-h-[60px] max-h-[300px] p-3 border-2 border-[#ddd] rounded-[8px] text-[14px]
-                                       leading-[1.5] resize-none transition-all duration-300 focus:outline-none
-                                       focus:border-primary focus:shadow-[0_0_0_3px_rgba(0,123,255,0.1)]">
-                            </textarea>
+                            <x-input wire:model.live="adminComments.{{ $booking->id }}" type="textarea"
+                                    class="resize-none" placeholder="Оставить комментарий..."/>
 
                             <div class="flex gap-[10px] mt-[15px]">
                                 <button
                                     wire:click="updateStatus({{ $booking->id }}, 'approved')"
-                                    class="flex-1 py-2
-                                        bg-gradient-to-br from-[#1f9d55] to-[#27ae60]
-                                        transition-all duration-300
-                                        shadow-[0_4px_15px_rgba(39,174,96,0.3)]
-                                        text-white rounded-lg cursor-pointer
-                                        font-semibold
-                                        hover:shadow-[0_6px_20px_rgba(39,174,96,0.45)]">
+                                    class="flex-1 py-2 bg-gradient-to-br from-[#1f9d55] to-[#27ae60]
+                                        transition-all duration-300 shadow-[0_4px_15px_rgba(39,174,96,0.3)] text-white
+                                        rounded-lg cursor-pointer font-semibold hover:shadow-[0_6px_20px_rgba(39,174,96,0.45)]">
                                     Принять
                                 </button>
 
                                 <button
                                     wire:click="updateStatus({{ $booking->id }}, 'rejected')"
-                                    class="flex-1 py-2
-                                        bg-gradient-to-br from-[#c2433a] to-[#EB4C42]
-                                        transition-all duration-300
-                                        shadow-[0_4px_15px_rgba(231,76,60,0.3)]
-                                        text-white rounded-lg cursor-pointer
-                                        font-semibold
-                                        hover:shadow-[0_6px_20px_rgba(231,76,60,0.45)]">
+                                    class="flex-1 py-2 bg-gradient-to-br from-[#c2433a] to-[#EB4C42]
+                                        transition-all duration-300 shadow-[0_4px_15px_rgba(231,76,60,0.3)] text-white
+                                        rounded-lg cursor-pointer font-semibold hover:shadow-[0_6px_20px_rgba(231,76,60,0.45)]">
                                     Отклонить
                                 </button>
                             </div>
@@ -271,13 +201,9 @@
                                     </button>
                                 </div>
                             @elseif($booking->status === 'rejected')
-                                <div class="py-3">
-                                    ❌ Отклонена
-                                </div>
+                                <div class="py-3">❌ Отклонена</div>
                             @elseif($booking->status === 'cancelled')
-                                <div class="py-3">
-                                    🚫 Отменена
-                                </div>
+                                <div class="py-3">🚫 Отменена</div>
                             @endif
                         </div>
                     @endif
@@ -288,41 +214,19 @@
 
             @if($hasMoreBookings)
                 <div class="col-span-full flex justify-center mt-2">
-                    <button
-                        wire:click="loadMore"
-                        class="px-6 py-3 text-white rounded-[10px] text-[16px]
-                            font-semibold transition-all duration-300
-                            shadow-[0_4px_15px_rgba(37,117,252,0.3)]
-                            bg-gradient-to-br from-[#1A2A6C] to-[#3456DB]
-                            hover:-translate-y-[2px] cursor-pointer
-                            hover:shadow-[0_6px_20px_rgba(37,117,252,0.45)]">
-                        Показать ещё
-                    </button>
+                    <x-button wire:click="loadMore">Показать ещё</x-button>
                 </div>
             @endif
         </div>
 
         @if($showCancelModal)
-            <div class="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(26,42,108,0.35)] backdrop-blur-[4px] backdrop-blur-sm">
-                <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Подтверждение отмены</h3>
-                    <p class="text-gray-600 mb-6">Вы уверены, что хотите отменить эту бронь? Действие нельзя будет отменить.</p>
-                    <div class="flex justify-end gap-3">
-                        <button wire:click="cancelBooking"
-                                class="px-5 py-2.5 bg-gradient-to-br from-[#c2433a] to-[#EB4C42]
-                                transition-all duration-300 shadow-[0_4px_15px_rgba(231,76,60,0.3)]
-                                text-white rounded-lg cursor-pointer
-                                transition-colors font-semibold hover:shadow-[0_6px_20px_rgba(231,76,60,0.45)]">
-                            Да, отменить
-                        </button>
-                        <button wire:click="closeCancelModal"
-                                class="px-5 py-2.5 border border-gray-300 text-gray-700 cursor-pointer
-                                rounded-lg hover:bg-gray-50 transition-colors font-semibold">
-                            Нет, оставить
-                        </button>
-                	</div>
-                </div>
-            </div>
+            <x-modal title="Подтверждение отмены">
+                <p class="text-gray-600 mb-6">Вы уверены, что хотите отменить эту бронь? Действие нельзя будет отменить.</p>
+                <x-slot name="footer">
+                    <x-button wire:click="cancelBooking" color="red">Да, отменить</x-button>
+                    <x-button wire:click="closeCancelModal" color="gray">Нет, оставить</x-button>
+                </x-slot>
+            </x-modal>
         @endif
 
         <div wire:loading.flex wire:target="updateStatus, cancelBooking"

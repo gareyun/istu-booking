@@ -1,47 +1,39 @@
 <div class="p-4 md:p-8 bg-gray-50 min-h-screen font-sans">
-
-    <h1 class="text-2xl md:text-3xl font-bold text-indigo-800 mb-6">
-        📅 Расписание аудиторий
-    </h1>
+    <h1 class="text-2xl md:text-3xl font-bold text-indigo-800 mb-6">📅 Расписание аудиторий</h1>
 
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div class="flex items-center gap-4">
-            <label for="classroom" class="text-gray-700 font-semibold whitespace-nowrap">
-                Аудитория:
-            </label>
-            <select
-                wire:model.live="selectedClassroom"
-                class="w-full md:w-64 border-2 border-gray-300 rounded-lg px-4 py-2
-                        focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 cursor-pointer">
-                <option value="">-- Выберите аудиторию --</option>
+            <label for="classroom" class="text-gray-700 font-semibold whitespace-nowrap">Аудитория:</label>
+            <x-select wire:model.live="selectedClassroom">
+                <option value="">Выберите аудиторию</option>
                 @foreach($classrooms as $classroom)
                     <option value="{{ $classroom->id }}">{{ $classroom->room }}</option>
                 @endforeach
-            </select>
+            </x-select>
 
             <a href="{{ route('booking') }}"
-                class="inline-block px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100
+                class="inline-block px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100
                         transition-colors font-semibold">
-                📝 Забронировать
+                Забронировать
             </a>
         </div>
 
         @if($selectedClassroom)
-        <div class="flex items-center gap-3">
-            <button wire:click="prevWeek"
-                class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition cursor-pointer">
-                ← Пред. неделя
-            </button>
-            <span class="text-gray-800 font-semibold whitespace-nowrap">
-                {{ \Carbon\Carbon::parse($weekDays[0]['date'])->format('d.m') }}
-                –
-                {{ \Carbon\Carbon::parse($weekDays[6]['date'])->format('d.m.Y') }}
-            </span>
-            <button wire:click="nextWeek"
-                class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition cursor-pointer">
-                След. неделя →
-            </button>
-        </div>
+            <div class="flex items-center gap-3">
+                <button wire:click="prevWeek"
+                    class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition cursor-pointer">
+                    ← Пред. неделя
+                </button>
+                <span class="text-gray-800 font-semibold whitespace-nowrap">
+                    {{ \Carbon\Carbon::parse($weekDays[0]['date'])->format('d.m') }}
+                    –
+                    {{ \Carbon\Carbon::parse($weekDays[6]['date'])->format('d.m.Y') }}
+                </span>
+                <button wire:click="nextWeek"
+                    class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition cursor-pointer">
+                    След. неделя →
+                </button>
+            </div>
         @endif
     </div>
 
@@ -60,7 +52,7 @@
 
             {{-- Сам календарь с сеткой и событиями --}}
             <div class="relative" style="height: {{ count($timeSlots) * 60 }}px; background: #fff;">
-                
+
                 {{-- вертикальные линии --}}
                 <div class="absolute inset-0 grid grid-cols-[60px_repeat(7,1fr)] z-0">
                     @foreach($timeSlots as $time)
@@ -102,10 +94,7 @@
                             $pixelsPerMinute = 2;
 
                             $topPx = $startMin * $pixelsPerMinute;
-                            $heightPx = max(
-                                40,
-                                ($endMin - $startMin) * $pixelsPerMinute
-                            );
+                            $heightPx = max(40, ($endMin - $startMin) * $pixelsPerMinute);
                         @endphp
                         <div wire:click="openBookingModal({{ $booking->id }})"
                                 class="absolute z-20 rounded-md p-1 text-xs text-white bg-indigo-500 hover:bg-indigo-600
@@ -120,6 +109,10 @@
                     @endforeach
                 @endforeach
             </div>
+        </div>
+    @else
+        <div class="col-span-full text-center text-2xl font-bold text-gray-400 py-10">
+            Выберите аудиторию для просмотра расписания
         </div>
     @endif
 
@@ -168,15 +161,16 @@
                         <div>
                             <div class="text-gray-500 font-semibold">Статус</div>
                             <div class="font-semibold">
-                                @if($selectedBooking->status === 'approved')
-                                    <span class="text-green-600">✅ Одобрена</span>
-                                @elseif($selectedBooking->status === 'rejected')
-                                    <span class="text-red-600">❌ Отклонена</span>
-                                @elseif($selectedBooking->status === 'cancelled')
-                                    <span class="text-gray-600">🚫 Отменена</span>
-                                @else
-                                    <span class="text-yellow-600">⏳ В ожидании</span>
-                                @endif
+                                @switch($selectedBooking->status)
+                                    @case('approved')
+                                        <span class="text-green-600">✅ Одобрена</span> @break
+                                    @case('rejected')
+                                        <span class="text-red-600">❌ Отклонена</span> @break
+                                    @case('cancelled')
+                                        <span class="text-gray-600">🚫 Отменена</span> @break
+                                    @default
+                                        <span class="text-yellow-600">⏳ В ожидании</span>
+                                @endswitch
                             </div>
                         </div>
                     </div>
@@ -223,16 +217,7 @@
                 </div>
 
                 <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
-                    <button
-                        wire:click="closeBookingModal"
-                        class="px-5 py-2.5 bg-gradient-to-br
-                            from-[#1A2A6C] to-[#3456DB]
-                            text-white rounded-lg font-semibold
-                            shadow-[0_4px_15px_rgba(52,86,219,0.3)]
-                            hover:shadow-[0_6px_20px_rgba(52,86,219,0.45)]
-                            transition-all duration-300 cursor-pointer">
-                        Закрыть
-                    </button>
+                    <x-button wire:click="closeBookingModal">Закрыть</x-button>
                 </div>
             </div>
         </div>

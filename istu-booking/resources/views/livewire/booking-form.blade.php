@@ -8,11 +8,7 @@
                 <div class="text-7xl mb-6">✅</div>
                 <h2 class="text-2xl font-bold text-green-600 mb-4">Мы получили вашу заявку!</h2>
                 <p class="text-gray-600 mb-8">Скоро мы её рассмотрим. Ожидайте уведомления.</p>
-                <button wire:click="resetForm" type="button"
-                        class="px-6 py-3 bg-gradient-to-br from-[#1A2A6C] to-[#3456DB] cursor-pointer
-                        text-white font-semibold rounded-[10px] hover:shadow-lg transition hover:-translate-y-[2px]">
-                    Подать новую заявку
-                </button>
+                <x-button wire:click="resetForm">Подать новую заявку</x-button>
             </div>
         @else
 
@@ -56,37 +52,17 @@
                     Аудитория
                     <span class="text-danger">*</span>
                 </label>
-
-                <div class="select-block relative">
-                    <select
-                        wire:model.live="classroom_id"
-                        class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
-                            focus:border-primary focus:ring-4 appearance-none focus:ring-[rgba(78,115,223,0.25)]
-                            outline-none bg-white cursor-pointer"
-                        required>
-
-                        <option value="">Выберите аудиторию</option>
-
-                        @foreach ($classrooms as $classroom)
-                            <option value="{{ $classroom->id }}">
-                                {{ $classroom->room }} ({{ $classroom->category->category }})
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </div>
-                
+                <x-select wire:model.live="classroom_id" required>
+                    <option value="">Выберите аудиторию</option>
+                    @foreach ($classrooms as $classroom)
+                        <option value="{{ $classroom->id }}">
+                            {{ $classroom->room }} ({{ $classroom->category->category }})
+                        </option>
+                    @endforeach
+                </x-select>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-                
                 <div>
                     <label class="block font-semibold text-[#495057] mb-2">
                         Дата бронирования
@@ -94,14 +70,7 @@
                     </label>
 
                     <div wire:ignore>
-                        <input
-                            type="text"
-                            id="event_date"
-                            class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
-                                   focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
-                                   outline-none bg-white"
-                            placeholder="ДД.ММ.ГГГГ"
-                            required>
+                        <x-input wire:model="description" id="event_date" placeholder="ДД.ММ.ГГГГ" required/>
                     </div>
                 </div>
 
@@ -112,27 +81,9 @@
                     </label>
 
                     <div class="flex flex-col md:flex-row gap-5 items-center">
-                        <input
-                            type="text"
-                            id="start_time"
-                            wire:model="start_time"
-                            class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
-                                   focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
-                                   outline-none bg-white"
-                            placeholder="14:30"
-                            required>
-
+                        <x-input wire:model="start_time" id="start_time" placeholder="14:30" required/>
                         <span class="text-xl font-bold text-secondary">—</span>
-
-                        <input
-                            type="text"
-                            id="end_time"
-                            wire:model="end_time"
-                            class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
-                                   focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
-                                   outline-none bg-white"
-                            placeholder="16:00"
-                            required>
+                        <x-input wire:model="end_time" id="end_time" placeholder="16:00" required/>
                     </div>
                 </div>
             </div>
@@ -143,15 +94,8 @@
                     <div class="mt-2 space-y-1">
                         @foreach($busySlots as $slot)
                             <div>
-                                {{ $slot['start_time'] }}
-                                -
-                                {{ $slot['end_time'] }}
-
-                                @if($slot['status'] === 'pending')
-                                    (на рассмотрении)
-                                @else
-                                    (занято)
-                                @endif
+                                {{ $slot['start_time'] }} - {{ $slot['end_time'] }}
+                                {{ $slot['status'] === 'pending' ? '(на рассмотрении)' : '(занято)' }}
                             </div>
                         @endforeach
                     </div>
@@ -163,31 +107,14 @@
                     Цель бронирования
                     <span class="text-danger">*</span>
                 </label>
-
-                <textarea
-                    wire:model="purpose"
-                    rows="3"
-                    class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
-                        focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
-                        outline-none bg-white"
-                    placeholder="Собрание студсовета, репетиция, занятие..."
-                    required></textarea>
+                <x-input wire:model="purpose" type="textarea" placeholder="Собрание студсовета, репетиция, занятие..." rows="3" required/>
             </div>
 
             <div class="bg-[#f8f9fa] p-5 rounded-[10px] mb-4">
                 <h5 class="font-[600] text-lg mb-4">🔧 Оборудование</h5>
-                
                 <div class="mb-4">
                     <label class="block font-semibold text-[#495057] mb-2">Необходимое оборудование</label>
-                    <textarea
-                        wire:model="equipment"
-                        rows="2"
-                        class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
-                               focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
-                               outline-none bg-white"
-                        placeholder="Проектор, микрофоны, стулья..."
-                    ></textarea>
-
+                    <x-input wire:model="equipment" type="textarea" placeholder="Проектор, микрофоны, стулья..." rows="2" required/>
                     <small class="text-secondary text-sm">Оставьте пустым, если оборудование не требуется</small>
                 </div>
 
@@ -196,21 +123,15 @@
                     <div class="flex gap-6">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input
-                                wire:model="is_tech_support"
-                                type="radio"
-                                value="1"
+                                wire:model="is_tech_support" type="radio" value="1"
                                 class="w-4 h-4 text-primary accent-primary border-gray-300 focus:ring-primary">
-
                             <span>Да</span>
                         </label>
 
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input
-                                wire:model="is_tech_support"
-                                type="radio"
-                                value="0"
+                                wire:model="is_tech_support" type="radio" value="0"
                                 class="w-4 h-4 text-primary accent-primary border-gray-300 focus:ring-primary">
-
                             <span>Нет</span>
                         </label>
                     </div>
@@ -219,20 +140,11 @@
 
             <div class="mb-4">
                 <label class="block font-semibold text-[#495057] mb-2">Комментарий для администратора</label>
-
-                <textarea
-                    wire:model="user_comment"
-                    rows="3"
-                    class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
-                        focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
-                           outline-none bg-white"
-                    placeholder="Дополнительная информация, пожелания, особенности мероприятия..."
-                ></textarea>
+                <x-input wire:model="user_comment" type="textarea" placeholder="Дополнительная информация, пожелания, особенности мероприятия..." rows="3" required/>
             </div>
 
             <div class="bg-warning text-[#684F06] rounded-[10px] p-5 mb-4">
                 <h5 class="font-bold text-lg mb-3">📋 Правила бронирования</h5>
-
                 <ul class="space-y-1 list-disc pl-5">
                     <li>Бронирование возможно только минимум за 24 часа до мероприятия</li>
                     <li>При использовании танцевального зала обязательна сменная обувь</li>
@@ -243,19 +155,11 @@
             </div>
 
             <div class="flex flex-col md:flex-row gap-3 md:justify-end">
-                <button
-                    type="submit"
-                    wire:loading.attr="disabled"
-                    class="text-white font-semibold px-8 py-3
-                           rounded-[10px] transition-all duration-300 hover:-translate-y-[2px] cursor-pointer
-                           bg-gradient-to-br from-[#1A2A6C] to-[#3456DB]
-                           hover:shadow-[0_6px_20px_rgba(37,117,252,0.6)]">
-                    Отправить заявку
-                </button>
+                <x-button type="submit" wire:loading.attr="disabled">Отправить заявку</x-button>
             </div>
-
         </form>
         @endif
+        
         <div wire:loading.flex class="fixed inset-0 bg-[rgba(255,255,255,0.7)] z-[9999] flex-col justify-center items-center">
             <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             <p class="mt-3 text-primary font-semibold">Загрузка...</p>
@@ -265,95 +169,43 @@
             <p>По вопросам обращайтесь: 8 (3412) 77-60-55, доб. 1371</p>
             <p class="mt-2">
                 Также вы можете подать заявку через
-                <a href="https://vk.com" target="_blank" class="text-primary hover:underline">
-                    VK бота
-                </a>
+                <a href="https://vk.com" target="_blank" class="text-primary hover:underline">VK бота</a>
             </p>
         </div>
 
         <div class="bg-white border border-[#e3e6f0] rounded-[10px] p-5 mt-8 mb-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                
                 <div>
                     <label class="block font-semibold text-[#495057] mb-2">Статус</label>
-
-                    <div class="select-block relative">
-                        <select
-                            wire:model.live="filterStatus"
-                            class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
-                                focus:border-primary focus:ring-4 appearance-none focus:ring-[rgba(78,115,223,0.25)]
-                                outline-none bg-white cursor-pointer">
-
-                            <option value="">Все статусы</option>
-                            <option value="pending">⏳ Ожидает</option>
-                            <option value="approved">✅ Одобрена</option>
-                            <option value="rejected">❌ Отклонена</option>
-                            <option value="cancelled">🚫 Отменена</option>
-                        </select>
-
-                        <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24">
-
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </div>
+                    <x-select wire:model.live="filterStatus">
+                        <option value="">Все статусы</option>
+                        <option value="pending">⏳ Ожидает</option>
+                        <option value="approved">✅ Одобрена</option>
+                        <option value="rejected">❌ Отклонена</option>
+                        <option value="cancelled">🚫 Отменена</option>
+                    </x-select>
                 </div>
 
                 <div>
                     <label class="block font-semibold text-[#495057] mb-2">Дата</label>
-                    <input
-                        type="text"
-                        id="filter_date"
-                        placeholder="ДД.ММ.ГГГГ"
-                        class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
-                               focus:border-primary focus:ring-4 focus:ring-[rgba(78,115,223,0.25)]
-                               outline-none bg-white">
+                    <x-input id="filter_date" placeholder="ДД.ММ.ГГГГ"/>
                 </div>
 
                 <div>
                     <label class="block font-semibold text-[#495057] mb-2">Аудитория</label>
-
-                    <div class="select-block relative">
-                        <select
-                            wire:model.live="filterClassroom"
-                            class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] transition-all duration-300
-                                focus:border-primary focus:ring-4 appearance-none focus:ring-[rgba(78,115,223,0.25)]
-                                outline-none bg-white cursor-pointer">
-
-                            <option value="">Все аудитории</option>
-
-                            @foreach($classrooms as $classroom)
-                                <option value="{{ $classroom->id }}">
-                                    {{ $classroom->room }}
-                                </option>
-                            @endforeach
-                        </select>
-
-                        <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24">
-
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </div>
+                    <x-select wire:model.live="filterClassroom">
+                        <option value="">Все аудитории</option>
+                        @foreach($classrooms as $classroom)
+                            <option value="{{ $classroom->id }}">
+                                {{ $classroom->room }}
+                            </option>
+                        @endforeach
+                    </x-select>
                 </div>
             </div>
 
             <div class="mt-4">
-                <button
-                    wire:click="resetFilters"
-                    type="button"
-                    class="px-6 py-3 text-white rounded-[10px] text-[16px]
-                        font-semibold transition-all duration-300
-                        shadow-[0_4px_15px_rgba(231,76,60,0.3)]
-                        bg-gradient-to-br from-[#c2433a] to-[#EB4C42]
-                        hover:-translate-y-[2px] cursor-pointer
-                        hover:shadow-[0_6px_20px_rgba(231,76,60,0.45)]">
-                    Сбросить
-                </button>
+                <x-button wire:click="resetFilters" color="red">Сбросить</x-button>
             </div>
         </div>
 
@@ -370,7 +222,6 @@
                 <div class="bg-white rounded-xl shadow p-4 mb-4 border border-[#e3e6f0]">
                     <div class="flex flex-col md:flex-row md:justify-between gap-2 mb-2">
                         <div class="flex items-center gap-2 flex-wrap">
-                            
                             <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 border border-gray-200">
                                 ID: {{ $booking->id }}
                             </span>
@@ -396,9 +247,7 @@
                         </span>
                     </div>
 
-                    <div class="font-semibold">
-                        Аудитория {{ $booking->classroom->room }}
-                    </div>
+                    <div class="font-semibold">Аудитория {{ $booking->classroom->room }}</div>
 
                     <div class="text-sm text-gray-600 mt-2">
                         📅 {{ $booking->date }}
@@ -408,14 +257,10 @@
                         {{ $booking->end_time }}
                     </div>
 
-                    <div class="mt-3">
-                        <b>Цель:</b> {{ $booking->purpose }}
-                    </div>
+                    <div class="mt-3"><b>Цель:</b> {{ $booking->purpose }}</div>
 
                     @if($booking->user_comment)
-                        <div class="text-gray-500 text-sm mt-2">
-                            {{ $booking->user_comment }}
-                        </div>
+                        <div class="text-gray-500 text-sm mt-2">{{ $booking->user_comment }}</div>
                     @endif
 
                     @if($booking->admin_comment)
@@ -431,86 +276,38 @@
 
             @if($hasMoreBookings)
                 <div class="flex justify-center mt-6">
-                    <button
-                        wire:click="loadMore"
-                        type="button"
-                        class="px-6 py-3 rounded-[10px] text-white font-semibold
-                            bg-gradient-to-br from-[#1A2A6C] to-[#3456DB]
-                            hover:-translate-y-[2px] transition-all duration-300
-                            hover:shadow-[0_6px_20px_rgba(37,117,252,0.45)]
-                            cursor-pointer">
-                        Показать ещё
-                    </button>
+                    <x-button wire:click="loadMore">Показать ещё</x-button>
                 </div>
             @endif
         </div>
 
         @if($showSettingsModal)
-            <div class="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(26,42,108,0.35)] backdrop-blur-[4px]">
-                <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
-                    @if ($errors->any())
-                        <div class="bg-[#FFF3CD] text-[#684F06]-700 rounded-[10px] p-4 mb-4">
-                            @foreach ($errors->all() as $error)
-                                <div>{{ $error }}</div>
-                            @endforeach
-                        </div>
-                    @endif
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Настройки уведомлений</h3>
-                    <label class="block font-semibold text-[#495057] mb-2">
-                        Привязать страницу ВКонтакте для уведомлений
-                    </label>
-                    <input
-                        type="text"
-                        wire:model="settingsVkLink"
-                        class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] 
-                            transition-all duration-300 focus:border-primary focus:ring-4 
-                            focus:ring-[rgba(78,115,223,0.25)] outline-none bg-white"
-                        placeholder="https://vk.com/username или @username">
+            <x-modal title="Настройки уведомлений">
+                <label class="block font-semibold text-[#495057] mb-2">Привязать страницу ВКонтакте для уведомлений</label>
+                <x-input wire:model="settingsVkLink" placeholder="https://vk.com/username или @username"/>
 
-                    @if($settingsVkLink)
-                        <small class="inline-block text-sm text-green-600">Страница привязана</small>
-                    @endif
+                @if($settingsVkLink)
+                    <small class="inline-block text-sm text-green-600">Страница привязана</small>
+                @endif
 
-                    <small class="text-gray-500 text-sm block mb-6 mt-4">
-                        Укажите ссылку один раз – она будет автоматически прикрепляться ко всем вашим заявкам.
-                    </small>
+                <label class="block font-semibold text-[#495057] mb-2 mt-4">
+                    Номер телефона <span class="text-danger">*</span>
+                </label>
+                <x-input wire:model="settingsPhone" placeholder="+7 (999) 123-45-67"/>
+                @error('settingsPhone')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
 
-                    <label class="block font-semibold text-[#495057] mb-2 mt-4">
-                        Номер телефона <span class="text-danger">*</span>
-                    </label>
-                    <input
-                        type="tel"
-                        wire:model="settingsPhone"
-                        class="w-full border-2 border-[#e3e6f0] rounded-[8px] px-[15px] py-[12px] 
-                            transition-all duration-300 focus:border-primary focus:ring-4 
-                            focus:ring-[rgba(78,115,223,0.25)] outline-none bg-white"
-                        placeholder="+7 (999) 123-45-67">
-                    @error('settingsPhone')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
+                <small class="text-gray-500 text-sm block mb-6 mt-1">
+                    Укажите номер телефона один раз – он будет обязателен для всех ваших заявок.
+                </small>
 
-                    <small class="text-gray-500 text-sm block mb-6 mt-4">
-                        Укажите номер телефона один раз – он будет обязателен для всех ваших заявок.
-                    </small>
-
-                    <div class="flex justify-end gap-3">
-                        <button wire:click="saveSettings"
-                                class="px-5 py-2.5 rounded-[10px] transition-all duration-300
-                                bg-gradient-to-br from-[#1A2A6C] to-[#3456DB]
-                                transition-colors font-semibold cursor-pointer text-white
-                                hover:shadow-[0_6px_20px_rgba(37,117,252,0.4)]">
-                            Сохранить
-                        </button>
-                        <button wire:click="closeSettingsModal"
-                                class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg
-                                hover:bg-gray-50 transition-colors font-semibold cursor-pointer">
-                            Отмена
-                        </button>
-                    </div>
-                </div>
-            </div>
-            @endif
-
+                <x-slot name="footer">
+                    <x-button wire:click="saveSettings">Сохранить</x-button>
+                    <x-button wire:click="closeSettingsModal" color="gray">Отмена</x-button>
+                </x-slot>
+            </x-modal>
+        @endif
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
