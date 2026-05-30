@@ -205,7 +205,6 @@ class BookingForm extends Component
 
         $vkLink = $user ? $user->vk_link : null;
 
-        // бронь минимум за 24 часа
         try {
             $bookingStart = Carbon::createFromFormat(
                 'd.m.Y H:i',

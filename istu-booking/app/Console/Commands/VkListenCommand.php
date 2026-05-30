@@ -62,7 +62,6 @@ class VkListenCommand extends Command
 
                         $this->info("New message from {$userId}: {$text}");
 
-                        // Делегируем обработку
                         $dialog->handleMessage($userId, $text);
                     }
                 }

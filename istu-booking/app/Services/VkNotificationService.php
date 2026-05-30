@@ -20,24 +20,20 @@ class VkNotificationService
         $vkLink = trim($vkLink);
         $vkLink = ltrim($vkLink, '@');
         
-        // извлекаем идентификатор из URL
         if (preg_match('/vk\.com\/(.+)/', $vkLink, $matches)) {
             $identifier = trim($matches[1], '/');
         } else {
             $identifier = $vkLink;
         }
         
-        // если это числовой ID (id123456789)
         if (preg_match('/^id(\d+)$/', $identifier, $matches)) {
             return $matches[1];
         }
         
-        // если просто число
         if (is_numeric($identifier)) {
             return $identifier;
         }
         
-        // если это username - получаем ID через API
         return $this->resolveScreenName($identifier);
     }
 
@@ -109,7 +105,6 @@ class VkNotificationService
 
     public function notifyStatusChange($booking): bool
     {
-        // указана ли ссылка VK
         if (empty($booking->vk_link)) {
             Log::info('VK notification skipped: no vk_link');
             return false;
@@ -124,7 +119,6 @@ class VkNotificationService
             return false;
         }
 
-        // Формируем сообщение
         $statusEmoji = match($booking->status) {
             'approved' => '✅',
             'rejected' => '❌',

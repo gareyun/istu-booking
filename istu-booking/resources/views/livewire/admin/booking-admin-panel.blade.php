@@ -28,151 +28,50 @@
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-[25px] p-5">
             @forelse($bookings as $booking)
-                <div class="bg-white rounded-[10px] shadow-[0_4px_15px_rgba(0,0,0,0.1)] p-5 transition-all duration-300
-                            hover:-translate-y-[5px] hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)]
-                            flex flex-col justify-between">
-
-                    <div>
-                        <div class="flex justify-between items-center mb-[15px]">
-                            <div class="text-[0.9rem] text-[#7f8c8d]">ID: {{ $booking->id }}</div>
-                            @if(!$booking->user_id && $booking->vk_user_id)
-                                <div class="text-xs text-gray-400 mt-2">через VK бота</div>
-                            @endif
-                        </div>
-
-                        <div class="text-[1.3rem] font-bold text-[#1a2a6c] mb-[15px]">
-                            Аудитория: {{ $booking->classroom->room }}
-                        </div>
-
-                        <div class="space-y-[7px]">
-                            <div class="flex justify-between">
-                                <div class="font-bold text-[#7f8c8d]">ФИО: </div>
-                                <div>
-                                    @if($booking->user)
-                                        {{ $booking->user->name }}
-                                    @else
-                                        {{ $booking->name ?? '—' }}
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div class="flex justify-between">
-                                <div class="font-bold text-[#7f8c8d]">Факультет: </div>
-                                <div>
-                                    @if($booking->user)
-                                        {{ $booking->user->faculty ?? '—' }}
-                                    @else
-                                        {{ $booking->faculty ?? '—' }}
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div class="flex justify-between">
-                                <div class="font-bold text-[#7f8c8d]">Группа: </div>
-                                <div>
-                                    @if($booking->user)
-                                        {{ $booking->user->group ?? '—' }}
-                                    @else
-                                        {{ $booking->group ?? '—' }}
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div class="flex justify-between">
-                                <div class="font-bold text-[#7f8c8d]">Номер телефона: </div>
-                                <div>
-                                    @if($booking->user)
-                                        {{ $booking->user->phone ?? '—' }}
-                                    @else
-                                        {{ $booking->phone ?? '—' }}
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div class="flex justify-between">
-                                <div class="font-bold text-[#7f8c8d]">Дата: </div>
-                                <div>{{ $booking->date }}</div>
-                            </div>
-
-                            <div class="flex justify-between">
-                                <div class="font-bold text-[#7f8c8d]">Время: </div>
-                                <div>{{ $booking->start_time }} - {{ $booking->end_time }}</div>
-                            </div>
-
-                            <div class="flex justify-between gap-5">
-                                <div class="font-bold text-[#7f8c8d]">Цель: </div>
-                                <div class="text-right">{{ $booking->purpose }}</div>
-                            </div>
-
-                            <div class="flex justify-between gap-5">
-                                <div class="font-bold text-[#7f8c8d]">Оборудование: </div>
-                                <div class="text-right">{{ $booking->equipment ?: '-' }}</div>
-                            </div>
-
-                            <div class="flex justify-between">
-                                <div class="font-bold text-[#7f8c8d]">Тех. специалист: </div>
-                                <div>{{ $booking->is_tech_support ? 'Да' : 'Нет' }}</div>
-                            </div>
-
-                            <div class="flex justify-between gap-5">
-                                <div class="font-bold text-[#7f8c8d]">Комментарий студента: </div>
-                                <div class="text-right break-words">{{ $booking->user_comment ?: '-' }}</div>
-                            </div>
-
-                            <div class="flex justify-between gap-5">
-                                <div class="font-bold text-[#7f8c8d]">Комментарий администратора: </div>
-                                <div class="text-right break-words">{{ $booking->admin_comment ?: '-' }}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    @if($booking->status === 'pending')
-                        <div class="mt-5">
+                <x-booking-card :booking="$booking">
+                    
+                    <x-slot name="actions">
+                        @if($booking->status === 'pending')
                             <x-input wire:model.live="adminComments.{{ $booking->id }}" type="textarea"
                                     class="resize-none" placeholder="Оставить комментарий..."/>
 
-                            <div class="flex gap-[10px] mt-[15px]">
-                                <button
-                                    wire:click="updateStatus({{ $booking->id }}, 'approved')"
-                                    class="flex-1 py-2 bg-gradient-to-br from-[#1f9d55] to-[#27ae60]
-                                        transition-all duration-300 shadow-[0_4px_15px_rgba(39,174,96,0.3)] text-white
-                                        rounded-lg cursor-pointer font-semibold hover:shadow-[0_6px_20px_rgba(39,174,96,0.45)]">
+                            <div class="flex gap-[10px]">
+                                <button wire:click="updateStatus({{ $booking->id }}, 'approved')" 
+                                        class="flex-1 py-2 bg-gradient-to-br from-[#1f9d55] to-[#27ae60] transition-all
+                                        duration-300 shadow-[0_4px_15px_rgba(39,174,96,0.3)] text-white rounded-lg
+                                        font-semibold hover:shadow-[0_6px_20px_rgba(39,174,96,0.45)] cursor-pointer">
                                     Принять
                                 </button>
-
-                                <button
-                                    wire:click="updateStatus({{ $booking->id }}, 'rejected')"
-                                    class="flex-1 py-2 bg-gradient-to-br from-[#c2433a] to-[#EB4C42]
-                                        transition-all duration-300 shadow-[0_4px_15px_rgba(231,76,60,0.3)] text-white
-                                        rounded-lg cursor-pointer font-semibold hover:shadow-[0_6px_20px_rgba(231,76,60,0.45)]">
+                                <button wire:click="updateStatus({{ $booking->id }}, 'rejected')" 
+                                        class="flex-1 py-2 bg-gradient-to-br from-[#c2433a] to-[#EB4C42] transition-all
+                                        duration-300 shadow-[0_4px_15px_rgba(231,76,60,0.3)] text-white rounded-lg
+                                        font-semibold hover:shadow-[0_6px_20px_rgba(231,76,60,0.45)] cursor-pointer">
                                     Отклонить
                                 </button>
                             </div>
-                        </div>
-                    @else
-                        <div class="mt-[30px] text-center text-[18px] font-bold">
-                            @if($booking->status === 'approved')
-                                <div class="py-3 flex justify-center items-center gap-3">
-                                    <div class="text-green-600 font-bold text-[18px]">✅ Одобрена</div>
-                                    |
-                                    <button wire:click="openCancelModal({{ $booking->id }})"
-                                            class="group inline-flex items-center gap-2
-                                            text-[#d64545] text-[14px] font-semibold
-                                            transition-all duration-200 hover:text-[#bb2d2d]
-                                            active:scale-[0.98] cursor-pointer">
-                                        Отменить бронь
-                                    </button>
-                                </div>
-                            @elseif($booking->status === 'rejected')
-                                <div class="py-3">❌ Отклонена</div>
-                            @elseif($booking->status === 'cancelled')
-                                <div class="py-3">🚫 Отменена</div>
-                            @endif
-                        </div>
-                    @endif
-                </div>
+                        @else
+                            <div class="text-center text-[18px] font-bold">
+                                @if($booking->status === 'approved')
+                                    <div class="flex justify-center items-center gap-3">
+                                        <span class="text-green-600 font-bold text-[18px]">✅ Одобрена</span>
+                                        <span class="text-gray-300">|</span>
+                                        <button wire:click="openCancelModal({{ $booking->id }})" 
+                                                class="text-[#d64545] text-[14px] font-semibold transition-all
+                                                duration-200 hover:text-[#bb2d2d] cursor-pointer">
+                                            Отменить бронь
+                                        </button>
+                                    </div>
+                                @elseif($booking->status === 'rejected')
+                                    <div class="text-red-600">❌ Отклонена</div>
+                                @elseif($booking->status === 'cancelled')
+                                    <div class="text-gray-500">🚫 Отменена</div>
+                                @endif
+                            </div>
+                        @endif
+                    </x-slot>
+                </x-booking-card>
             @empty
-                <div class="text-2xl font-bold">Заявок нет</div>
+                <div class="col-span-full text-2xl font-bold text-center text-gray-400 py-10">Заявок нет</div>
             @endforelse
 
             @if($hasMoreBookings)
