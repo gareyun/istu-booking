@@ -11,8 +11,8 @@ use Livewire\Attributes\Layout;
 
 class TechSupportPanel extends Component
 {
-    public $selectedDate = '';
-    public $selectedClassroom = '';
+    public $filterDate = '';
+    public $filterClassroom = '';
 
     public function getBookingsProperty()
     {
@@ -25,11 +25,11 @@ class TechSupportPanel extends Component
                             ->where('equipment', '!=', '');
                     });
             })
-            ->when($this->selectedDate, function ($query) {
-                $query->where('date', $this->selectedDate);
+            ->when($this->filterDate, function ($query) {
+                $query->where('date', $this->filterDate);
             })
-            ->when($this->selectedClassroom, function ($query) {
-                $query->where('classroom_id', $this->selectedClassroom);
+            ->when($this->filterClassroom, function ($query) {
+                $query->where('classroom_id', $this->filterClassroom);
             })
             ->orderBy('date')
             ->orderBy('start_time')
@@ -38,7 +38,7 @@ class TechSupportPanel extends Component
 
     public function resetFilters()
     {
-        $this->reset(['selectedDate', 'selectedClassroom']);
+        $this->reset(['filterDate', 'filterClassroom']);
         $this->dispatch('resetFilterDate');
     }
 

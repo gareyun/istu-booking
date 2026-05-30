@@ -1,6 +1,4 @@
 <div class="min-h-screen bg-[#f5f7fa] text-[#333] font-['Segoe_UI']">
-    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
-    
     <div class="flex-1 p-[30px] overflow-y-auto">
         <h1 class="text-[1.5rem] mb-5 pb-[10px] border-b-2 border-[#1a2a6c] text-[#1a2a6c] font-bold">Заявки</h1>
 
@@ -26,42 +24,7 @@
             <x-button onclick="window.location.href='{{ route('admin.classrooms') }}'">Аудитории</x-button>
         </div>
 
-        <div class="bg-white rounded-[10px] shadow-[0_4px_15px_rgba(0,0,0,0.08)] p-5 mb-5">
-            <div class="flex flex-wrap gap-4 items-end mb-[20px]">
-
-                <div class="flex flex-col min-w-[220px]">
-                    <label class="mb-2 font-semibold text-[#1a2a6c]">Дата</label>
-                    <div wire:ignore>
-                        <x-input wire:model="description" id="admin_filter_date" placeholder="ДД.ММ.ГГГГ" class="font-medium "/>
-                    </div>
-                </div>
-
-                <div class="flex flex-col min-w-[220px]">
-                    <label class="mb-2 font-semibold text-[#1a2a6c]">Аудитория</label>
-                    <x-select wire:model.live="selectedClassroom">
-                        <option value="">Все аудитории</option>
-                        @foreach($classrooms as $classroom)
-                            <option value="{{ $classroom->id }}">
-                                {{ $classroom->room }}
-                            </option>
-                        @endforeach
-                    </x-select>
-                </div>
-
-                <div class="flex flex-col min-w-[220px]">
-                    <label class="mb-2 font-semibold text-[#1a2a6c]">Статус заявки</label>
-                    <x-select wire:model.live="status">
-                        <option value="">Все статусы</option>
-                        <option value="pending">⏳ В ожидании</option>
-                        <option value="approved">✅ Одобренные</option>
-                        <option value="rejected">❌ Отклонённые</option>
-                        <option value="cancelled">🚫 Отменённые</option>
-                    </x-select>
-                </div>
-
-                <x-button wire:click="resetFilters" color="red">Сбросить</x-button>
-            </div>
-        </div>
+        <x-filter :classrooms="$classrooms"/>
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-[25px] p-5">
             @forelse($bookings as $booking)
@@ -235,31 +198,4 @@
             <p class="mt-3 text-primary font-semibold">Загрузка...</p>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
-
-    <script>
-        document.addEventListener('livewire:init', () => {
-
-            flatpickr("#admin_filter_date", {
-                dateFormat: "d.m.Y",
-                locale: "ru",
-
-                onChange: function(selectedDates, dateStr) {
-                    @this.set('selectedDate', dateStr);
-                }
-            });
-
-            Livewire.on('resetFilterDate', () => {
-                const fp =
-                    document.querySelector("#admin_filter_date")._flatpickr;
-
-                if (fp) {
-                    fp.clear();
-                }
-            });
-
-        });
-    </script>
 </div>

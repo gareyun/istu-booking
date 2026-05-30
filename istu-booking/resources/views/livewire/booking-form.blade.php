@@ -1,6 +1,4 @@
 <div class="min-h-screen bg-[#f8f9fc] font-sans py-10 px-4">
-    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
-
     <div class="max-w-[800px] mx-auto bg-white rounded-[15px] shadow-[0_0_30px_rgba(0,0,0,0.1)] p-6 md:p-10">
 
         @if($submitted)
@@ -114,7 +112,7 @@
                 <h5 class="font-[600] text-lg mb-4">🔧 Оборудование</h5>
                 <div class="mb-4">
                     <label class="block font-semibold text-[#495057] mb-2">Необходимое оборудование</label>
-                    <x-input wire:model="equipment" type="textarea" placeholder="Проектор, микрофоны, стулья..." rows="2" required/>
+                    <x-input wire:model="equipment" type="textarea" placeholder="Проектор, микрофоны, стулья..." rows="2"/>
                     <small class="text-secondary text-sm">Оставьте пустым, если оборудование не требуется</small>
                 </div>
 
@@ -140,7 +138,7 @@
 
             <div class="mb-4">
                 <label class="block font-semibold text-[#495057] mb-2">Комментарий для администратора</label>
-                <x-input wire:model="user_comment" type="textarea" placeholder="Дополнительная информация, пожелания, особенности мероприятия..." rows="3" required/>
+                <x-input wire:model="user_comment" type="textarea" placeholder="Дополнительная информация, пожелания, особенности мероприятия..." rows="3"/>
             </div>
 
             <div class="bg-warning text-[#684F06] rounded-[10px] p-5 mb-4">
@@ -165,7 +163,7 @@
             <p class="mt-3 text-primary font-semibold">Загрузка...</p>
         </div>
 
-        <div class="text-center mt-[30px] pt-5 border-t border-[#e3e6f0] text-secondary text-[0.9rem]">
+        <div class="text-center mt-[30px] pt-5 mb-8 border-t border-[#e3e6f0] text-secondary text-[0.9rem]">
             <p>По вопросам обращайтесь: 8 (3412) 77-60-55, доб. 1371</p>
             <p class="mt-2">
                 Также вы можете подать заявку через
@@ -173,41 +171,7 @@
             </p>
         </div>
 
-        <div class="bg-white border border-[#e3e6f0] rounded-[10px] p-5 mt-8 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block font-semibold text-[#495057] mb-2">Статус</label>
-                    <x-select wire:model.live="filterStatus">
-                        <option value="">Все статусы</option>
-                        <option value="pending">⏳ Ожидает</option>
-                        <option value="approved">✅ Одобрена</option>
-                        <option value="rejected">❌ Отклонена</option>
-                        <option value="cancelled">🚫 Отменена</option>
-                    </x-select>
-                </div>
-
-                <div>
-                    <label class="block font-semibold text-[#495057] mb-2">Дата</label>
-                    <x-input id="filter_date" placeholder="ДД.ММ.ГГГГ"/>
-                </div>
-
-                <div>
-                    <label class="block font-semibold text-[#495057] mb-2">Аудитория</label>
-                    <x-select wire:model.live="filterClassroom">
-                        <option value="">Все аудитории</option>
-                        @foreach($classrooms as $classroom)
-                            <option value="{{ $classroom->id }}">
-                                {{ $classroom->room }}
-                            </option>
-                        @endforeach
-                    </x-select>
-                </div>
-            </div>
-
-            <div class="mt-4">
-                <x-button wire:click="resetFilters" color="red">Сбросить</x-button>
-            </div>
-        </div>
+        <x-filter :classrooms="$classrooms"/>
 
         @if($loadError)
             <div class="bg-red-100 border border-red-300 text-red-700 rounded-[10px] p-4 mb-6">
@@ -310,9 +274,6 @@
         @endif
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
-
     <script>
         document.addEventListener('livewire:init', () => {
             flatpickr("#event_date", {
@@ -322,23 +283,6 @@
 
                 onChange: function(selectedDates, dateStr) {
                     @this.set('date', dateStr);
-                }
-            });
-
-            flatpickr("#filter_date", {
-                dateFormat: "d.m.Y",
-                locale: "ru",
-
-                onChange: function(selectedDates, dateStr) {
-                    @this.set('filterDate', dateStr);
-                }
-            });
-
-            Livewire.on('resetFilterDate', () => {
-                const fp = document.querySelector("#filter_date")._flatpickr;
-
-                if (fp) {
-                    fp.clear();
                 }
             });
 

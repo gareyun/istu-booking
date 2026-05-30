@@ -14,9 +14,9 @@ use Livewire\Attributes\Layout;
 
 class BookingAdminPanel extends Component
 {
-    public $status = '';
-    public $selectedDate = '';
-    public $selectedClassroom = '';
+    public $filterStatus = '';
+    public $filterDate = '';
+    public $filterClassroom = '';
     public $adminComments = [];
 
     public $showCancelModal = false;
@@ -27,9 +27,9 @@ class BookingAdminPanel extends Component
 
     public $loadError = false;
 
-    public function setStatus($status = '')
+    public function setStatus($filterStatus = '')
     {
-        $this->status = $status;
+        $this->filterStatus = $filterStatus;
     }
 
     public function loadMore()
@@ -140,14 +140,14 @@ class BookingAdminPanel extends Component
     {
         try {
             $query = Booking::with(['classroom', 'user'])
-                ->when($this->status, function ($query) {
-                    $query->where('status', $this->status);
+                ->when($this->filterStatus, function ($query) {
+                    $query->where('status', $this->filterStatus);
                 })
-                ->when($this->selectedDate, function ($query) {
-                    $query->where('date', $this->selectedDate);
+                ->when($this->filterDate, function ($query) {
+                    $query->where('date', $this->filterDate);
                 })
-                ->when($this->selectedClassroom, function ($query) {
-                    $query->where('classroom_id', $this->selectedClassroom);
+                ->when($this->filterClassroom, function ($query) {
+                    $query->where('classroom_id', $this->filterClassroom);
                 })
                 ->orderByDesc('id');
 
@@ -172,9 +172,9 @@ class BookingAdminPanel extends Component
 
     public function resetFilters()
     {
-        $this->status = '';
-        $this->selectedDate = '';
-        $this->selectedClassroom = '';
+        $this->filterStatus = '';
+        $this->filterDate = '';
+        $this->filterClassroom = '';
         $this->perPage = 10;
         $this->dispatch('resetFilterDate');
     }
