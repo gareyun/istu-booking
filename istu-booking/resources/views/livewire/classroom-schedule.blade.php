@@ -117,109 +117,93 @@
     @endif
 
     @if($showBookingModal && $selectedBooking)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
-                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <x-modal title="Информация о бронировании" width="672px">
+            <p class="text-sm text-gray-500 mb-4">
+                Номер заявки: {{ $selectedBooking->id }}
+                @if(!$selectedBooking->user_id && $selectedBooking->vk_user_id)
+                    (через VK бота)
+                @endif
+            </p>
+
+            <div class="space-y-4 text-[15px]">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <h2 class="text-2xl font-bold text-[#1a2a6c]">Информация о бронировании</h2>
-                        <p class="text-sm text-gray-500 mt-1">
-                            ID заявки: {{ $selectedBooking->id }}
-                            @if(!$selectedBooking->user_id && $selectedBooking->vk_user_id)
-                                (через VK бота)
-                            @endif
-                        </p>
+                        <div class="text-gray-500 font-semibold">Аудитория</div>
+                        <div class="text-gray-900">{{ $selectedBooking->classroom->room }}</div>
                     </div>
-
-                    <button
-                        wire:click="closeBookingModal"
-                        class="text-gray-400 hover:text-gray-600 text-2xl font-bold transition cursor-pointer">
-                        &times;
-                    </button>
-                </div>
-
-                <div class="p-6 space-y-4 text-[15px]">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <div class="text-gray-500 font-semibold">Аудитория</div>
-                            <div class="text-gray-900">{{ $selectedBooking->classroom->room }}</div>
-                        </div>
-
-                        <div>
-                            <div class="text-gray-500 font-semibold">Дата</div>
-                            <div class="text-gray-900">{{ $selectedBooking->date }}</div>
-                        </div>
-
-                        <div>
-                            <div class="text-gray-500 font-semibold">Время</div>
-                            <div class="text-gray-900">
-                                {{ $selectedBooking->start_time }}
-                                –
-                                {{ $selectedBooking->end_time }}
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="text-gray-500 font-semibold">Статус</div>
-                            <div class="font-semibold">
-                                @switch($selectedBooking->status)
-                                    @case('approved')
-                                        <span class="text-green-600">✅ Одобрена</span> @break
-                                    @case('rejected')
-                                        <span class="text-red-600">❌ Отклонена</span> @break
-                                    @case('cancelled')
-                                        <span class="text-gray-600">🚫 Отменена</span> @break
-                                    @default
-                                        <span class="text-yellow-600">⏳ В ожидании</span>
-                                @endswitch
-                            </div>
+                    <div>
+                        <div class="text-gray-500 font-semibold">Дата</div>
+                        <div class="text-gray-900">{{ $selectedBooking->date }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 font-semibold">Время</div>
+                        <div class="text-gray-900">
+                            {{ $selectedBooking->start_time }} – {{ $selectedBooking->end_time }}
                         </div>
                     </div>
-                    
-                    <div class="grid grid-cols-2 gap-4 border-t pt-4">
-                        <div>
-                            <div class="text-gray-500 font-semibold mb-1">Студент</div>
-                            <div>{{ optional($selectedBooking->user)->name ?? $selectedBooking->name ?? 'Не указан' }}</div>
-                            <div class="text-sm text-gray-500">
-                                {{ optional($selectedBooking->user)->faculty ?? $selectedBooking->faculty ?? '' }}, 
-                                {{ optional($selectedBooking->user)->group ?? $selectedBooking->group ?? '' }}
-                            </div>
+                    <div>
+                        <div class="text-gray-500 font-semibold">Статус</div>
+                        <div class="font-semibold">
+                            @switch($selectedBooking->status)
+                                @case('approved')
+                                    <span class="text-green-600">✅ Одобрена</span> @break
+                                @case('rejected')
+                                    <span class="text-red-600">❌ Отклонена</span> @break
+                                @case('cancelled')
+                                    <span class="text-gray-600">🚫 Отменена</span> @break
+                                @default
+                                    <span class="text-yellow-600">⏳ В ожидании</span>
+                            @endswitch
                         </div>
-                        <div>
-                            <div class="text-gray-500 font-semibold mb-1">Номер телефона</div>
-                            <div>{{ optional($selectedBooking->user)->phone ?? $selectedBooking->phone ?? 'Не указан' }}</div>
-                        </div>
-                    </div>
-
-                    <div class="border-t pt-4">
-                        <div class="text-gray-500 font-semibold mb-1">Цель бронирования</div>
-                        <div class="text-gray-900 whitespace-pre-line">{{ $selectedBooking->purpose }}</div>
-                    </div>
-
-                    <div class="border-t pt-4">
-                        <div class="text-gray-500 font-semibold mb-1">Оборудование</div>
-                        <div class="text-gray-900">{{ $selectedBooking->equipment ?: 'Не требуется' }}</div>
-                    </div>
-
-                    <div class="border-t pt-4">
-                        <div class="text-gray-500 font-semibold mb-1">Технический специалист</div>
-                        <div class="text-gray-900">{{ $selectedBooking->is_tech_support ? 'Да' : 'Нет' }}</div>
-                    </div>
-
-                    <div class="border-t pt-4">
-                        <div class="text-gray-500 font-semibold mb-1">Комментарий пользователя</div>
-                        <div class="text-gray-900 whitespace-pre-line">{{ $selectedBooking->user_comment ?: '–' }}</div>
-                    </div>
-
-                    <div class="border-t pt-4">
-                        <div class="text-gray-500 font-semibold mb-1">Комментарий администратора</div>
-                        <div class="text-gray-900 whitespace-pre-line">{{ $selectedBooking->admin_comment ?: '–' }}</div>
                     </div>
                 </div>
 
-                <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
-                    <x-button wire:click="closeBookingModal">Закрыть</x-button>
+                <div class="grid grid-cols-2 gap-4 border-t pt-4">
+                    <div>
+                        <div class="text-gray-500 font-semibold mb-1">Студент</div>
+                        <div>{{ optional($selectedBooking->user)->name ?? $selectedBooking->name ?? 'Не указан' }}</div>
+                        <div class="text-sm text-gray-500">
+                            {{ optional($selectedBooking->user)->faculty ?? $selectedBooking->faculty ?? '' }}, 
+                            {{ optional($selectedBooking->user)->group ?? $selectedBooking->group ?? '' }}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 font-semibold mb-1">Номер телефона</div>
+                        <div>{{ optional($selectedBooking->user)->phone ?? $selectedBooking->phone ?? 'Не указан' }}</div>
+                    </div>
+                </div>
+
+                <div class="border-t pt-4">
+                    <div class="text-gray-500 font-semibold mb-1">Цель бронирования</div>
+                    <div class="text-gray-900 whitespace-pre-line">{{ $selectedBooking->purpose }}</div>
+                </div>
+
+                <div class="border-t pt-4">
+                    <div class="text-gray-500 font-semibold mb-1">Оборудование</div>
+                    <div class="text-gray-900">{{ $selectedBooking->equipment ?: 'Не требуется' }}</div>
+                </div>
+
+                <div class="border-t pt-4">
+                    <div class="text-gray-500 font-semibold mb-1">Технический специалист</div>
+                    <div class="text-gray-900">{{ $selectedBooking->is_tech_support ? 'Да' : 'Нет' }}</div>
+                </div>
+
+                <div class="border-t pt-4">
+                    <div class="text-gray-500 font-semibold mb-1">Комментарий пользователя</div>
+                    <div class="text-gray-900 whitespace-pre-line">{{ $selectedBooking->user_comment ?: '–' }}</div>
+                </div>
+
+                <div class="border-t pt-4">
+                    <div class="text-gray-500 font-semibold mb-1">Комментарий администратора</div>
+                    <div class="text-gray-900 whitespace-pre-line">{{ $selectedBooking->admin_comment ?: '–' }}</div>
                 </div>
             </div>
-        </div>
+
+            <x-slot:footer>
+                <div class="w-full border-t border-gray-200 pt-3 flex justify-end">
+                    <x-button wire:click="closeBookingModal" color="red">Закрыть</x-button>
+                </div>
+            </x-slot>
+        </x-modal>
     @endif
 </div>

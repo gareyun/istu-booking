@@ -132,6 +132,7 @@
             <p class="mb-[5px] text-lg font-semibold">Корпус</p>
             <x-input wire:model="newBuildingName" placeholder="Название" class="mb-4"/>
 
+            <p class="mb-[5px] text-lg font-semibold">Тип корпуса</p>
             <div class="flex justify-between items-center mb-4">
                 <x-select wire:model="newBuildingTypeId">
                     @foreach($buildingTypes as $type)
@@ -246,31 +247,38 @@
 
     {{-- ROOM EDIT MODAL --}}
     @if($showEditModal)
-        <div class="fixed inset-0 z-[1000] bg-[rgba(26,42,108,0.35)] backdrop-blur-[4px]">
-            <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-[500px] max-w-full p-[25px]
-                    rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] flex flex-col text-2xl animate-modalFade">
-                <h2 class="font-bold text-[#1a2a6c] border-b-2 border-[#1a2a6c] pb-2 mb-5">Редактировать аудиторию</h2>
+        <x-modal title="Редактировать аудиторию">
+            <p class="mb-[5px] text-lg font-semibold">Аудитория</p>
+            <x-input wire:model="room" class="mb-3" />
 
-                <p class="mb-[5px] text-lg font-semibold">Аудитория</p>
-                <x-input wire:model="room" class="mb-4"/>
+            <x-select wire:model="classroom_category_id" wrapper-class="mb-3">
+                @foreach($categories as $category)
+                    <option value="{{ $category->id }}">{{ $category->category }}</option>
+                @endforeach
+            </x-select>
 
-                <p class="mb-[5px] text-lg font-semibold">Описание</p>
-                <x-input wire:model="description" type="textarea" class="mb-4"/>
+            <x-select wire:model="building_id" wrapper-class="mb-3">
+                @foreach($buildings as $building)
+                    <option value="{{ $building->id }}">{{ $building->name }}</option>
+                @endforeach
+            </x-select>
 
-                <p class="mb-[5px] text-lg font-semibold">Оборудование</p>
-                <x-input wire:model="equipment" type="textarea" class="mb-4"/>
+            <p class="mb-[5px] text-lg font-semibold">Описание</p>
+            <x-input wire:model="description" type="textarea" class="mb-2" />
 
-                <p class="mb-[5px] text-lg font-semibold">Вместимость</p>
-                <x-input wire:model="capacity" type="number" class="mb-4"/>
+            <p class="mb-[5px] text-lg font-semibold">Оборудование</p>
+            <x-input wire:model="equipment" type="textarea" class="mb-2" />
 
-                <p class="mb-[5px] text-lg font-semibold">Идентификатор Google Calendar</p>
-                <x-input wire:model="google_calendar_id" class="mb-4"/>
+            <p class="mb-[5px] text-lg font-semibold">Вместимость</p>
+            <x-input wire:model="capacity" type="number" class="mb-3" />
 
-                <div class="flex justify-end gap-2.5 mt-2.5">
-                    <x-button wire:click="update">Сохранить</x-button>
-                    <x-button wire:click="closeModal" color="red">Отмена</x-button>
-                </div>
-            </div>
-        </div>
+            <p class="mb-[5px] text-lg font-semibold">Идентификатор Google Calendar</p>
+            <x-input wire:model="google_calendar_id" class="mb-3" />
+
+            <x-slot:footer>
+                <x-button wire:click="update">Сохранить</x-button>
+                <x-button wire:click="closeModal" color="red">Отмена</x-button>
+            </x-slot>
+        </x-modal>
     @endif
 </div>

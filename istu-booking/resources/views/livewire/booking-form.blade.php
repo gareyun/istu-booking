@@ -246,7 +246,7 @@
         </div>
 
         @if($showSettingsModal)
-            <x-modal title="Настройки уведомлений">
+            <x-modal title="Настройки">
                 <label class="block font-semibold text-[#495057] mb-2">Привязать страницу ВКонтакте для уведомлений</label>
                 <x-input wire:model="settingsVkLink" placeholder="https://vk.com/username или @username"/>
 
