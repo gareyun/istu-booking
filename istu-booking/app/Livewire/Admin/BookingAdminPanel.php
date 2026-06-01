@@ -14,17 +14,27 @@ use Livewire\Attributes\Layout;
 
 class BookingAdminPanel extends Component
 {
-    public $status = '';
-    public $selectedDate = '';
-    public $selectedClassroom = '';
+    public $filterStatus = '';
+    public $filterDate = '';
+    public $filterClassroom = '';
     public $adminComments = [];
 
     public $showCancelModal = false;
     public $bookingToCancel = null;
 
-    public function setStatus($status = '')
+    public $perPage = 10;
+    public $hasMoreBookings = false;
+
+    public $loadError = false;
+
+    public function setStatus($filterStatus = '')
     {
-        $this->status = $status;
+        $this->filterStatus = $filterStatus;
+    }
+
+    public function loadMore()
+    {
+        $this->perPage += 10;
     }
 
     public function updateStatus($bookingId, $action)
@@ -128,25 +138,44 @@ class BookingAdminPanel extends Component
 
     public function getBookingsProperty()
     {
-        return Booking::with(['classroom', 'user'])
-            ->when($this->status, function ($query) {
-                $query->where('status', $this->status);
-            })
-            ->when($this->selectedDate, function ($query) {
-                $query->where('date', $this->selectedDate);
-            })
-            ->when($this->selectedClassroom, function ($query) {
-                $query->where('classroom_id', $this->selectedClassroom);
-            })
-            ->orderByDesc('id')
-            ->get();
+        try {
+            $query = Booking::with(['classroom', 'user'])
+                ->when($this->filterStatus, function ($query) {
+                    $query->where('status', $this->filterStatus);
+                })
+                ->when($this->filterDate, function ($query) {
+                    $query->where('date', $this->filterDate);
+                })
+                ->when($this->filterClassroom, function ($query) {
+                    $query->where('classroom_id', $this->filterClassroom);
+                })
+                ->orderByDesc('id');
+
+            $this->hasMoreBookings = $query->count() > $this->perPage;
+
+            $this->loadError = false;
+
+            return $query
+                ->take($this->perPage)
+                ->get();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error(
+                'Admin booking load error: ' . $e->getMessage()
+            );
+
+            $this->loadError = true;
+            $this->hasMoreBookings = false;
+
+            return collect();
+        }
     }
 
     public function resetFilters()
     {
-        $this->status = '';
-        $this->selectedDate = '';
-        $this->selectedClassroom = '';
+        $this->filterStatus = '';
+        $this->filterDate = '';
+        $this->filterClassroom = '';
+        $this->perPage = 10;
         $this->dispatch('resetFilterDate');
     }
 

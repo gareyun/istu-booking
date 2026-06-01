@@ -448,7 +448,7 @@ class VkDialogService
             return;
         }
 
-        Booking::create([
+        $booking = Booking::create([
             'classroom_id'    => $state['classroom_id'],
             'date'            => $state['date'],
             'start_time'      => $state['start_time'],
@@ -465,6 +465,16 @@ class VkDialogService
             'vk_user_id'      => $userId,
             'status'          => 'pending',
         ]);
+
+        $booking->load('classroom');
+
+        try {
+            app(VkNotificationService::class)->notifyBookingCreated($booking, true);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error(
+                'VK notification create booking error: ' . $e->getMessage()
+            );
+        }
 
         Cache::forget("vk_bot_state_{$userId}");
 

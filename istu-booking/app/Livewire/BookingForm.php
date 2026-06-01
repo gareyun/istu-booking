@@ -35,6 +35,13 @@ class BookingForm extends Component
     public $settingsVkLink = '';
     public $settingsPhone = '';
 
+    public $submitted = false;
+
+    public $perPage = 5;
+    public $hasMoreBookings = false;
+
+    public $loadError = false;
+
     public function mount()
     {
         $this->classrooms = Classroom::all();
@@ -50,25 +57,48 @@ class BookingForm extends Component
 
     public function loadBookings()
     {
-        $query = User::find(1)
-            ->bookings()
-            ->with('classroom');
+        try {
+            $query = User::find(1)
+                ->bookings()
+                ->with('classroom');
 
-        if ($this->filterStatus) {
-            $query->where('status', $this->filterStatus);
+            if ($this->filterStatus) {
+                $query->where('status', $this->filterStatus);
+            }
+
+            if ($this->filterDate) {
+                $query->where('date', $this->filterDate);
+            }
+
+            if ($this->filterClassroom) {
+                $query->where('classroom_id', $this->filterClassroom);
+            }
+
+            $this->bookings = $query
+                ->latest()
+                ->take($this->perPage)
+                ->get();
+
+            $this->hasMoreBookings = $query->count() > $this->perPage;
+
+            $this->loadError = false;
+        } catch (\Exception $e) {
+
+            \Illuminate\Support\Facades\Log::error(
+                'Booking load error: ' . $e->getMessage()
+            );
+
+            $this->bookings = [];
+            $this->hasMoreBookings = false;
+            $this->loadError = true;
         }
+        
+    }
 
-        if ($this->filterDate) {
-            $query->where('date', $this->filterDate);
-        }
-
-        if ($this->filterClassroom) {
-            $query->where('classroom_id', $this->filterClassroom);
-        }
-
-        $this->bookings = $query
-            ->latest()
-            ->get();
+    public function loadMore()
+    {
+        $this->perPage += 5;
+        $this->loadBookings();
     }
 
     public function updatedClassroomId()
@@ -175,7 +205,6 @@ class BookingForm extends Component
 
         $vkLink = $user ? $user->vk_link : null;
 
-        // бронь минимум за 24 часа
         try {
             $bookingStart = Carbon::createFromFormat(
                 'd.m.Y H:i',
@@ -205,13 +234,24 @@ class BookingForm extends Component
             return;
         }
 
-        Booking::create([
+        $booking = Booking::create([
             'user_id' => 1,
             ...$validated,
             'vk_link' => $vkLink
         ]);
 
+        $booking->load('classroom');
+
+        try {
+            app(\App\Services\VkNotificationService::class)->notifyBookingCreated($booking);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error(
+                'VK notification create booking error: ' . $e->getMessage()
+            );
+        }
+
         session()->flash('success', 'Заявка успешно создана');
+        $this->submitted = true; 
 
         $this->reset([
             'classroom_id',
@@ -225,6 +265,12 @@ class BookingForm extends Component
         $this->is_tech_support = 0;
 
         $this->loadBookings();
+        $this->loadBusySlots();
+    }
+
+    public function resetForm()
+    {
+        $this->submitted = false;
         $this->loadBusySlots();
     }
 
