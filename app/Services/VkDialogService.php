@@ -309,7 +309,7 @@ class VkDialogService
         $state['name'] = $text;
         $state['step'] = 'faculty';
         Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
-        $this->vk->sendMessage($userId, "🏛 Введите ваш факультет/институт):");
+        $this->vk->sendMessage($userId, "🏛 Введите ваш факультет/институт:");
     }
 
     protected function processFaculty(int $userId, string $text, array $state): void
