@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Classroom;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 use Livewire\Attributes\Layout;
 #[Layout('components.layout')]
@@ -44,21 +45,22 @@ class BookingForm extends Component
 
     public function mount()
     {
+        $user = Auth::user();
         $this->classrooms = Classroom::all();
 
-        $this->loadBookings();
+        $this->settingsVkLink = $user->vk_link ?? '';
+        $this->settingsPhone = $user->phone ?? '';
 
-        $user = User::find(1);
-        if ($user) {
-            $this->settingsVkLink = $user->vk_link ?? '';
-            $this->settingsPhone = $user->phone ?? '';
-        }
+        $this->loadBookings();
     }
 
     public function loadBookings()
     {
         try {
-            $query = User::find(1)
+            /** @var User $user */
+            $user = Auth::user();
+
+            $query = $user
                 ->bookings()
                 ->with('classroom');
 
@@ -165,26 +167,33 @@ class BookingForm extends Component
 
     public function saveSettings()
     {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
         $this->validate([
             'settingsVkLink' => 'nullable|string|max:255',
             'settingsPhone'  => 'required|string|max:20'
         ]);
 
-        $user = User::find(1);
-        if ($user) {
-            $user->update([
-                'vk_link' => $this->settingsVkLink,
-                'phone'   => $this->settingsPhone
-                ]);
-            session()->flash('success', 'Настройки сохранены.');
-        }
+        $user->update([
+            'vk_link' => $this->settingsVkLink,
+            'phone'   => $this->settingsPhone
+            ]);
+        session()->flash('success', 'Настройки сохранены.');
 
         $this->closeSettingsModal();
     }
 
     public function submit()
     {
-        $user = User::find(1);
+        $user = Auth::user();
+
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
         
         if (!$user || !$user->phone) {
             $this->addError('phone', 'Для отправки заявки необходимо указать номер телефона в настройках.');
@@ -235,7 +244,7 @@ class BookingForm extends Component
         }
 
         $booking = Booking::create([
-            'user_id' => 1,
+            'user_id' => $user->id,
             ...$validated,
             'vk_link' => $vkLink
         ]);

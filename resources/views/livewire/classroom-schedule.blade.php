@@ -1,3 +1,7 @@
+@php
+    $isAdmin = auth()->user()->role === 'admin';
+@endphp
+
 <div class="p-4 md:p-8 bg-gray-50 min-h-screen font-sans">
     <h1 class="text-2xl md:text-3xl font-bold text-indigo-800 mb-6">📅 Расписание аудиторий</h1>
 
@@ -50,10 +54,7 @@
                 @endforeach
             </div>
 
-            {{-- Сам календарь с сеткой и событиями --}}
             <div class="relative" style="height: {{ count($timeSlots) * 60 }}px; background: #fff;">
-
-                {{-- вертикальные линии --}}
                 <div class="absolute inset-0 grid grid-cols-[60px_repeat(7,1fr)] z-0">
                     @foreach($timeSlots as $time)
                         <div class="border-b border-gray-100
@@ -65,7 +66,6 @@
                     @endforeach
                 </div>
 
-                {{-- временные метки слева --}}
                 <div class="absolute left-0 top-0 w-[60px] h-full z-10 bg-white">
                     @foreach($timeSlots as $time)
                         <div class="h-[60px] border-b border-gray-100 flex items-start justify-end pr-1
@@ -77,7 +77,6 @@
                     @endforeach
                 </div>
 
-                {{-- События --}}
                 @foreach($weekDays as $index => $day)
                     @php $dayBookings = $bookings->where('date', $day['fullDate']); @endphp
                     @foreach($dayBookings as $booking)
@@ -90,19 +89,26 @@
                             $startMin = $calendarStart->diffInMinutes($start, false);
                             $endMin = $calendarStart->diffInMinutes($end, false);
 
-                            // 30 минут = 60px
                             $pixelsPerMinute = 2;
 
                             $topPx = $startMin * $pixelsPerMinute;
                             $heightPx = max(40, ($endMin - $startMin) * $pixelsPerMinute);
                         @endphp
-                        <div wire:click="openBookingModal({{ $booking->id }})"
-                                class="absolute z-20 rounded-md p-1 text-xs text-white bg-indigo-500 hover:bg-indigo-600
-                                transition overflow-hidden cursor-pointer shadow-md hover:shadow-lg"
+                        
+                        <div
+                            @if($isAdmin)
+                                wire:click="openBookingModal({{ $booking->id }})"
+                            @endif
+                                class="absolute z-20 rounded-md p-1 text-xs text-white bg-indigo-500
+                                transition overflow-hidden shadow-md
+                                {{ $isAdmin
+                                    ? 'hover:bg-indigo-600 cursor-pointer hover:shadow-lg'
+                                    : ''
+                                }}"
                                 style="top: {{ $topPx }}px;
-                                height: {{ $heightPx }}px;
-                                left: calc(60px + (100% - 60px) / 7 * {{ $index }} + 2px);
-                                width: calc((100% - 60px) / 7 - 4px);">
+                                       height: {{ $heightPx }}px;
+                                       left: calc(60px + (100% - 60px) / 7 * {{ $index }} + 2px);
+                                       width: calc((100% - 60px) / 7 - 4px);">
                             <div class="font-semibold truncate">{{ $booking->purpose }}</div>
                             <div>{{ $booking->start_time }}–{{ $booking->end_time }}</div>
                         </div>
@@ -116,7 +122,7 @@
         </div>
     @endif
 
-    @if($showBookingModal && $selectedBooking)
+    @if($isAdmin && $showBookingModal && $selectedBooking)
         <x-modal title="Информация о бронировании" width="672px">
             <p class="text-sm text-gray-500 mb-4">
                 Номер заявки: {{ $selectedBooking->id }}

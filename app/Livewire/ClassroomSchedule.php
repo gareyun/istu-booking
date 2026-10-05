@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Classroom;
 use App\Models\Booking;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 use Livewire\Attributes\Layout;
 #[Layout('components.layout')]
@@ -88,9 +89,12 @@ class ClassroomSchedule extends Component
 
     public function openBookingModal($bookingId)
     {
-        $this->selectedBooking = Booking::with(['classroom', 'user'])
-            ->findOrFail($bookingId);
+        $user = Auth::user();
+        if (!$user || $user->role !== 'admin') {
+            abort(403);
+        }
 
+        $this->selectedBooking = Booking::with(['classroom', 'user'])->findOrFail($bookingId);
         $this->showBookingModal = true;
     }
 

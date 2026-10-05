@@ -13,7 +13,7 @@
     @endif
 
     <div class="mb-5 flex gap-3">
-        <x-button onclick="window.location.href='{{ route('admin') }}'">Заявки</x-button>
+        <x-button onclick="window.location.href='{{ route('admin.index') }}'">Заявки</x-button>
         <x-button wire:click="openCreateModal">+ Добавить аудиторию</x-button>
         <x-button wire:click="openBuildingModal">+ Добавить корпус</x-button>
         <x-button wire:click="openBuildingListModal">Корпуса</x-button>
