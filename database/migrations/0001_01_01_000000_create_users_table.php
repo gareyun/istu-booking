@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('faculty');
             $table->string('group');
             $table->string('vk_link')->nullable();
-            $table->enum('role', ['student','admin','tech_specialist'])->default('student');
+            $table->enum('role', ['student','admin','tech'])->default('student');
             $table->rememberToken();
             $table->timestamps();
         });

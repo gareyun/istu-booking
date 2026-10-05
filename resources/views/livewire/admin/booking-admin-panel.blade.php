@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-[#f5f7fa] text-[#333] font-['Segoe_UI']">
-    <div class="flex-1 p-[30px] overflow-y-auto">
+    <div class="w-full p-[30px] overflow-y-auto">
         <h1 class="text-[1.5rem] mb-5 pb-[10px] border-b-2 border-[#1a2a6c] text-[#1a2a6c] font-bold">Заявки</h1>
 
         @if($loadError)

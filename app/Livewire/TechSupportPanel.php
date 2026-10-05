@@ -44,7 +44,7 @@ class TechSupportPanel extends Component
 
     public function render()
     {
-        return view('livewire.tech-support-panel', [
+        return view('livewire.admin.tech-support-panel', [
             'bookings' => $this->bookings,
             'classrooms' => Classroom::orderBy('room')->get(),
         ]);
