@@ -1,5 +1,5 @@
 <div class="flex-1 p-[30px] overflow-y-auto">
-    <h1 class="text-2xl mb-5 pb-2.5 border-b-2 border-[#1a2a6c] text-[#1a2a6c]">Аудитории</h1>
+    <h1 class="text-2xl mb-5 pb-2.5 border-b-2 border-[#1a2a6c] text-[#1a2a6c]">Пространства</h1>
 
     @if ($successMessage)
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
@@ -14,7 +14,7 @@
 
     <div class="mb-5 flex gap-3">
         <x-button onclick="window.location.href='{{ route('admin.index') }}'">Заявки</x-button>
-        <x-button wire:click="openCreateModal">+ Добавить аудиторию</x-button>
+        <x-button wire:click="openCreateModal">+ Добавить пространство</x-button>
         <x-button wire:click="openBuildingModal">+ Добавить корпус</x-button>
         <x-button wire:click="openBuildingListModal">Корпуса</x-button>
     </div>
@@ -26,7 +26,7 @@
                 <div class="text-xl font-bold text-[#1a2a6c] mb-[5px]">{{ $classroom->room }}</div>
 
                 <div class="my-2 flex justify-between">
-                    <div class="font-bold text-[#7f8c8d]">Тип аудитории:</div>
+                    <div class="font-bold text-[#7f8c8d]">Тип пространства:</div>
                     <div>{{ $classroom->category->category }}</div>
                 </div>
 
@@ -60,9 +60,9 @@
 
     {{-- CREATE ROOM MODAL --}}
     @if($showCreateModal)
-        <x-modal title="Добавить аудиторию">
-            <p class="mb-[5px] text-lg font-semibold">Аудитория</p>
-            <x-input wire:model="room" placeholder="Номер аудитории" class="mb-4"/>
+        <x-modal title="Добавить пространство">
+            <p class="mb-[5px] text-lg font-semibold">Пространство</p>
+            <x-input wire:model="room" placeholder="Название пространства" class="mb-4"/>
 
             <div class="flex justify-between items-center mb-4">
                 <x-select wire:model="classroom_category_id">
@@ -111,7 +111,7 @@
             <x-input wire:model="description" type="textarea" placeholder="Описание" class="mb-4"/>
 
             <p class="mb-[5px] text-lg font-semibold">Оборудование</p>
-            <x-input wire:model="equipment" type="textarea" placeholder="Оборудование, имеющееся в аудитории" class="mb-4"/>
+            <x-input wire:model="equipment" type="textarea" placeholder="Оборудование, имеющееся в пространстве" class="mb-4"/>
 
             <p class="mb-[5px] text-lg font-semibold">Вместимость</p>
             <x-input wire:model="capacity" type="number" placeholder="Количество человек" class="mb-4"/>
@@ -247,8 +247,8 @@
 
     {{-- ROOM EDIT MODAL --}}
     @if($showEditModal)
-        <x-modal title="Редактировать аудиторию">
-            <p class="mb-[5px] text-lg font-semibold">Аудитория</p>
+        <x-modal title="Редактировать пространство">
+            <p class="mb-[5px] text-lg font-semibold">Пространство</p>
             <x-input wire:model="room" class="mb-3" />
 
             <x-select wire:model="classroom_category_id" wrapper-class="mb-3">

@@ -4,14 +4,14 @@
         @if($submitted)
             <div class="text-center py-12">
                 <div class="text-7xl mb-6">✅</div>
-                <h2 class="text-2xl font-bold text-green-600 mb-4">Мы получили вашу заявку!</h2>
+                <h2 class="text-2xl font-bold text-green-600 mb-4">Заявка отправлена в СЦ "Интеграл"!</h2>
                 <p class="text-gray-600 mb-8">Скоро мы её рассмотрим. Ожидайте уведомления.</p>
                 <x-button wire:click="resetForm">Подать новую заявку</x-button>
             </div>
         @else
 
         <div class="text-center mb-4 border-b-[3px] border-primary pb-5">
-            <h1 class="text-primary font-bold text-3xl md:text-4xl mb-2">Бронирование аудитории</h1>
+            <h1 class="text-primary font-bold text-3xl md:text-4xl mb-2">Бронирование молодёжных пространств в СЦ "Интеграл"</h1>
             <p class="text-secondary text-[1.1rem]">Заполните форму, отправьте заявку и мы её рассмотрим</p>
         </div>
 
@@ -47,11 +47,11 @@
 
             <div class="mb-4">
                 <label class="block font-semibold text-[#495057] mb-2">
-                    Аудитория
+                    Пространство
                     <span class="text-danger">*</span>
                 </label>
                 <x-select wire:model.live="classroom_id" required>
-                    <option value="">Выберите аудиторию</option>
+                    <option value="">Выберите пространство</option>
                     @foreach ($classrooms as $classroom)
                         <option value="{{ $classroom->id }}">
                             {{ $classroom->room }} ({{ $classroom->category->category }})
@@ -107,11 +107,11 @@
                     Цель бронирования
                     <span class="text-danger">*</span>
                 </label>
-                <x-input wire:model="purpose" type="textarea" placeholder="Собрание студсовета, репетиция, занятие..." rows="3" required/>
+                <x-input wire:model="purpose" type="textarea" placeholder="Собрание студсовета, репетиция, совещание..." rows="3" required/>
             </div>
 
             <div class="bg-[#f8f9fa] p-5 rounded-[10px] mb-4">
-                <h5 class="font-[600] text-lg mb-4">🔧 Оборудование</h5>
+                <h5 class="font-[600] text-lg mb-4">🔧 Техническое сопровождение</h5>
                 <div class="mb-4">
                     <label class="block font-semibold text-[#495057] mb-2">Необходимое оборудование</label>
                     <x-input wire:model="equipment" type="textarea" placeholder="Проектор, микрофоны, стулья..." rows="2"/>
@@ -146,11 +146,10 @@
             <div class="bg-warning text-[#684F06] rounded-[10px] p-5 mb-4">
                 <h5 class="font-bold text-lg mb-3">📋 Правила бронирования</h5>
                 <ul class="space-y-1 list-disc pl-5">
-                    <li>Бронирование возможно только минимум за 24 часа до мероприятия</li>
+                    <li>Бронирование возможно минимум за 24 часа до мероприятия</li>
                     <li>При использовании танцевального зала обязательна сменная обувь</li>
                     <li>Необходимо поддерживать чистоту после мероприятия</li>
                     <li>Мебель должна быть возвращена на свои места</li>
-                    <li>Заявка будет рассмотрена администратором в течение 24 часов</li>
                 </ul>
             </div>
 
@@ -213,7 +212,7 @@
                         </span>
                     </div>
 
-                    <div class="font-semibold">Аудитория {{ $booking->classroom->room }}</div>
+                    <div class="font-semibold">Пространство {{ $booking->classroom->room }}</div>
 
                     <div class="text-sm text-gray-600 mt-2">
                         📅 {{ $booking->date }}

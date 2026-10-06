@@ -3,13 +3,13 @@
 @endphp
 
 <div class="p-4 md:p-8 bg-gray-50 min-h-screen font-sans">
-    <h1 class="text-2xl md:text-3xl font-bold text-indigo-800 mb-6">📅 Расписание аудиторий</h1>
+    <h1 class="text-2xl md:text-3xl font-bold text-indigo-800 mb-6">📅 Расписание пространств</h1>
 
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div class="flex items-center gap-4">
-            <label for="classroom" class="text-gray-700 font-semibold whitespace-nowrap">Аудитория:</label>
+            <label for="classroom" class="text-gray-700 font-semibold whitespace-nowrap">Пространство:</label>
             <x-select wire:model.live="selectedClassroom">
-                <option value="">Выберите аудиторию</option>
+                <option value="">Выберите пространство</option>
                 @foreach($classrooms as $classroom)
                     <option value="{{ $classroom->id }}">{{ $classroom->room }}</option>
                 @endforeach
@@ -118,7 +118,7 @@
         </div>
     @else
         <div class="col-span-full text-center text-2xl font-bold text-gray-400 py-10">
-            Выберите аудиторию для просмотра расписания
+            Выберите пространство для просмотра расписания
         </div>
     @endif
 
@@ -134,7 +134,7 @@
             <div class="space-y-4 text-[15px]">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <div class="text-gray-500 font-semibold">Аудитория</div>
+                        <div class="text-gray-500 font-semibold">Пространство</div>
                         <div class="text-gray-900">{{ $selectedBooking->classroom->room }}</div>
                     </div>
                     <div>

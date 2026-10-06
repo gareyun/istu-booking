@@ -225,7 +225,7 @@ class BookingForm extends Component
         }
 
         if ($bookingStart->lessThanOrEqualTo(now()->addHours(24))) {
-            $this->addError('date', 'Забронировать аудиторию можно не позднее чем за 24 часа до начала мероприятия.');
+            $this->addError('date', 'Забронировать пространство можно не позднее чем за 24 часа до начала мероприятия.');
             return;
         }
 

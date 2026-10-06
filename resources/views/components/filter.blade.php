@@ -20,9 +20,9 @@
         </div>
 
         <div class="flex flex-col flex-1 min-w-[200px]">
-            <label class="mb-2 font-semibold text-[#1a2a6c]">Аудитория</label>
+            <label class="mb-2 font-semibold text-[#1a2a6c]">Пространство</label>
             <x-select wire:model.live="{{ $classroomProp }}">
-                <option value="">Все аудитории</option>
+                <option value="">Все пространства</option>
                 @foreach($classrooms as $classroom)
                     <option value="{{ $classroom->id }}">{{ $classroom->room }}</option>
                 @endforeach

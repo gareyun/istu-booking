@@ -141,7 +141,7 @@ class VkNotificationService
 
         $message = "{$statusEmoji} Статус вашей заявки изменён!\n\n";
         $message .= "📋 Статус: {$statusText}\n";
-        $message .= "🏫 Аудитория: {$booking->classroom->room}\n";
+        $message .= "🏫 Пространство: {$booking->classroom->room}\n";
         $message .= "📅 Дата: {$booking->date}\n";
         $message .= "⏰ Время: {$booking->start_time} - {$booking->end_time}\n";
         $message .= "🎯 Цель: {$booking->purpose}\n";
@@ -156,7 +156,7 @@ class VkNotificationService
             $message .= "- необходимо поддерживать чистоту после мероприятия\n";
             $message .= "- мебель должна быть возвращена на свои места";
         } elseif ($booking->status === 'rejected') {
-            $message .= "\n\nВы можете подать новую заявку на другую дату или аудиторию.";
+            $message .= "\n\nВы можете подать новую заявку на другую дату или пространство.";
         } elseif ($booking->status === 'cancelled') {
             $message .= "\n\nБронь была отменена администратором. Вы можете подать новую заявку.";
         }
@@ -187,7 +187,7 @@ class VkNotificationService
 
         $message = "📨 Ваша заявка на бронирование получена!\n\n";
 
-        $message .= "🏫 Аудитория: {$booking->classroom->room}\n";
+        $message .= "🏫 Пространство: {$booking->classroom->room}\n";
         $message .= "📅 Дата: {$booking->date}\n";
         $message .= "⏰ Время: {$booking->start_time} - {$booking->end_time}\n";
         $message .= "🎯 Цель: {$booking->purpose}\n";

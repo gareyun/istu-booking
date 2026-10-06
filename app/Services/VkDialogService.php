@@ -97,8 +97,8 @@ class VkDialogService
 
         $buttons[] = [['text' => 'Отмена', 'color' => 'negative']];
 
-        $message = ($error ? "❌ Не удалось распознать аудиторию.\n" : "📅 ")
-            . "Выберите аудиторию из списка или введите её номер/название:";
+        $message = ($error ? "❌ Не удалось распознать пространство.\n" : "📅 ")
+            . "Выберите пространство из списка или введите её номер/название:";
 
         $this->vk->sendMessageWithKeyboard($userId, $message, $buttons, true);
         Cache::put("vk_bot_state_{$userId}", ['step' => 'classroom'], now()->addMinutes(30));
@@ -127,7 +127,7 @@ class VkDialogService
 
         Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
 
-        $this->vk->sendMessage($userId, "✅ Аудитория: {$classroom->room}\n"
+        $this->vk->sendMessage($userId, "✅ Пространство: {$classroom->room}\n"
             . "📅 Введите дату бронирования в формате ДД.ММ.ГГГГ (например, 15.05.2026):");
     }
 
@@ -207,7 +207,7 @@ class VkDialogService
             if ($bookingDateTime->lt(now()->addHours(24))) {
                 $this->vk->sendMessage(
                     $userId,
-                    "❌ Аудиторию можно бронировать не позднее чем за 24 часа до начала.\n"
+                    "❌ Пространство можно бронировать не позднее чем за 24 часа до начала.\n"
                     . "Выберите другую дату или время."
                 );
 
@@ -419,7 +419,7 @@ class VkDialogService
             . "🏛 Факультет: {$state['faculty']}\n"
             . "👥 Группа: {$state['group']}\n"
             . "📱 Телефон: {$state['phone']}\n"
-            . "🏫 Аудитория: {$state['classroom_name']}\n"
+            . "🏫 Пространство: {$state['classroom_name']}\n"
             . "📅 Дата: {$state['date']}\n"
             . "⏰ Время: {$state['start_time']} – {$state['end_time']}\n"
             . "🎯 Цель: {$state['purpose']}\n"

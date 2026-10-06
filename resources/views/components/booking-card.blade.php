@@ -18,7 +18,7 @@
         </div>
 
         <div class="text-[1.3rem] font-bold text-[#1a2a6c] mb-[15px]">
-            Аудитория: {{ $booking->classroom->room }}
+            Пространство: {{ $booking->classroom->room }}
         </div>
 
         <div class="space-y-[8px]">

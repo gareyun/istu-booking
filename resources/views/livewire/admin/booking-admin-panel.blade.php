@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-[#f5f7fa] text-[#333] font-['Segoe_UI']">
+<div class="min-h-screen bg-[#f5f7fa] text-[#333]">
     <div class="w-full p-[30px] overflow-y-auto">
         <h1 class="text-[1.5rem] mb-5 pb-[10px] border-b-2 border-[#1a2a6c] text-[#1a2a6c] font-bold">Заявки</h1>
 
@@ -21,7 +21,7 @@
         @endif
 
         <div class="mb-5">
-            <x-button onclick="window.location.href='{{ route('admin.classrooms') }}'">Аудитории</x-button>
+            <x-button onclick="window.location.href='{{ route('admin.classrooms') }}'">Пространства</x-button>
         </div>
 
         <x-filter :classrooms="$classrooms"/>
