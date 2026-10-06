@@ -14,7 +14,7 @@
             <div wire:ignore>
                 <input type="text" id="date_filter_input" placeholder="ДД.ММ.ГГГГ"
                        class="w-full px-4 py-[12px] border-2 border-[#e0e0e0] rounded-[10px]
-                       focus:outline-none focus:border-[#3456db] font-medium transition-all duration-300
+                       focus:outline-none focus:border-[#3456db] transition-all duration-300
                        bg-white focus:shadow-[0_0_0_4px_rgba(52,86,219,0.12)] cursor-pointer">
             </div>
         </div>
@@ -49,16 +49,53 @@
 
     <script>
         document.addEventListener('livewire:init', () => {
-            const fp = flatpickr("#date_filter_input", {
-                dateFormat: "d.m.Y",
-                locale: "ru",
-                onChange: function(selectedDates, dateStr) {
-                    @this.set('{{ $dateProp }}', dateStr);
+            let filterDatePicker = null;
+
+            function initFilterDatePicker() {
+
+                const input = document.getElementById('date_filter_input');
+
+                if (!input) {
+                    return;
+                }
+
+                if (filterDatePicker) {
+                    filterDatePicker.destroy();
+                    filterDatePicker = null;
+                }
+
+                filterDatePicker = flatpickr(input, {
+                    dateFormat: 'd.m.Y',
+                    locale: 'ru',
+                    disableMobile: true,
+                    allowInput: true,
+
+                    onChange: function(selectedDates, dateStr) {
+                        @this.set(
+                            '{{ $dateProp }}',
+                            dateStr
+                        );
+                    }
+                });
+            }
+
+            initFilterDatePicker();
+
+            Livewire.on('resetFilterDate', () => {
+                if (filterDatePicker) {
+                    filterDatePicker.clear();
                 }
             });
 
-            Livewire.on('resetFilterDate', () => {
-                if (fp) fp.clear();
+            Livewire.hook('morph.updated', ({ el }) => {
+                if (
+                    el.querySelector &&
+                    el.querySelector('#date_filter_input')
+                ) {
+                    requestAnimationFrame(() => {
+                        initFilterDatePicker();
+                    });
+                }
             });
         });
     </script>
