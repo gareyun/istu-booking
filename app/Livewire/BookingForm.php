@@ -280,11 +280,20 @@ class BookingForm extends Component
     public function resetForm()
     {
         $this->submitted = false;
-        $this->loadBusySlots();
-    }
 
-    public function render()
-    {
-        return view('livewire.booking-form');
+        $this->reset([
+            'classroom_id',
+            'date',
+            'start_time',
+            'end_time',
+            'purpose',
+            'equipment',
+            'user_comment',
+        ]);
+
+        $this->is_tech_support = 0;
+        $this->busySlots = [];
+
+        $this->dispatch('booking-form-reset');
     }
 }

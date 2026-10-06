@@ -68,7 +68,7 @@
                     </label>
 
                     <div wire:ignore>
-                        <x-input wire:model="description" id="event_date" placeholder="ДД.ММ.ГГГГ" required/>
+                        <x-input id="event_date" placeholder="ДД.ММ.ГГГГ" autocomplete="off" required/>
                     </div>
                 </div>
 
@@ -79,9 +79,11 @@
                     </label>
 
                     <div class="flex flex-col md:flex-row gap-5 items-center">
-                        <x-input wire:model="start_time" id="start_time" placeholder="14:30" required/>
+                        <x-input wire:model="start_time" id="start_time" placeholder="__:__"
+                                    inputmode="numeric" autocomplete="off" maxlength="5" required/>
                         <span class="text-xl font-bold text-secondary">—</span>
-                        <x-input wire:model="end_time" id="end_time" placeholder="16:00" required/>
+                        <x-input wire:model="end_time" id="end_time" placeholder="__:__"
+                                    inputmode="numeric" autocomplete="off" maxlength="5" required/>
                     </div>
                 </div>
             </div>
@@ -171,8 +173,6 @@
             </p>
         </div>
 
-        <x-filter :classrooms="$classrooms"/>
-
         @if($loadError)
             <div class="bg-red-100 border border-red-300 text-red-700 rounded-[10px] p-4 mb-6">
                 ❌ Не удалось загрузить данные. Попробуйте позже.
@@ -181,6 +181,8 @@
 
         <div class="mt-10">
             <h2 class="text-2xl font-bold mb-6 text-center">📋 Мои заявки</h2>
+
+            <x-filter :classrooms="$classrooms"/>
 
             @forelse($bookings as $booking)
                 <div class="bg-white rounded-xl shadow p-4 mb-4 border border-[#e3e6f0]">
@@ -276,42 +278,165 @@
 
     <script>
         document.addEventListener('livewire:init', () => {
-            flatpickr("#event_date", {
-                dateFormat: "d.m.Y",
-                locale: "ru",
-                minDate: "today",
+            let datePicker = null;
 
-                onChange: function(selectedDates, dateStr) {
-                    @this.set('date', dateStr);
+            function initDatePicker() {
+                const dateInput = document.getElementById('event_date');
+
+                if (!dateInput) {
+                    return;
                 }
-            });
 
-            function setupTimeMask(element) {
-                element.addEventListener('input', function(e) {
-                    let value = e.target.value.replace(/\D/g, '');
+                if (datePicker) {
+                    datePicker.destroy();
+                    datePicker = null;
+                }
 
-                    if (value.length >= 3) {
-                        value =
-                            value.substring(0, 2)
-                            + ':'
-                            + value.substring(2, 4);
-                    } else if (value.length >= 1) {
-                        if (parseInt(value) > 23) {
-                            value = '23';
+                datePicker = flatpickr(dateInput, {
+                    dateFormat: 'd.m.Y',
+                    locale: 'ru',
+                    minDate: 'today',
+                    disableMobile: true,
+                    allowInput: true,
+                    onChange: function(selectedDates, dateStr) {
+                        const component = Livewire.find(
+                            dateInput.closest('[wire\\:id]').getAttribute('wire:id')
+                        );
+
+                        if (component) {
+                            component.set('date', dateStr);
                         }
                     }
-
-                    e.target.value = value.substring(0, 5);
                 });
             }
 
-            setupTimeMask(
-                document.getElementById('start_time')
-            );
+            function setupTimeMask(element) {
+                if (!element) {
+                    return;
+                }
 
-            setupTimeMask(
-                document.getElementById('end_time')
-            );
+                if (element.dataset.timeMaskInitialized === 'true') {
+                    return;
+                }
+
+                element.dataset.timeMaskInitialized = 'true';
+
+                function formatTime(digits, isDeleting, hadColon) {
+                    if (isDeleting && !hadColon && digits.length === 2) {
+                        digits = digits.substring(0, 1);
+                    }
+
+                    let hours = digits.substring(0, 2);
+                    let minutes = digits.substring(2, 4);
+
+                    if (hours.length === 2 && parseInt(hours, 10) > 23) {
+                        hours = '23';
+                    }
+
+                    if (minutes.length === 2 && parseInt(minutes, 10) > 59) {
+                        minutes = '59';
+                    }
+
+                    if (minutes.length > 0) {
+                        return hours + ':' + minutes;
+                    }
+
+                    if (hours.length === 2) {
+                        return (!isDeleting || hadColon) ? hours + ':' : hours;
+                    }
+
+                    return hours;
+                }
+
+                function caretFromDigits(formatted, digitsBefore) {
+                    if (digitsBefore <= 0) {
+                        return 0;
+                    }
+
+                    let count = 0;
+
+                    for (let i = 0; i < formatted.length; i++) {
+                        if (/\d/.test(formatted[i])) {
+                            count++;
+
+                            if (count === digitsBefore) {
+                                return formatted[i + 1] === ':' ? i + 2 : i + 1;
+                            }
+                        }
+                    }
+
+                    return formatted.length;
+                }
+
+                element.addEventListener('input', function (e) {
+                    const input = e.target;
+                    const isDeleting = typeof e.inputType === 'string' && e.inputType.startsWith('delete');
+                    const hadColon = input.value.includes(':');
+
+                    const caret = input.selectionStart ?? input.value.length;
+                    let digitsBefore = input.value.slice(0, caret).replace(/\D/g, '').length;
+
+                    let digits = input.value.replace(/\D/g, '');
+
+                    if (!isDeleting && digits.length > 0 && digits[0] > '2') {
+                        digits = '0' + digits;
+                        digitsBefore += 1;
+                    }
+
+                    digits = digits.substring(0, 4);
+
+                    const formatted = formatTime(digits, isDeleting, hadColon);
+
+                    if (input.value === formatted) {
+                        return;
+                    }
+
+                    input.value = formatted;
+
+                    let newCaret = caretFromDigits(formatted, digitsBefore);
+
+                    if (isDeleting && formatted[newCaret - 1] === ':') {
+                        newCaret--;
+                    }
+
+                    input.setSelectionRange(newCaret, newCaret);
+
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                });
+
+                element.addEventListener('keydown', function (e) {
+                    const allowedKeys = ['Backspace', 'Delete',
+                                         'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+                                         'Tab', 'Home', 'End', 'Enter'
+                    ];
+
+                    if (allowedKeys.includes(e.key) || e.ctrlKey || e.metaKey) {
+                        return;
+                    }
+
+                    if (!/^\d$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            function initTimeMasks() {
+                setupTimeMask(document.getElementById('start_time'));
+                setupTimeMask(document.getElementById('end_time'));
+            }
+
+            function initBookingForm() {
+                requestAnimationFrame(() => {
+                    initDatePicker();
+                    initTimeMasks();
+                });
+            }
+
+            initBookingForm();
+
+            Livewire.on('booking-form-reset', () => {
+                initBookingForm();
+            });
         });
     </script>
 </div>
