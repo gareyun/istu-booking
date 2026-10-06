@@ -19,21 +19,27 @@ class VkNotificationService
     {
         $vkLink = trim($vkLink);
         $vkLink = ltrim($vkLink, '@');
-        
-        if (preg_match('/vk\.com\/(.+)/', $vkLink, $matches)) {
-            $identifier = trim($matches[1], '/');
+
+        if (preg_match(
+            '/^(?:https?:\/\/)?(?:www\.)?vk\.(?:ru|com)\/([^\/?#]+)\/?$/i',
+            $vkLink,
+            $matches
+        )) {
+            $identifier = $matches[1];
         } else {
             $identifier = $vkLink;
         }
-        
-        if (preg_match('/^id(\d+)$/', $identifier, $matches)) {
+
+        $identifier = trim($identifier, " /");
+
+        if (preg_match('/^id(\d+)$/i', $identifier, $matches)) {
             return $matches[1];
         }
-        
+
         if (is_numeric($identifier)) {
             return $identifier;
         }
-        
+
         return $this->resolveScreenName($identifier);
     }
 
