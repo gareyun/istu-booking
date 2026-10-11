@@ -1,10 +1,10 @@
-<div class="min-h-screen bg-[#f8f9fc] font-sans py-10 px-4">
+<div class="min-h-screen bg-[#f8f9fc] font-sans pt-8 pb-10 px-4">
     <div class="max-w-[800px] mx-auto bg-white rounded-[15px] shadow-[0_0_30px_rgba(0,0,0,0.1)] p-6 md:p-10">
 
         @if($submitted)
             <div class="text-center py-12">
                 <div class="text-7xl mb-6">✅</div>
-                <h2 class="text-2xl font-bold text-green-600 mb-4">Заявка отправлена в СЦ "Интеграл"!</h2>
+                <h2 class="text-2xl font-bold text-green-600 mb-4">Заявка успешно создана</h2>
                 <p class="text-gray-600 mb-8">Скоро мы её рассмотрим. Ожидайте уведомления.</p>
                 <x-button wire:click="resetForm">Подать новую заявку</x-button>
             </div>
@@ -90,7 +90,7 @@
 
             @if(count($busySlots))
                 <div class="bg-blue-100 text-blue-800 rounded-[10px] p-4 mb-4">
-                    <b>⛔ Занятые слоты:</b>
+                    <b>⛔ Занятые временные слоты:</b>
                     <div class="mt-2 space-y-1">
                         @foreach($busySlots as $slot)
                             <div>

@@ -185,7 +185,7 @@ class VkNotificationService
             return false;
         }
 
-        $message = "📨 Ваша заявка на бронирование получена!\n\n";
+        $message = "📨 Ваша заявка на бронирование успешно создана!\n\n";
 
         $message .= "🏫 Пространство: {$booking->classroom->room}\n";
         $message .= "📅 Дата: {$booking->date}\n";

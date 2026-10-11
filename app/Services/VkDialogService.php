@@ -175,13 +175,13 @@ class VkDialogService
         if ($busySlots->isEmpty()) {
             $this->vk->sendMessage(
                 $userId,
-                "🟢 На выбранную дату занятых слотов нет.\nМожно выбрать любое свободное время."
+                "🟢 На выбранную дату занятых временных слотов нет.\nМожно выбрать любое свободное время."
             );
 
             return;
         }
 
-        $message = "📌 Занятые слоты:\n\n";
+        $message = "📌 Занятые временные слоты:\n\n";
 
         foreach ($busySlots as $slot) {
             $message .= "• {$slot->start_time} – {$slot->end_time}\n";
