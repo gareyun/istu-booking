@@ -94,7 +94,6 @@ class BookingForm extends Component
             $this->hasMoreBookings = false;
             $this->loadError = true;
         }
-        
     }
 
     public function loadMore()
@@ -167,21 +166,27 @@ class BookingForm extends Component
 
     public function saveSettings()
     {
-        /** @var User $user */
-        $user = Auth::user();
         if (!Auth::check()) {
             return redirect()->route('login');
         }
+
+        /** @var User $user */
+        $user = Auth::user();
 
         $this->validate([
             'settingsVkLink' => 'nullable|string|max:255',
             'settingsPhone'  => 'required|string|max:20'
         ]);
 
-        $user->update([
-            'vk_link' => $this->settingsVkLink,
-            'phone'   => $this->settingsPhone
-            ]);
+        $data = ['phone' => $this->settingsPhone];
+
+        if (empty($user->vk_id)) {
+            $data['vk_link'] = $this->settingsVkLink;
+        } else {
+            $this->settingsVkLink = $user->vk_link ?? '';
+        }
+
+        $user->update($data);
         session()->flash('success', 'Настройки сохранены.');
 
         $this->closeSettingsModal();
@@ -189,13 +194,14 @@ class BookingForm extends Component
 
     public function submit()
     {
-        $user = Auth::user();
-
         if (!Auth::check()) {
             return redirect()->route('login');
         }
-        
-        if (!$user || !$user->phone) {
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        if (!$user->phone) {
             $this->addError('phone', 'Для отправки заявки необходимо указать номер телефона в настройках.');
             $this->openSettingsModal();
             return;
@@ -212,7 +218,7 @@ class BookingForm extends Component
             'user_comment' => 'nullable|string'
         ]);
 
-        $vkLink = $user ? $user->vk_link : null;
+        $vkLink = $user->vk_link;
 
         try {
             $bookingStart = Carbon::createFromFormat(

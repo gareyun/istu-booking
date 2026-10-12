@@ -11,7 +11,7 @@
         @else
 
         <div class="text-center mb-4 border-b-[3px] border-primary pb-5">
-            <h1 class="text-primary font-bold text-3xl md:text-4xl mb-2">Бронирование молодёжных пространств в СЦ "Интеграл"</h1>
+            <h1 class="text-primary font-bold text-3xl md:text-4xl mb-2">Бронирование молодёжных пространств СЦ "Интеграл"</h1>
             <p class="text-secondary text-[1.1rem]">Заполните форму, отправьте заявку и мы её рассмотрим</p>
         </div>
 

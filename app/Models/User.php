@@ -18,6 +18,7 @@ class User extends Authenticatable
         'faculty',
         'group',
         'vk_link',
+        'vk_id',
         'role'
     ];
 
@@ -37,5 +38,27 @@ class User extends Authenticatable
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function activationCodes()
+    {
+        return $this->hasMany(WebActivationCode::class);
+    }
+
+    public function isEmailVerified(): bool
+    {
+        return $this->email_verified_at !== null;
+    }
+
+    public function markEmailAsVerified(): bool
+    {
+        return $this->forceFill([
+            'email_verified_at' => $this->freshTimestamp(),
+        ])->save();
+    }
+
+    public function hasWebAccess(): bool
+    {
+        return !empty($this->password);
     }
 }

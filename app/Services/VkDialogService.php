@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use App\Models\Classroom;
 use App\Models\Booking;
 use App\Models\User;
@@ -11,27 +12,74 @@ use Carbon\Carbon;
 class VkDialogService
 {
     protected VkBotService $vk;
+    protected VkRegistrationService $registration;
 
-    public function __construct(VkBotService $vk)
+    public function __construct(VkBotService $vk, VkRegistrationService $registration)
     {
         $this->vk = $vk;
+        $this->registration = $registration;
     }
-
+    
     public function handleMessage(int $userId, string $text): void
     {
         $text = trim($text);
+        $command = mb_strtolower($text);
 
-        // сброс
-        if (in_array(mb_strtolower($text), ['/start', 'начать', 'старт', 'начать заново'])) {
-            Cache::forget("vk_bot_state_{$userId}");
-            $this->sendStepClassroom($userId, false);
+        $stateKey = "vk_bot_state_{$userId}";
+
+        if ($command === '/отмена') {
+            $hadBooking = Cache::pull($stateKey) !== null;
+            $hadRegistration = $this->registration->cancel($userId);
+
+            if ($hadRegistration) {
+                $this->vk->sendMessage(
+                    $userId,
+                    "🚫 Регистрация отменена. Чтобы начать заново, отправьте /бронь."
+                );
+            } elseif ($hadBooking) {
+                $this->vk->sendMessage($userId, "🚫 Процесс бронирования отменён.");
+            } else {
+                $this->vk->sendMessage($userId, "ℹ️ У вас нет активного процесса.");
+            }
+
             return;
         }
 
-        $state = Cache::get("vk_bot_state_{$userId}");
+        $user = $this->findUser($userId);
+
+        if (!$user) {
+            if (
+                in_array($command, VkRegistrationService::START_COMMANDS, true)
+                || $this->registration->hasActiveRegistration($userId)
+            ) {
+                $this->registration->handle($userId, $text);
+            }
+
+            return;
+        }
+
+        if (!$user->isEmailVerified()) {
+            $this->registration->handleUnverified($user, $text);
+            return;
+        }
+
+        if ($command === '/бронь') {
+            Cache::forget($stateKey);
+            $this->sendStepClassroom($userId);
+            return;
+        }
+
+        if (in_array($command, VkRegistrationService::START_COMMANDS, true)) {
+            $this->vk->sendMessage(
+                $userId,
+                "✅ Вы уже зарегистрированы. Чтобы подать заявку на бронирование, отправьте /бронь."
+            );
+            return;
+        }
+
+        $state = Cache::get($stateKey);
 
         if (!$state) {
-            $this->sendStepClassroom($userId, false);
             return;
         }
 
@@ -51,18 +99,6 @@ class VkDialogService
             case 'purpose':
                 $this->processPurpose($userId, $text, $state);
                 break;
-            case 'name':
-                $this->processName($userId, $text, $state);
-                break;
-            case 'faculty':
-                $this->processFaculty($userId, $text, $state);
-                break;
-            case 'group':
-                $this->processGroup($userId, $text, $state);
-                break;
-            case 'phone':
-                $this->processPhone($userId, $text, $state);
-                break;
             case 'equipment':
                 $this->processEquipment($userId, $text, $state);
                 break;
@@ -70,16 +106,24 @@ class VkDialogService
                 $this->processTechSupport($userId, $text, $state);
                 break;
             case 'comment':
-                $this->processComment($userId, $text, $state);
+                $this->processComment($userId, $text, $state, $user);
                 break;
             case 'confirm':
-                $this->processConfirm($userId, $text, $state);
+                $this->processConfirm($userId, $text, $state, $user);
                 break;
             default:
-                // Сброс при неизвестном шаге
-                Cache::forget("vk_bot_state_{$userId}");
-                $this->sendStepClassroom($userId, true);
+                Cache::forget($stateKey);
+                $this->vk->sendMessage(
+                    $userId,
+                    "⚠️ Состояние бронирования сброшено. Чтобы начать заново, отправьте /бронь."
+                );
+                break;
         }
+    }
+
+    protected function findUser(int $vkId): ?User
+    {
+        return User::where('vk_id', (string) $vkId)->first();
     }
 
     protected function sendStepClassroom(int $userId, bool $error = false): void
@@ -98,7 +142,7 @@ class VkDialogService
         $buttons[] = [['text' => 'Отмена', 'color' => 'negative']];
 
         $message = ($error ? "❌ Не удалось распознать пространство.\n" : "📅 ")
-            . "Выберите пространство из списка или введите её номер/название:";
+            . "Выберите пространство из списка:";
 
         $this->vk->sendMessageWithKeyboard($userId, $message, $buttons, true);
         Cache::put("vk_bot_state_{$userId}", ['step' => 'classroom'], now()->addMinutes(30));
@@ -207,7 +251,7 @@ class VkDialogService
             if ($bookingDateTime->lt(now()->addHours(24))) {
                 $this->vk->sendMessage(
                     $userId,
-                    "❌ Пространство можно бронировать не позднее чем за 24 часа до начала.\n"
+                    "❌ Пространство можно бронировать минимум за 24 часа до начала.\n"
                     . "Выберите другую дату или время."
                 );
 
@@ -288,77 +332,13 @@ class VkDialogService
         }
 
         $state['purpose'] = $text;
-        $state['step'] = 'name';
-        Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
-
-        $buttons = [
-            [['text' => 'Нет', 'color' => 'negative']],
-            [['text' => 'Проектор'], ['text' => 'Звук']],
-            [['text' => 'Компьютер'], ['text' => 'Другое']],
-        ];
-        $this->vk->sendMessage($userId, "👤 Введите ваше полное имя (ФИО):");
-    }
-
-    protected function processName(int $userId, string $text, array $state): void
-    {
-        $text = trim($text);
-        if (mb_strlen($text) < 2) {
-            $this->vk->sendMessage($userId, "❌ Введите ваше полное имя (ФИО):");
-            return;
-        }
-        $state['name'] = $text;
-        $state['step'] = 'faculty';
-        Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
-        $this->vk->sendMessage($userId, "🏛 Введите ваш факультет/институт:");
-    }
-
-    protected function processFaculty(int $userId, string $text, array $state): void
-    {
-        $text = trim($text);
-        if (mb_strlen($text) < 2) {
-            $this->vk->sendMessage($userId, "❌ Факультет не может быть пустым. Введите ещё раз:");
-            return;
-        }
-        $state['faculty'] = $text;
-        $state['step'] = 'group';
-        Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
-        $this->vk->sendMessage($userId, "👥 Введите вашу группу (например, Б22-191-2):");
-    }
-
-    protected function processGroup(int $userId, string $text, array $state): void
-    {
-        $text = trim($text);
-        if (mb_strlen($text) < 2) {
-            $this->vk->sendMessage($userId, "❌ Группа не может быть пустой. Введите ещё раз:");
-            return;
-        }
-        $state['group'] = $text;
-        $state['step'] = 'phone';
-        Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
-
-        $this->vk->sendMessage($userId, "📱 Введите ваш номер телефона:");
-    }
-
-    protected function processPhone(int $userId, string $text, array $state): void
-    {
-        $text = trim($text);
-
-        $digits = preg_replace('/\D/', '', $text);
-        if (strlen($digits) < 10) {
-            $this->vk->sendMessage($userId, "❌ Неверный формат номера. Введите корректный номер телефона (минимум 10 цифр):");
-            return;
-        }
-
-        $state['phone'] = $text;
         $state['step'] = 'equipment';
         Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
 
         $buttons = [
             [['text' => 'Нет', 'color' => 'negative']],
-            [['text' => 'Проектор'], ['text' => 'Звук']],
-            [['text' => 'Компьютер'], ['text' => 'Другое']],
         ];
-        $this->vk->sendMessageWithKeyboard($userId, "🔧 Нужно ли оборудование? Выберите или введите список:", $buttons, true);
+        $this->vk->sendMessageWithKeyboard($userId, "🔧 Нужно ли оборудование? Введите список или нажмите «Нет»:", $buttons, true);
     }
 
     protected function processEquipment(int $userId, string $text, array $state): void
@@ -403,7 +383,7 @@ class VkDialogService
         $this->vk->sendMessageWithKeyboard($userId, "💬 Оставьте комментарий для администратора или нажмите «Нет»:", $buttons, true);
     }
 
-    protected function processComment(int $userId, string $text, array $state): void
+    protected function processComment(int $userId, string $text, array $state, User $user): void
     {
         if (mb_strtolower(trim($text)) === 'нет') {
             $state['user_comment'] = null;
@@ -415,10 +395,10 @@ class VkDialogService
         Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
 
         $summary = "📋 Проверьте данные заявки:\n\n"
-            . "👤 ФИО: {$state['name']}\n"
-            . "🏛 Факультет: {$state['faculty']}\n"
-            . "👥 Группа: {$state['group']}\n"
-            . "📱 Телефон: {$state['phone']}\n"
+            . "👤 ФИО: {$user->name}\n"
+            . "🏛 Факультет: {$user->faculty}\n"
+            . "👥 Группа: {$user->group}\n"
+            . "📱 Телефон: {$user->phone}\n"
             . "🏫 Пространство: {$state['classroom_name']}\n"
             . "📅 Дата: {$state['date']}\n"
             . "⏰ Время: {$state['start_time']} – {$state['end_time']}\n"
@@ -434,7 +414,7 @@ class VkDialogService
         $this->vk->sendMessageWithKeyboard($userId, $summary, $buttons, true);
     }
 
-    protected function processConfirm(int $userId, string $text, array $state): void
+    protected function processConfirm(int $userId, string $text, array $state, User $user): void
     {
         $text = mb_strtolower(trim($text));
         if ($text === 'отменить' || $text === '❌ отменить') {
@@ -449,20 +429,21 @@ class VkDialogService
         }
 
         $booking = Booking::create([
+            'user_id'         => $user->id,
             'classroom_id'    => $state['classroom_id'],
             'date'            => $state['date'],
             'start_time'      => $state['start_time'],
             'end_time'        => $state['end_time'],
             'purpose'         => $state['purpose'],
-            'name'            => $state['name'],
-            'faculty'         => $state['faculty'],
-            'group'           => $state['group'],
-            'phone'           => $state['phone'],
+            'name'            => $user->name,
+            'faculty'         => $user->faculty,
+            'group'           => $user->group,
+            'phone'           => $user->phone,
             'equipment'       => $state['equipment'],
             'is_tech_support' => $state['is_tech_support'],
             'user_comment'    => $state['user_comment'],
             'vk_link'         => "https://vk.com/id{$userId}",
-            'vk_user_id'      => $userId,
+            'vk_user_id'      => (string) $userId,
             'status'          => 'pending',
         ]);
 
@@ -471,7 +452,7 @@ class VkDialogService
         try {
             app(VkNotificationService::class)->notifyBookingCreated($booking, true);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error(
+            Log::error(
                 'VK notification create booking error: ' . $e->getMessage()
             );
         }

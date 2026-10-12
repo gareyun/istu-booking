@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
                 'name' => 'Иванов Александр Михайлович',
                 'email' => 'mail1@example.com',
                 'phone' => '+7 (950) 950-50-50',
-                'password' => bcrypt('password'),
+                'password' => bcrypt('12321fverhb7y456756password'),
                 'faculty' => 'ФИТ',
                 'group' => 'Б22-191-2'
             ]),
@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
                 'name' => 'Александров Иван Алексеевич',
                 'email' => 'mail2@example.com',
                 'phone' => '+7 (950) 950-50-50',
-                'password' => bcrypt('password'),
+                'password' => bcrypt('paswergwer34545645623frsdrvgsword'),
                 'faculty' => 'ФИТ',
                 'group' => 'Б22-191-1'
             ]),
@@ -31,7 +31,7 @@ class UserSeeder extends Seeder
                 'name' => 'Алексеев Анатолий Юрьевич',
                 'email' => 'mail3@example.com',
                 'phone' => '+7 (950) 950-50-50',
-                'password' => bcrypt('password'),
+                'password' => bcrypt('passworderbsfb324234dsftgbt'),
                 'faculty' => 'ФСАиД',
                 'group' => 'Б23-131-1'
             ])

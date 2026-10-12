@@ -70,18 +70,24 @@ class VkNotificationService
         return null;
     }
 
-    public function sendMessage(string $userId, string $message): bool
+    public function sendMessage(string $userId, string $message, bool $removeKeyboard = false): bool
     {
         try {
             $randomId = random_int(100000, 999999);
-            
-            $response = Http::get('https://api.vk.com/method/messages.send', [
+
+            $params = [
                 'user_id' => (int) $userId,
                 'message' => $message,
                 'random_id' => $randomId,
                 'access_token' => $this->accessToken,
                 'v' => $this->apiVersion,
-            ]);
+            ];
+
+            if ($removeKeyboard) {
+                $params['keyboard'] = json_encode(['buttons' => [], 'one_time' => true]);
+            }
+
+            $response = Http::get('https://api.vk.com/method/messages.send', $params);
 
             $data = $response->json();
             
@@ -109,19 +115,37 @@ class VkNotificationService
         }
     }
 
-    public function notifyStatusChange($booking): bool
+    private function resolveRecipient($booking): ?string
     {
+        if (!empty($booking->vk_user_id)) {
+            return (string) $booking->vk_user_id;
+        }
+
+        if ($booking->user && !empty($booking->user->vk_id)) {
+            return (string) $booking->user->vk_id;
+        }
+
         if (empty($booking->vk_link)) {
-            Log::info('VK notification skipped: no vk_link');
-            return false;
+            Log::info('VK notification skipped: no vk recipient');
+            return null;
         }
 
         $userId = $this->extractUserId($booking->vk_link);
-        
+
         if (!$userId) {
             Log::warning('VK: Не удалось извлечь ID пользователя', [
                 'vk_link' => $booking->vk_link
             ]);
+        }
+
+        return $userId;
+    }
+
+    public function notifyStatusChange($booking): bool
+    {
+        $userId = $this->resolveRecipient($booking);
+
+        if (!$userId) {
             return false;
         }
 
@@ -170,18 +194,9 @@ class VkNotificationService
             return false;
         }
 
-        if (empty($booking->vk_link)) {
-            Log::info('VK notification skipped: no vk_link');
-            return false;
-        }
-
-        $userId = $this->extractUserId($booking->vk_link);
+        $userId = $this->resolveRecipient($booking);
 
         if (!$userId) {
-            Log::warning('VK: Не удалось извлечь ID пользователя', [
-                'vk_link' => $booking->vk_link
-            ]);
-
             return false;
         }
 
