@@ -8,7 +8,6 @@ class Classroom extends Model
 {
     protected $fillable = [
         'classroom_category_id',
-        'building_id',
         'room',
         'description',
         'equipment',
@@ -24,10 +23,5 @@ class Classroom extends Model
     public function category()
     {
         return $this->belongsTo(ClassroomCategory::class, 'classroom_category_id');
-    }
-
-    public function building()
-    {
-        return $this->belongsTo(Building::class);
     }
 }
