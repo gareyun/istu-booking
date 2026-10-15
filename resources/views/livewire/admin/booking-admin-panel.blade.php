@@ -83,10 +83,20 @@
 
         @if($showCancelModal)
             <x-modal title="Подтверждение отмены">
-                <p class="text-gray-600 mb-6">Вы уверены, что хотите отменить эту бронь? Действие нельзя будет отменить.</p>
+                <p class="text-gray-600 mb-4">Вы уверены, что хотите отменить эту бронь? Действие нельзя будет отменить.</p>
+
+                <label class="block font-semibold text-[#495057] mb-2">
+                    Причина отмены <span class="text-red-500">*</span>
+                </label>
+                <x-input wire:model="cancelReason" type="textarea" rows="3" class="resize-none"
+                        placeholder="Например: в помещении проводятся ремонтные работы..."/>
+                @error('cancelReason')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+
                 <x-slot name="footer">
-                    <x-button wire:click="cancelBooking" color="red">Да, отменить</x-button>
-                    <x-button wire:click="closeCancelModal" color="gray">Нет, оставить</x-button>
+                    <x-button wire:click="cancelBooking" color="red">Отменить бронь</x-button>
+                    <x-button wire:click="closeCancelModal" color="gray">Оставить</x-button>
                 </x-slot>
             </x-modal>
         @endif

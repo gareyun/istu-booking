@@ -21,6 +21,7 @@ class BookingAdminPanel extends Component
 
     public $showCancelModal = false;
     public $bookingToCancel = null;
+    public $cancelReason = '';
 
     public $perPage = 10;
     public $hasMoreBookings = false;
@@ -69,6 +70,8 @@ class BookingAdminPanel extends Component
     public function openCancelModal($bookingId)
     {
         $this->bookingToCancel = $bookingId;
+        $this->cancelReason = '';
+        $this->resetValidation();
         $this->showCancelModal = true;
     }
 
@@ -76,6 +79,8 @@ class BookingAdminPanel extends Component
     {
         $this->showCancelModal = false;
         $this->bookingToCancel = null;
+        $this->cancelReason = '';
+        $this->resetValidation();
     }
 
     public function cancelBooking()
@@ -83,6 +88,15 @@ class BookingAdminPanel extends Component
         if (!$this->bookingToCancel) {
             return;
         }
+
+        $this->validate(
+            ['cancelReason' => 'required|string|min:3|max:500'],
+            [
+                'cancelReason.required' => 'Укажите причину отмены брони.',
+                'cancelReason.min'      => 'Причина должна содержать минимум 3 символа.',
+                'cancelReason.max'      => 'Причина не должна превышать 500 символов.',
+            ]
+        );
 
         $booking = Booking::with('classroom')->findOrFail($this->bookingToCancel);
 
@@ -124,6 +138,7 @@ class BookingAdminPanel extends Component
         }
 
         $booking->status = 'cancelled';
+        $booking->cancel_reason = trim($this->cancelReason);
         $booking->save();
 
         try {

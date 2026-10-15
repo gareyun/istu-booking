@@ -18,6 +18,7 @@ class Booking extends Model
         'is_tech_support',
         'user_comment',
         'admin_comment',
+        'cancel_reason',
         'status',
         'google_event_id',
         'vk_link',

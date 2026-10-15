@@ -294,6 +294,13 @@
                             {{ $booking->admin_comment }}
                         </div>
                     @endif
+
+                    @if($booking->status === 'cancelled' && $booking->cancel_reason)
+                        <div class="text-red-600 text-sm mt-2">
+                            <b>Причина отмены:</b>
+                            {{ $booking->cancel_reason }}
+                        </div>
+                    @endif
                 </div>
             @empty
                 <div class="text-gray-500 text-center">Заявок не найдено</div>
@@ -319,7 +326,7 @@
                 @endif
 
                 <label class="block font-semibold text-[#495057] mb-2 mt-4">
-                    Номер телефона
+                    Номер телефона <span class="text-red-500">*</span>
                 </label>
                 <x-input wire:model="settingsPhone" placeholder="+7 (999) 123-45-67"/>
                 @error('settingsPhone')

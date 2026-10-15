@@ -182,7 +182,11 @@ class VkNotificationService
         } elseif ($booking->status === 'rejected') {
             $message .= "\n\nВы можете подать новую заявку на другую дату или пространство.";
         } elseif ($booking->status === 'cancelled') {
-            $message .= "\n\nБронь была отменена администратором. Вы можете подать новую заявку.";
+            $message .= "\n\nБронь была отменена администратором.";
+            if (!empty($booking->cancel_reason)) {
+                $message .= "\n\n📝 Причина отмены:\n{$booking->cancel_reason}";
+            }
+            $message .= "\n\nВы можете подать новую заявку.";
         }
 
         return $this->sendMessage($userId, $message);

@@ -69,7 +69,7 @@
                     </button>
                 </div>
             @else
-                <small class="mt-1 block text-xs text-gray-500">JPG, PNG или WEBP, до 5 МБ. Рекомендуется горизонтальное фото.</small>
+                <small class="mt-1 block text-xs text-gray-500">JPG, PNG или WEBP, до 10 МБ. Рекомендуется горизонтальное фото.</small>
             @endif
         </div>
     </div>
