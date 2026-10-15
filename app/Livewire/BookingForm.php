@@ -16,6 +16,7 @@ class BookingForm extends Component
 {
     public $classrooms = [];
     public $bookings = [];
+    public $selectedClassroom = null;
 
     public $classroom_id;
     public $date;
@@ -23,6 +24,7 @@ class BookingForm extends Component
     public $end_time;
     public $purpose;
     public $equipment;
+    public $description;
     public $is_tech_support = 0;
     public $user_comment;
 
@@ -33,8 +35,8 @@ class BookingForm extends Component
     public $filterClassroom = '';
 
     public $showSettingsModal = false;
-    public $settingsVkLink = '';
     public $settingsPhone = '';
+    public $userVkLink = '';
 
     public $submitted = false;
 
@@ -46,9 +48,9 @@ class BookingForm extends Component
     public function mount()
     {
         $user = Auth::user();
-        $this->classrooms = Classroom::all();
+        $this->classrooms = Classroom::with('category')->orderBy('room')->get();
 
-        $this->settingsVkLink = $user->vk_link ?? '';
+        $this->userVkLink = $this->normalizeVkLink($user->vk_link);
         $this->settingsPhone = $user->phone ?? '';
 
         $this->loadBookings();
@@ -104,7 +106,34 @@ class BookingForm extends Component
 
     public function updatedClassroomId()
     {
+        $this->loadSelectedClassroom();
         $this->loadBusySlots();
+    }
+
+    public function loadSelectedClassroom(): void
+    {
+        $classroom = $this->classroom_id
+            ? Classroom::with('category')->find($this->classroom_id)
+            : null;
+
+        if (!$classroom) {
+            $this->selectedClassroom = null;
+            return;
+        }
+
+        $this->selectedClassroom = [
+            'id'            => $classroom->id,
+            'room'          => $classroom->room,
+            'category'      => $classroom->category?->category,
+            'capacity'      => $classroom->capacity,
+            'equipment'     => $classroom->equipment,
+            'description'   => $classroom->description,
+            'photo'         => $classroom->photo
+                ? (str_starts_with($classroom->photo, 'http')
+                    ? $classroom->photo
+                    : asset('storage/' . $classroom->photo))
+                : null,
+        ];
     }
 
     public function updatedDate()
@@ -150,6 +179,7 @@ class BookingForm extends Component
         $this->busySlots = Booking::where('classroom_id', $this->classroom_id)
             ->where('date', $this->date)
             ->whereIn('status', ['pending', 'approved'])
+            ->orderBy('start_time', 'asc')
             ->get(['start_time', 'end_time', 'status'])
             ->toArray();
     }
@@ -164,6 +194,25 @@ class BookingForm extends Component
         $this->showSettingsModal = false;
     }
 
+    protected function normalizeVkLink(?string $link): string
+    {
+        $link = trim((string) $link);
+
+        if ($link === '') {
+            return '';
+        }
+
+        if (str_starts_with($link, '@')) {
+            return 'https://vk.com/' . ltrim($link, '@');
+        }
+
+        if (!preg_match('~^https?://~i', $link)) {
+            return 'https://' . ltrim($link, '/');
+        }
+
+        return $link;
+    }
+
     public function saveSettings()
     {
         if (!Auth::check()) {
@@ -174,19 +223,11 @@ class BookingForm extends Component
         $user = Auth::user();
 
         $this->validate([
-            'settingsVkLink' => 'nullable|string|max:255',
             'settingsPhone'  => 'required|string|max:20'
         ]);
 
-        $data = ['phone' => $this->settingsPhone];
+        $user->update(['phone' => $this->settingsPhone]);
 
-        if (empty($user->vk_id)) {
-            $data['vk_link'] = $this->settingsVkLink;
-        } else {
-            $this->settingsVkLink = $user->vk_link ?? '';
-        }
-
-        $user->update($data);
         session()->flash('success', 'Настройки сохранены.');
 
         $this->closeSettingsModal();
@@ -214,6 +255,7 @@ class BookingForm extends Component
             'end_time' => 'required|after:start_time',
             'purpose' => 'required|string|max:255',
             'equipment' => 'nullable|string',
+            'description' => 'nullable|string',
             'is_tech_support' => 'required|boolean',
             'user_comment' => 'nullable|string'
         ]);
@@ -275,9 +317,11 @@ class BookingForm extends Component
             'end_time',
             'purpose',
             'equipment',
+            'description',
             'user_comment'
         ]);
         $this->is_tech_support = 0;
+        $this->selectedClassroom = null;
 
         $this->loadBookings();
         $this->loadBusySlots();
@@ -294,11 +338,13 @@ class BookingForm extends Component
             'end_time',
             'purpose',
             'equipment',
+            'description',
             'user_comment',
         ]);
 
         $this->is_tech_support = 0;
         $this->busySlots = [];
+        $this->selectedClassroom = null;
 
         $this->dispatch('booking-form-reset');
     }

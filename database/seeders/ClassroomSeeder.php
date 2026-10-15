@@ -21,6 +21,7 @@ class ClassroomSeeder extends Seeder
                 'description' => 'Конференц-зал в Интеграле',
                 'equipment' => 'Ноутбук, проектор, флипчарт',
                 'capacity' => '30',
+                'photo' => 'classrooms/photo_1.jpg',
                 'google_calendar_id' => $calendars['9-2'] ?? null,
             ]),
             Classroom::create([

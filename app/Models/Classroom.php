@@ -12,6 +12,7 @@ class Classroom extends Model
         'description',
         'equipment',
         'capacity',
+        'photo',
         'google_calendar_id'
     ];
 

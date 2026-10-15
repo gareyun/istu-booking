@@ -21,7 +21,15 @@
         @foreach ($classrooms as $classroom)
             <div class="bg-white rounded-[10px] shadow-[0_4px_15px_rgba(0,0,0,0.1)]
                             p-5 mb-5 transition-transform duration-300 ease-in-out">
-                <div class="text-xl font-bold text-[#1a2a6c] mb-[5px]">{{ $classroom->room }}</div>
+
+                <div class="flex items-center gap-3 mb-[5px]">
+                    @if($classroom->photo)
+                        <img src="{{ str_starts_with($classroom->photo, 'http') ? $classroom->photo : asset('storage/' . $classroom->photo) }}"
+                            alt="{{ $classroom->room }}" loading="lazy" width="64" height="48"
+                            class="h-12 w-16 rounded-lg object-cover border border-[#e3e6f0]">
+                    @endif
+                    <div class="text-xl font-bold text-[#1a2a6c]">{{ $classroom->room }}</div>
+                </div>
 
                 <div class="my-2 flex justify-between">
                     <div class="font-bold text-[#7f8c8d]">Категория пространства:</div>
@@ -53,9 +61,10 @@
 
     @if($showCreateModal)
         <x-modal title="Добавить пространство">
-            <p class="mb-[5px] text-lg font-semibold">Пространство</p>
+            <p class="mb-[5px] text-lg font-semibold">Пространство <span class="text-danger">*</span></p>
             <x-input wire:model="room" placeholder="Название пространства" class="mb-4"/>
 
+            <p class="mb-[5px] text-lg font-semibold">Категория <span class="text-danger">*</span></p>
             <div class="flex justify-between items-center mb-4">
                 <x-select wire:model="classroom_category_id">
                     @foreach($categories as $category)
@@ -99,7 +108,9 @@
             <p class="mb-[5px] text-lg font-semibold">Вместимость</p>
             <x-input wire:model="capacity" type="number" placeholder="Количество человек" class="mb-4"/>
 
-            <p class="mb-[5px] text-lg font-semibold">Идентификатор Google Calendar</p>
+            <x-photo-field :photo="$photo"/>
+
+            <p class="mb-[5px] text-lg font-semibold">Идентификатор Google Calendar <span class="text-danger">*</span></p>
             <x-input wire:model="google_calendar_id" placeholder="Ссылка на календарь" class="mb-4"/>
 
             <x-slot name="footer">
@@ -114,6 +125,7 @@
             <p class="mb-[5px] text-lg font-semibold">Пространство</p>
             <x-input wire:model="room" class="mb-3" />
 
+            <p class="mb-[5px] text-lg font-semibold">Категория</p>
             <x-select wire:model="classroom_category_id" wrapper-class="mb-3">
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}">{{ $category->category }}</option>
@@ -128,6 +140,8 @@
 
             <p class="mb-[5px] text-lg font-semibold">Вместимость</p>
             <x-input wire:model="capacity" type="number" class="mb-3" />
+
+            <x-photo-field :photo="$photo" :current-photo="$currentPhoto" :remove-photo="$removePhoto"/>
 
             <p class="mb-[5px] text-lg font-semibold">Идентификатор Google Calendar</p>
             <x-input wire:model="google_calendar_id" class="mb-3" />

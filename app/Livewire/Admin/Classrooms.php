@@ -3,14 +3,18 @@
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use App\Models\Classroom;
 use App\Models\ClassroomCategory;
+use Illuminate\Support\Facades\Storage;
 
 use Livewire\Attributes\Layout;
 #[Layout('components.layout')]
 
 class Classrooms extends Component
 {
+    use WithFileUploads;
+
     public $classrooms;
     public $categories;
 
@@ -23,6 +27,10 @@ class Classrooms extends Component
 
     public $room, $description, $equipment, $capacity, $google_calendar_id;
     public $classroom_category_id;
+
+    public $photo;
+    public $currentPhoto = null;
+    public $removePhoto = false;
 
     public $successMessage = null;
     public $errorMessage = null;
@@ -53,6 +61,9 @@ class Classrooms extends Component
     {
         $classroom = Classroom::findOrFail($id);
 
+        $this->resetValidation();
+        $this->reset(['photo', 'removePhoto']);
+
         $this->editingId = $id;
         $this->room = $classroom->room;
         $this->description = $classroom->description;
@@ -60,24 +71,51 @@ class Classrooms extends Component
         $this->capacity = $classroom->capacity;
         $this->google_calendar_id = $classroom->google_calendar_id;
         $this->classroom_category_id = $classroom->classroom_category_id;
+        $this->currentPhoto = $classroom->photo;
 
         $this->successMessage = null;
         $this->errorMessage = null;
         $this->showEditModal = true;
     }
 
-    public function save()
+    protected function rules(): array
     {
-        $validated = $this->validate([
+        return [
             'room' => 'required|string|max:50',
             'description' => 'required|string|max:255',
             'equipment' => 'nullable|string|max:255',
             'capacity' => 'required|integer|min:1',
             'google_calendar_id' => 'required|string|max:100',
             'classroom_category_id' => 'required|exists:classroom_categories,id',
-        ]);
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+        ];
+    }
 
-        Classroom::create($validated);
+    protected function messages(): array
+    {
+        return [
+            'photo.image' => 'Файл должен быть изображением.',
+            'photo.mimes' => 'Допустимые форматы: JPG, PNG, WEBP.',
+            'photo.max' => 'Размер фотографии не должен превышать 5 МБ.',
+        ];
+    }
+
+    public function updatedPhoto()
+    {
+        $this->validateOnly('photo');
+    }
+
+    public function save()
+    {
+        $validated = $this->validate();
+
+        $data = collect($validated)->except('photo')->all();
+
+        if ($this->photo) {
+            $data['photo'] = $this->photo->store('classrooms', 'public');
+        }
+
+        Classroom::create($data);
 
         $this->closeModal();
         $this->loadData();
@@ -86,16 +124,21 @@ class Classrooms extends Component
 
     public function update()
     {
-        $validated = $this->validate([
-            'room' => 'required|string|max:50',
-            'description' => 'required|string|max:255',
-            'equipment' => 'nullable|string|max:255',
-            'capacity' => 'required|integer|min:1',
-            'google_calendar_id' => 'required|string|max:100',
-            'classroom_category_id' => 'required|exists:classroom_categories,id',
-        ]);
+        $validated = $this->validate();
 
-        Classroom::findOrFail($this->editingId)->update($validated);
+        $classroom = Classroom::findOrFail($this->editingId);
+
+        $data = collect($validated)->except('photo')->all();
+
+        if ($this->photo) {
+            $data['photo'] = $this->photo->store('classrooms', 'public');
+            $this->deletePhotoFile($classroom->photo);
+        } elseif ($this->removePhoto) {
+            $data['photo'] = null;
+            $this->deletePhotoFile($classroom->photo);
+        }
+
+        $classroom->update($data);
 
         $this->closeModal();
         $this->loadData();
@@ -116,6 +159,8 @@ class Classrooms extends Component
             return;
         }
 
+        $this->deletePhotoFile($classroom->photo);
+
         $classroom->delete();
         $this->loadData();
         $this->successMessage = 'Пространство успешно удалено.';
@@ -125,14 +170,27 @@ class Classrooms extends Component
     {
         $this->showCreateModal = false;
         $this->showEditModal = false;
+
+        $this->reset(['photo', 'currentPhoto', 'removePhoto']);
+        $this->resetValidation();
     }
 
     private function resetFields()
     {
         $this->reset([
             'room', 'description', 'equipment', 'capacity',
-            'google_calendar_id', 'classroom_category_id'
+            'google_calendar_id', 'classroom_category_id',
+            'photo', 'currentPhoto', 'removePhoto',
         ]);
+
+        $this->resetValidation();
+    }
+
+    private function deletePhotoFile(?string $path): void
+    {
+        if ($path && !str_starts_with($path, 'http')) {
+            Storage::disk('public')->delete($path);
+        }
     }
 
     public function toggleCategoryModal() {

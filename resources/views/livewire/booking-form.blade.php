@@ -29,7 +29,7 @@
             </div>
         @endif
 
-        <div class="mb-8">
+        <div class="mb-4">
             <button wire:click="openSettingsModal" type="button"
                     class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100
                     transition-colors font-semibold cursor-pointer">
@@ -43,6 +43,16 @@
             </a>
         </div>
 
+        <div class="bg-warning text-[#684F06] rounded-[10px] p-5 mb-4">
+            <h5 class="font-bold text-lg mb-3">📋 Правила бронирования</h5>
+            <ul class="space-y-1 list-disc pl-5">
+                <li>Бронирование возможно минимум за 24 часа до мероприятия</li>
+                <li>При использовании танцевального зала обязательна сменная обувь</li>
+                <li>Необходимо поддерживать чистоту после мероприятия</li>
+                <li>Мебель должна быть возвращена на свои места</li>
+            </ul>
+        </div>
+
         <form wire:submit.prevent="submit">
 
             <div class="mb-4">
@@ -54,11 +64,71 @@
                     <option value="">Выберите пространство</option>
                     @foreach ($classrooms as $classroom)
                         <option value="{{ $classroom->id }}">
-                            {{ $classroom->room }} ({{ $classroom->category->category }})
+                            {{ $classroom->room }}
                         </option>
                     @endforeach
                 </x-select>
             </div>
+            
+            @if($selectedClassroom)
+                <section class="mb-5 overflow-hidden rounded-2xl border border-[#e3e6f0] bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+                    <div class="relative h-52 sm:h-64 overflow-hidden bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc]">
+                        @if($selectedClassroom['photo'])
+                            <img
+                                src="{{ $selectedClassroom['photo'] }}"
+                                alt="Фотография пространства {{ $selectedClassroom['room'] }}"
+                                loading="lazy"
+                                decoding="async"
+                                class="h-full w-full object-cover">
+                        @else
+                            <div class="flex h-full w-full flex-col items-center justify-center gap-3 text-[#3456DB]">
+                                <span class="text-6xl">🏫</span>
+                            </div>
+                        @endif
+
+                        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent px-5 pb-5 pt-12">
+                            <div class="flex flex-wrap items-end justify-between gap-3">
+                                <div class="min-w-0">
+                                    <p class="mb-1 text-xs font-medium uppercase tracking-wider text-white/75">
+                                        Выбранное пространство
+                                    </p>
+                                    <h3 class="text-2xl font-bold text-white drop-shadow-sm sm:text-3xl">
+                                        {{ $selectedClassroom['room'] }}
+                                    </h3>
+                                </div>
+
+                                @if($selectedClassroom['category'])
+                                    <div>
+                                        <span class="mr-2 rounded-lg border border-white/30 bg-white/15 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm">
+                                            {{ $selectedClassroom['category'] }}
+                                        </span>
+                                        <span class="rounded-lg border border-white/30 bg-white/15 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm">
+                                            {{ $selectedClassroom['capacity']
+                                                ? 'До ' . $selectedClassroom['capacity'] . ' человек'
+                                                : 'Вместимость не указана' }}
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-7 py-4">
+                        <div class="mb-3 flex flex-col">
+                            <h4 class="font-bold text-primary">Описание</h4>
+                            <p class="break-words text-sm leading-6 text-gray-600">
+                                {{ $selectedClassroom['description'] ?: 'Описание отсутствует' }}
+                            </p>
+                        </div>
+                        <div class="flex flex-col">
+                            <h4 class="font-bold text-primary">Оборудование</h4>
+                            <p class="break-words text-sm leading-6 text-gray-600">
+                                {{ $selectedClassroom['equipment'] ?: 'Информация об оборудовании не указана' }}
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            @endif
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                 <div>
@@ -141,16 +211,6 @@
             <div class="mb-4">
                 <label class="block font-semibold text-[#495057] mb-2">Комментарий для администратора</label>
                 <x-input wire:model="user_comment" type="textarea" placeholder="Дополнительная информация, пожелания, особенности мероприятия..." rows="3"/>
-            </div>
-
-            <div class="bg-warning text-[#684F06] rounded-[10px] p-5 mb-4">
-                <h5 class="font-bold text-lg mb-3">📋 Правила бронирования</h5>
-                <ul class="space-y-1 list-disc pl-5">
-                    <li>Бронирование возможно минимум за 24 часа до мероприятия</li>
-                    <li>При использовании танцевального зала обязательна сменная обувь</li>
-                    <li>Необходимо поддерживать чистоту после мероприятия</li>
-                    <li>Мебель должна быть возвращена на свои места</li>
-                </ul>
             </div>
 
             <div class="flex flex-col md:flex-row gap-3 md:justify-end">
@@ -248,24 +308,23 @@
 
         @if($showSettingsModal)
             <x-modal title="Настройки">
-                <label class="block font-semibold text-[#495057] mb-2">Привязать страницу ВКонтакте для уведомлений</label>
-                <x-input wire:model="settingsVkLink" placeholder="https://vk.com/username или @username"/>
-
-                @if($settingsVkLink)
-                    <small class="inline-block text-sm text-green-600">Страница привязана</small>
+                <label class="block font-semibold text-[#495057] mb-2">Привязанная страница ВКонтакте</label>
+                @if($userVkLink)
+                    <a href="{{ $userVkLink }}" target="_blank" rel="noopener noreferrer"
+                    class="inline-block break-all text-primary hover:underline">
+                        {{ $userVkLink }}
+                    </a>
+                @else
+                    <span class="text-gray-500 text-sm">Страница ВКонтакте не привязана</span>
                 @endif
 
                 <label class="block font-semibold text-[#495057] mb-2 mt-4">
-                    Номер телефона <span class="text-danger">*</span>
+                    Номер телефона
                 </label>
                 <x-input wire:model="settingsPhone" placeholder="+7 (999) 123-45-67"/>
                 @error('settingsPhone')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror
-
-                <small class="text-gray-500 text-sm block mb-6 mt-1">
-                    Укажите номер телефона один раз – он будет обязателен для всех ваших заявок.
-                </small>
 
                 <x-slot name="footer">
                     <x-button wire:click="saveSettings">Сохранить</x-button>
