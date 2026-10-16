@@ -14,6 +14,9 @@ use Livewire\Attributes\Layout;
 
 class BookingForm extends Component
 {
+    private const STUDENT_MAX_DAYS_AHEAD = 30;
+    public $maxDate = null;
+
     public $classrooms = [];
     public $bookings = [];
     public $selectedClassroom = null;
@@ -52,6 +55,10 @@ class BookingForm extends Component
 
         $this->userVkLink = $this->normalizeVkLink($user->vk_link);
         $this->settingsPhone = $user->phone ?? '';
+
+        $this->maxDate = $this->hasUnlimitedBooking($user)
+            ? null
+            : now()->addDays(self::STUDENT_MAX_DAYS_AHEAD)->format('d.m.Y');
 
         $this->loadBookings();
     }
@@ -194,6 +201,11 @@ class BookingForm extends Component
         $this->showSettingsModal = false;
     }
 
+    protected function hasUnlimitedBooking(User $user): bool
+    {
+        return in_array($user->role, ['admin', 'tech_support'], true);
+    }
+
     protected function normalizeVkLink(?string $link): string
     {
         $link = trim((string) $link);
@@ -274,6 +286,17 @@ class BookingForm extends Component
 
         if ($bookingStart->lessThanOrEqualTo(now()->addHours(24))) {
             $this->addError('date', 'Забронировать пространство можно не позднее чем за 24 часа до начала мероприятия.');
+            return;
+        }
+
+        if (
+            !$this->hasUnlimitedBooking($user)
+            && $bookingStart->startOfDay()->greaterThan(now()->addDays(self::STUDENT_MAX_DAYS_AHEAD)->startOfDay())
+        ) {
+            $this->addError(
+                'date',
+                'Забронировать аудиторию можно не более чем на ' . self::STUDENT_MAX_DAYS_AHEAD . ' дней вперёд от даты подачи заявки.'
+            );
             return;
         }
 

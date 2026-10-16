@@ -361,6 +361,7 @@
                     dateFormat: 'd.m.Y',
                     locale: 'ru',
                     minDate: 'today',
+                    maxDate: @json($maxDate),
                     disableMobile: true,
                     allowInput: true,
                     onChange: function(selectedDates, dateStr) {
