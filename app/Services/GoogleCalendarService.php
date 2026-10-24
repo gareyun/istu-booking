@@ -99,7 +99,7 @@ class GoogleCalendarService
                 $booking->google_event_id
             );
         } catch (\Google_Service_Exception $e) {
-            if ($e->getCode() !== 404) {
+            if (!in_array($e->getCode(), [404, 410], true)) {
                 throw $e;
             }
         }
