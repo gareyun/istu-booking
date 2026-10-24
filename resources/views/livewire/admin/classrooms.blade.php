@@ -60,7 +60,7 @@
     </div>
 
     @if($showCreateModal)
-        <x-modal title="Добавить пространство">
+        <x-modal title="Добавить пространство" :error="$errorMessage">
             <p class="mb-[5px] text-lg font-semibold">Пространство <span class="text-danger">*</span></p>
             <x-input wire:model="room" placeholder="Название пространства" class="mb-4"/>
 
@@ -99,13 +99,13 @@
                 </div>
             @endif
 
-            <p class="mb-[5px] text-lg font-semibold">Описание</p>
+            <p class="mb-[5px] text-lg font-semibold">Описание <span class="text-danger">*</span></p>
             <x-input wire:model="description" type="textarea" placeholder="Описание" class="mb-4"/>
 
-            <p class="mb-[5px] text-lg font-semibold">Оборудование</p>
+            <p class="mb-[5px] text-lg font-semibold">Оборудование <span class="text-danger">*</span></p>
             <x-input wire:model="equipment" type="textarea" placeholder="Оборудование, имеющееся в пространстве" class="mb-4"/>
 
-            <p class="mb-[5px] text-lg font-semibold">Вместимость</p>
+            <p class="mb-[5px] text-lg font-semibold">Вместимость <span class="text-danger">*</span></p>
             <x-input wire:model="capacity" type="number" placeholder="Количество человек" class="mb-4"/>
 
             <x-photo-field :photo="$photo"/>
@@ -121,7 +121,7 @@
     @endif
 
     @if($showEditModal)
-        <x-modal title="Редактировать пространство">
+        <x-modal title="Редактировать пространство" :error="$errorMessage">
             <p class="mb-[5px] text-lg font-semibold">Пространство</p>
             <x-input wire:model="room" class="mb-3" />
 
@@ -146,7 +146,7 @@
             <p class="mb-[5px] text-lg font-semibold">Идентификатор Google Calendar</p>
             <x-input wire:model="google_calendar_id" class="mb-3" />
 
-            <x-slot:footer>
+            <x-slot name="footer">
                 <x-button wire:click="update">Сохранить</x-button>
                 <x-button wire:click="closeModal" color="red">Отмена</x-button>
             </x-slot>

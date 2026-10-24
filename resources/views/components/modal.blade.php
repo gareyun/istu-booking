@@ -1,4 +1,4 @@
-@props(['title', 'width' => '525px'])
+@props(['title', 'width' => '525px', 'error' => null])
 
 <div class="fixed inset-0 z-[1000] bg-[rgba(26,42,108,0.35)] backdrop-blur-[4px]">
     <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-[500px] max-w-full max-h-[90vh]
@@ -6,11 +6,24 @@
         style="width: {{ $width }};">
 
         <h2 class="text-xl font-bold text-[#1a2a6c] border-b-2 border-[#1a2a6c] pb-2 mb-5">{{ $title }}</h2>
-        
+
+        @if ($errors->any() || $error)
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 mr-[20px]">
+                <ul class="list-disc pl-5">
+                    @foreach ($errors->all() as $message)
+                        <li>{{ $message }}</li>
+                    @endforeach
+                    @if ($error)
+                        <li>{{ $error }}</li>
+                    @endif
+                </ul>
+            </div>
+        @endif
+
         <div class="flex-1 overflow-y-auto pr-[20px]">
             {{ $slot }}
         </div>
-        
+
         @if (isset($footer))
             <div class="flex justify-end gap-2.5 mt-2.5 pr-[20px]">
                 {{ $footer }}

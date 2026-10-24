@@ -8,6 +8,8 @@ use App\Models\Classroom;
 use App\Services\GoogleCalendarService;
 use App\Services\VkNotificationService;
 use Carbon\Carbon;
+use App\Exceptions\GoogleCalendarException;
+use Illuminate\Support\Facades\Log;
 
 use Livewire\Attributes\Layout;
 #[Layout('components.layout')]
@@ -42,17 +44,28 @@ class BookingAdminPanel extends Component
     {
         $booking = Booking::with('classroom')->findOrFail($bookingId);
 
-        if ($action === 'approved') {
-            $booking->status = 'approved';
+        if ($booking->status !== 'pending') {
+            session()->flash('error', 'Заявка уже обработана.');
+            return;
+        }
 
+        if ($action === 'approved') {
             try {
-                $eventId = app(GoogleCalendarService::class)->createEvent($booking);
-                $booking->google_event_id = $eventId;
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Google Calendar error: ' . $e->getMessage());
+                $booking->google_event_id = app(GoogleCalendarService::class)->createEvent($booking);
+            } catch (GoogleCalendarException $e) {
+                session()->flash('error', $e->getMessage());
+                return;
+            } catch (\Throwable $e) {
+                Log::error('Booking approve error: ' . $e->getMessage());
+                session()->flash('error', 'Не удалось создать событие в Google Календаре. Заявка не одобрена.');
+                return;
             }
+
+            $booking->status = 'approved';
         } elseif ($action === 'rejected') {
             $booking->status = 'rejected';
+        } else {
+            return;
         }
 
         $booking->admin_comment = $this->adminComments[$bookingId] ?? null;
@@ -61,7 +74,7 @@ class BookingAdminPanel extends Component
         try {
             app(VkNotificationService::class)->notifyStatusChange($booking);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('VK notification error: ' . $e->getMessage());
+            Log::error('VK notification error: ' . $e->getMessage());
         }
 
         session()->flash('success', 'Статус заявки обновлён');

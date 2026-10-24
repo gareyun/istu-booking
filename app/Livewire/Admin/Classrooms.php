@@ -83,20 +83,40 @@ class Classrooms extends Component
         return [
             'room' => 'required|string|max:50',
             'description' => 'required|string|max:255',
-            'equipment' => 'nullable|string|max:255',
+            'equipment' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
             'google_calendar_id' => 'required|string|max:100',
             'classroom_category_id' => 'required|exists:classroom_categories,id',
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
         ];
     }
 
     protected function messages(): array
     {
         return [
-            'photo.image' => 'Файл должен быть изображением.',
-            'photo.mimes' => 'Допустимые форматы: JPG, PNG, WEBP.',
-            'photo.max' => 'Размер фотографии не должен превышать 5 МБ.',
+            'required'           => 'Поле «:attribute» обязательно для заполнения.',
+            'string'             => 'Поле «:attribute» должно быть текстом.',
+            'integer'            => 'Поле «:attribute» должно быть целым числом.',
+            'min.numeric'        => 'Поле «:attribute» должно быть не меньше :min.',
+            'max.string'         => 'Поле «:attribute» не должно быть длиннее :max символов.',
+            'exists'             => 'Выбранная категория не существует.',
+            'photo.image'        => 'Файл должен быть изображением.',
+            'photo.mimes'        => 'Допустимые форматы: JPG, PNG, WEBP.',
+            'photo.max'          => 'Размер фотографии не должен превышать 10 МБ.',
+        ];
+    }
+
+    protected function validationAttributes(): array
+    {
+        return [
+            'room'                  => 'Пространство',
+            'description'           => 'Описание',
+            'equipment'             => 'Оборудование',
+            'capacity'              => 'Вместимость',
+            'google_calendar_id'    => 'Идентификатор Google Calendar',
+            'classroom_category_id' => 'Категория',
+            'photo'                 => 'Фотография',
+            'newCategory'           => 'Категория',
         ];
     }
 
@@ -107,6 +127,9 @@ class Classrooms extends Component
 
     public function save()
     {
+        $this->successMessage = null;
+        $this->errorMessage = null;
+
         $validated = $this->validate();
 
         $data = collect($validated)->except('photo')->all();
@@ -124,6 +147,9 @@ class Classrooms extends Component
 
     public function update()
     {
+        $this->successMessage = null;
+        $this->errorMessage = null;
+
         $validated = $this->validate();
 
         $classroom = Classroom::findOrFail($this->editingId);
