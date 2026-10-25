@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('capacity')->nullable();
             $table->string('photo')->nullable();
             $table->string('google_calendar_id', 100)->nullable();
+            $table->boolean('is_hidden')->default(false);
             $table->timestamps();
         });
     }

@@ -62,7 +62,7 @@
                 </label>
                 <x-select wire:model.live="classroom_id" required>
                     <option value="">Выберите пространство</option>
-                    @foreach ($classrooms as $classroom)
+                    @foreach ($classrooms->where('is_hidden', false) as $classroom)
                         <option value="{{ $classroom->id }}">
                             {{ $classroom->room }}
                         </option>
@@ -241,6 +241,13 @@
         <div class="mt-10">
             <h2 class="text-2xl font-bold mb-6 text-center">📋 Мои заявки</h2>
 
+            @if($bookingsSuccess)
+                <div class="bg-green-100 text-green-700 rounded-[10px] p-4 mb-4">{{ $bookingsSuccess }}</div>
+            @endif
+            @if($bookingsError)
+                <div class="bg-red-100 text-red-700 rounded-[10px] p-4 mb-4">{{ $bookingsError }}</div>
+            @endif
+
             <x-filter :classrooms="$classrooms"/>
 
             @forelse($bookings as $booking)
@@ -267,7 +274,7 @@
                                 'pending' => '⏳ Ожидает',
                                 'approved' => '✅ Одобрена',
                                 'rejected' => '❌ Отклонена',
-                                'cancelled' => '❌ Отменена',
+                                'cancelled' => $booking->cancelled_by === 'student' ? '↩️ Отозвана вами' : '❌ Отменена',
                             } }}
                         </span>
                     </div>
@@ -301,6 +308,15 @@
                             {{ $booking->cancel_reason }}
                         </div>
                     @endif
+
+                    @if($booking->isWithdrawable())
+                        <div class="mt-3">
+                            <button wire:click="openWithdrawModal({{ $booking->id }})" type="button"
+                                    class="text-[#d64545] text-sm font-semibold hover:text-[#bb2d2d] transition-colors cursor-pointer">
+                                Отозвать заявку
+                            </button>
+                        </div>
+                    @endif
                 </div>
             @empty
                 <div class="text-gray-500 text-center">Заявок не найдено</div>
@@ -312,6 +328,20 @@
                 </div>
             @endif
         </div>
+
+        @if($showWithdrawModal)
+            <x-modal title="Отзыв заявки">
+                <p class="text-gray-600">
+                    Вы уверены, что хотите отозвать заявку? Администратор получит уведомление.
+                    Если бронь уже была одобрена, она будет снята, а время освободится для других.
+                </p>
+
+                <x-slot name="footer">
+                    <x-button wire:click="withdrawBooking" color="red">Отозвать заявку</x-button>
+                    <x-button wire:click="closeWithdrawModal" color="gray">Оставить</x-button>
+                </x-slot>
+            </x-modal>
+        @endif
 
         @if($showSettingsModal)
             <x-modal title="Настройки">

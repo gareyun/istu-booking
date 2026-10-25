@@ -8,6 +8,7 @@ use App\Models\Classroom;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Services\BookingWithdrawalService;
 
 use Livewire\Attributes\Layout;
 #[Layout('components.layout')]
@@ -47,6 +48,11 @@ class BookingForm extends Component
     public $hasMoreBookings = false;
 
     public $loadError = false;
+    public $bookingsSuccess = null;
+    public $bookingsError = null;
+
+    public $showWithdrawModal = false;
+    public $withdrawBookingId = null;
 
     public function mount()
     {
@@ -120,10 +126,15 @@ class BookingForm extends Component
     public function loadSelectedClassroom(): void
     {
         $classroom = $this->classroom_id
-            ? Classroom::with('category')->find($this->classroom_id)
+            ? Classroom::bookable()->with('category')->find($this->classroom_id)
             : null;
 
         if (!$classroom) {
+            if ($this->classroom_id) {
+                $this->classroom_id = null;
+                $this->addError('classroom_id', 'Это пространство временно недоступно для бронирования.');
+            }
+
             $this->selectedClassroom = null;
             return;
         }
@@ -201,6 +212,44 @@ class BookingForm extends Component
         $this->showSettingsModal = false;
     }
 
+    public function openWithdrawModal($bookingId)
+    {
+        $this->bookingsSuccess = null;
+        $this->bookingsError = null;
+        $this->withdrawBookingId = $bookingId;
+        $this->showWithdrawModal = true;
+    }
+
+    public function closeWithdrawModal()
+    {
+        $this->showWithdrawModal = false;
+        $this->withdrawBookingId = null;
+    }
+
+    public function withdrawBooking()
+    {
+        $this->bookingsSuccess = null;
+        $this->bookingsError = null;
+
+        $booking = Booking::with(['classroom', 'user'])
+            ->where('user_id', Auth::id())
+            ->find($this->withdrawBookingId);
+
+        if (!$booking) {
+            $this->bookingsError = 'Заявка не найдена.';
+        } else {
+            try {
+                app(BookingWithdrawalService::class)->withdraw($booking, Auth::user());
+                $this->bookingsSuccess = 'Заявка отозвана.';
+            } catch (\DomainException $e) {
+                $this->bookingsError = $e->getMessage();
+            }
+        }
+
+        $this->closeWithdrawModal();
+        $this->loadBookings();
+    }
+
     protected function hasUnlimitedBooking(User $user): bool
     {
         return in_array($user->role, ['admin', 'tech_support'], true);
@@ -257,6 +306,13 @@ class BookingForm extends Component
         if (!$user->phone) {
             $this->addError('phone', 'Для отправки заявки необходимо указать номер телефона в настройках.');
             $this->openSettingsModal();
+            return;
+        }
+
+        if ($this->classroom_id && !Classroom::bookable()->whereKey($this->classroom_id)->exists()) {
+            $this->reset(['classroom_id', 'selectedClassroom']);
+            $this->busySlots = [];
+            $this->addError('classroom_id', 'Это пространство временно недоступно для бронирования. Выберите другое.');
             return;
         }
 

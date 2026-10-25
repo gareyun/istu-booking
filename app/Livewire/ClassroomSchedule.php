@@ -7,15 +7,18 @@ use App\Models\Classroom;
 use App\Models\Booking;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Collection;
 
 use Livewire\Attributes\Layout;
 #[Layout('components.layout')]
 
 class ClassroomSchedule extends Component
 {
+    /** @var Collection<int, Classroom> */
+    public $classrooms;
+
     public $selectedClassroom = null;
     public $weekStart;
-    public $classrooms = [];
 
     protected $queryString = ['selectedClassroom', 'weekStart'];
 
@@ -24,7 +27,18 @@ class ClassroomSchedule extends Component
 
     public function mount()
     {
-        $this->classrooms = Classroom::orderBy('room')->get();
+        $query = Classroom::orderBy('room');
+
+        if (Auth::user()?->role !== 'admin') {
+            $query->bookable();
+        }
+
+        $this->classrooms = $query->get();
+
+        if ($this->selectedClassroom && !$this->classrooms->contains('id', (int) $this->selectedClassroom)) {
+            $this->selectedClassroom = null;
+        }
+
         $this->weekStart = Carbon::now()->startOfWeek(Carbon::MONDAY)->format('Y-m-d');
     }
 

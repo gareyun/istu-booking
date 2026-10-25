@@ -33,6 +33,9 @@ return [
     'vk' => [
         'access_token' => env('VK_ACCESS_TOKEN'),
         'community_id' => env('VK_COMMUNITY_ID'),
+        'admin_ids' => array_values(array_filter(
+            array_map('trim', explode(',', (string) env('VK_ADMIN_IDS', '')))
+        )),
     ],
 
 ];

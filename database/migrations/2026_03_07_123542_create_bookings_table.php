@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('user_comment')->nullable();
             $table->string('admin_comment')->nullable();
             $table->text('cancel_reason')->nullable();
+            $table->string('cancelled_by', 20)->nullable();
             $table->enum('status', ['pending','approved','rejected', 'cancelled'])->default('pending');
             $table->string('google_event_id', 200)->nullable();
             $table->string('vk_link')->nullable();

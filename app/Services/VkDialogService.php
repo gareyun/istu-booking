@@ -8,6 +8,7 @@ use App\Models\Classroom;
 use App\Models\Booking;
 use App\Models\User;
 use Carbon\Carbon;
+use App\Services\BookingWithdrawalService;
 
 class VkDialogService
 {
@@ -69,6 +70,12 @@ class VkDialogService
             return;
         }
 
+        if ($command === '/отозвать') {
+            Cache::forget($stateKey);
+            $this->sendStepWithdraw($userId, $user);
+            return;
+        }
+
         if (in_array($command, VkRegistrationService::START_COMMANDS, true)) {
             $this->vk->sendMessage(
                 $userId,
@@ -111,6 +118,12 @@ class VkDialogService
             case 'confirm':
                 $this->processConfirm($userId, $text, $state, $user);
                 break;
+            case 'withdraw_select':
+                $this->processWithdrawSelect($userId, $text, $state, $user);
+                break;
+            case 'withdraw_confirm':
+                $this->processWithdrawConfirm($userId, $text, $state, $user);
+                break;
             default:
                 Cache::forget($stateKey);
                 $this->vk->sendMessage(
@@ -128,7 +141,16 @@ class VkDialogService
 
     protected function sendStepClassroom(int $userId, bool $error = false): void
     {
-        $classrooms = Classroom::orderBy('room')->get();
+        $classrooms = Classroom::bookable()->orderBy('room')->get();
+        if ($classrooms->isEmpty()) {
+            Cache::forget("vk_bot_state_{$userId}");
+            $this->vk->sendMessage(
+                $userId,
+                "ℹ️ Сейчас нет пространств, доступных для бронирования. Попробуйте позже."
+            );
+            return;
+        }
+
         $buttons = [];
         $row = [];
         foreach ($classrooms as $i => $room) {
@@ -156,8 +178,11 @@ class VkDialogService
             return;
         }
 
-        $classroom = Classroom::where('room', $text)
-            ->orWhere('room', 'like', "%{$text}%")
+        $classroom = Classroom::bookable()
+            ->where(function ($query) use ($text) {
+                $query->where('room', $text)
+                    ->orWhere('room', 'like', "%{$text}%");
+            })
             ->first();
 
         if (!$classroom) {
@@ -428,6 +453,15 @@ class VkDialogService
             return;
         }
 
+        if (!Classroom::bookable()->whereKey($state['classroom_id'])->exists()) {
+            Cache::forget("vk_bot_state_{$userId}");
+            $this->vk->sendMessage(
+                $userId,
+                "❌ Это пространство временно недоступно для бронирования. Чтобы начать заново, отправьте /бронь."
+            );
+            return;
+        }
+
         $booking = Booking::create([
             'user_id'         => $user->id,
             'classroom_id'    => $state['classroom_id'],
@@ -459,7 +493,115 @@ class VkDialogService
 
         Cache::forget("vk_bot_state_{$userId}");
 
-        $this->vk->sendMessage($userId, "✅ Заявка успешно создана! Ожидайте подтверждения администратора. "
-            . "О статусе заявки пришлём уведомление.");
+        $this->vk->sendMessage($userId, "✅ Заявка №{$booking->id} успешно создана! Ожидайте подтверждения администратора. "
+            . "О статусе заявки пришлём уведомление.\n\nЧтобы отозвать заявку, отправьте /отозвать.");
+    }
+
+    protected function sendStepWithdraw(int $userId, User $user): void
+    {
+        $bookings = $user->bookings()
+            ->with('classroom')
+            ->whereIn('status', ['pending', 'approved'])
+            ->latest()
+            ->take(20)
+            ->get()
+            ->filter(fn ($b) => $b->isWithdrawable())
+            ->take(8)
+            ->values();
+
+        if ($bookings->isEmpty()) {
+            $this->vk->sendMessage($userId, "ℹ️ У вас нет заявок, которые можно отозвать.");
+            return;
+        }
+
+        $message = "↩️ Выберите заявку, которую нужно отозвать:\n\n";
+        $buttons = [];
+
+        foreach ($bookings as $b) {
+            $statusText = $b->status === 'approved' ? 'одобрена' : 'на рассмотрении';
+            $message .= "№{$b->id}: 🏫 {$b->classroom->room}, 📅 {$b->date}, ⏰ {$b->start_time}–{$b->end_time} ({$statusText})\n";
+            $buttons[] = [['text' => "Отозвать №{$b->id}"]];
+        }
+
+        $buttons[] = [['text' => 'Отмена', 'color' => 'negative']];
+
+        $this->vk->sendMessageWithKeyboard($userId, $message, $buttons, true);
+
+        Cache::put("vk_bot_state_{$userId}", [
+            'step' => 'withdraw_select',
+            'ids'  => $bookings->pluck('id')->all(),
+        ], now()->addMinutes(30));
+    }
+
+    protected function processWithdrawSelect(int $userId, string $text, array $state, User $user): void
+    {
+        if (mb_strtolower(trim($text)) === 'отмена') {
+            Cache::forget("vk_bot_state_{$userId}");
+            $this->vk->sendMessage($userId, "🚫 Отзыв заявки отменён.");
+            return;
+        }
+
+        if (!preg_match('/(\d+)/u', $text, $m) || !in_array((int) $m[1], $state['ids'], true)) {
+            $this->vk->sendMessage($userId, "❌ Выберите заявку кнопкой из списка или нажмите «Отмена».");
+            return;
+        }
+
+        $booking = $user->bookings()->with('classroom')->find((int) $m[1]);
+
+        if (!$booking) {
+            Cache::forget("vk_bot_state_{$userId}");
+            $this->vk->sendMessage($userId, "❌ Заявка не найдена.");
+            return;
+        }
+
+        $state['booking_id'] = $booking->id;
+        $state['step'] = 'withdraw_confirm';
+        Cache::put("vk_bot_state_{$userId}", $state, now()->addMinutes(30));
+
+        $buttons = [
+            [['text' => 'Да, отозвать', 'color' => 'positive'], ['text' => 'Нет', 'color' => 'negative']],
+        ];
+
+        $this->vk->sendMessageWithKeyboard(
+            $userId,
+            "Отозвать заявку №{$booking->id}?\n\n"
+            . "🏫 {$booking->classroom->room}\n"
+            . "📅 {$booking->date}, {$booking->start_time} – {$booking->end_time}\n\n"
+            . "Администратор получит уведомление.",
+            $buttons,
+            true
+        );
+    }
+
+    protected function processWithdrawConfirm(int $userId, string $text, array $state, User $user): void
+    {
+        $answer = mb_strtolower(trim($text));
+
+        if (in_array($answer, ['нет', 'отмена'], true)) {
+            Cache::forget("vk_bot_state_{$userId}");
+            $this->vk->sendMessage($userId, "🚫 Заявка не отозвана.");
+            return;
+        }
+
+        if (!in_array($answer, ['да, отозвать', 'да'], true)) {
+            $this->vk->sendMessage($userId, "Пожалуйста, выберите «Да, отозвать» или «Нет».");
+            return;
+        }
+
+        Cache::forget("vk_bot_state_{$userId}");
+
+        $booking = $user->bookings()->with(['classroom', 'user'])->find($state['booking_id']);
+
+        if (!$booking) {
+            $this->vk->sendMessage($userId, "❌ Заявка не найдена.");
+            return;
+        }
+
+        try {
+            app(BookingWithdrawalService::class)->withdraw($booking, $user, false);
+            $this->vk->sendMessage($userId, "✅ Заявка №{$booking->id} отозвана. Администратор уведомлён.");
+        } catch (\DomainException $e) {
+            $this->vk->sendMessage($userId, "❌ " . $e->getMessage());
+        }
     }
 }

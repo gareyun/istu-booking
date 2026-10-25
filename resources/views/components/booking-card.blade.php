@@ -5,7 +5,7 @@
     <div>
         <div class="flex justify-between items-start mb-[15px]">
             <div class="text-[0.9rem] text-[#7f8c8d]">ID: {{ $booking->id }}
-                @if(!$booking->user_id && $booking->vk_user_id)
+                @if($booking->vk_user_id)
                     <span class="text-xs text-gray-400 mt-1">(через VK бота)</span>
                 @endif
             </div>

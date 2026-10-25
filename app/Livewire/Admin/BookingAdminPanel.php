@@ -152,6 +152,7 @@ class BookingAdminPanel extends Component
 
         $booking->status = 'cancelled';
         $booking->cancel_reason = trim($this->cancelReason);
+        $booking->cancelled_by = 'admin';
         $booking->save();
 
         try {

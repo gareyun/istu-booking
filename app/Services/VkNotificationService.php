@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -141,6 +142,64 @@ class VkNotificationService
         return $userId;
     }
 
+    private function adminRecipients(): array
+    {
+        $ids = collect(config('services.vk.admin_ids', []));
+
+        User::where('role', 'admin')->get()->each(function (User $admin) use ($ids) {
+            $id = $admin->vk_id ?: ($admin->vk_link ? $this->extractUserId($admin->vk_link) : null);
+
+            if ($id) {
+                $ids->push($id);
+            }
+        });
+
+        return $ids->map(fn ($id) => (string) $id)->filter()->unique()->values()->all();
+    }
+
+    public function notifyAdminsBookingWithdrawn($booking, string $previousStatus): void
+    {
+        $recipients = $this->adminRecipients();
+
+        if (empty($recipients)) {
+            Log::warning('VK: не заданы получатели-администраторы для уведомления об отзыве заявки', [
+                'booking_id' => $booking->id,
+            ]);
+            return;
+        }
+
+        $user = $booking->user;
+        $name = $user?->name ?? $booking->name ?? 'Не указан';
+        $faculty = $user?->faculty ?? $booking->faculty;
+        $group = $user?->group ?? $booking->group;
+        $phone = $user?->phone ?? $booking->phone;
+
+        $message = "↩️ Студент отозвал заявку №{$booking->id}\n\n";
+        $message .= "👤 {$name}\n";
+
+        if ($faculty || $group) {
+            $message .= "🏛 " . trim("{$faculty}, {$group}", ', ') . "\n";
+        }
+
+        if ($phone) {
+            $message .= "📱 {$phone}\n";
+        }
+
+        $message .= "\n🏫 Пространство: {$booking->classroom->room}\n";
+        $message .= "📅 Дата: {$booking->date}\n";
+        $message .= "⏰ Время: {$booking->start_time} - {$booking->end_time}\n";
+        $message .= "🎯 Цель: {$booking->purpose}\n\n";
+        $message .= "📋 Статус до отзыва: " . ($previousStatus === 'approved' ? 'одобрена' : 'на рассмотрении');
+
+        if ($previousStatus === 'approved') {
+            $message .= "\n🗓 Событие удалено из Google Календаря.";
+        }
+
+        foreach ($recipients as $recipient) {
+            $this->sendMessage($recipient, $message);
+        }
+    }
+
     public function notifyStatusChange($booking): bool
     {
         $userId = $this->resolveRecipient($booking);
@@ -163,7 +222,7 @@ class VkNotificationService
             default => 'ОБНОВЛЁН'
         };
 
-        $message = "{$statusEmoji} Статус вашей заявки изменён!\n\n";
+        $message = "{$statusEmoji} Статус вашей заявки №{$booking->id} изменён!\n\n";
         $message .= "📋 Статус: {$statusText}\n";
         $message .= "🏫 Пространство: {$booking->classroom->room}\n";
         $message .= "📅 Дата: {$booking->date}\n";
@@ -204,7 +263,7 @@ class VkNotificationService
             return false;
         }
 
-        $message = "📨 Ваша заявка на бронирование успешно создана!\n\n";
+        $message = "📨 Ваша заявка №{$booking->id} на бронирование успешно создана!\n\n";
 
         $message .= "🏫 Пространство: {$booking->classroom->room}\n";
         $message .= "📅 Дата: {$booking->date}\n";
@@ -224,6 +283,25 @@ class VkNotificationService
 
         $message .= "\n⏳ Сейчас заявка находится на рассмотрении администратора.";
         $message .= "\nО результате рассмотрения придёт отдельное уведомление.";
+
+        return $this->sendMessage($userId, $message);
+    }
+
+    public function notifyStudentBookingWithdrawn($booking): bool
+    {
+        $userId = $this->resolveRecipient($booking);
+
+        if (!$userId) {
+            return false;
+        }
+
+        $message = "↩️ Вы отозвали заявку №{$booking->id}\n\n";
+        $message .= "🏫 Пространство: {$booking->classroom->room}\n";
+        $message .= "📅 Дата: {$booking->date}\n";
+        $message .= "⏰ Время: {$booking->start_time} - {$booking->end_time}\n";
+        $message .= "🎯 Цель: {$booking->purpose}\n\n";
+        $message .= "Бронь снята, время снова доступно для других заявок.\n";
+        $message .= "Чтобы подать новую заявку, отправьте /бронь.";
 
         return $this->sendMessage($userId, $message);
     }

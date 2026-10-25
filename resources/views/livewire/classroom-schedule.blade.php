@@ -126,7 +126,7 @@
         <x-modal title="Информация о бронировании" width="672px">
             <p class="text-sm text-gray-500 mb-4">
                 Номер заявки: {{ $selectedBooking->id }}
-                @if(!$selectedBooking->user_id && $selectedBooking->vk_user_id)
+                @if($selectedBooking->vk_user_id)
                     (через VK бота)
                 @endif
             </p>

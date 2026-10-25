@@ -13,8 +13,18 @@ class Classroom extends Model
         'equipment',
         'capacity',
         'photo',
-        'google_calendar_id'
+        'google_calendar_id',
+        'is_hidden',
     ];
+
+    protected $casts = [
+        'is_hidden' => 'boolean',
+    ];
+
+    public function scopeBookable($query)
+    {
+        return $query->where('is_hidden', false);
+    }
 
     public function bookings()
     {

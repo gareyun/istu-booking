@@ -32,6 +32,8 @@ class Classrooms extends Component
     public $currentPhoto = null;
     public $removePhoto = false;
 
+    public $is_hidden = false;
+
     public $successMessage = null;
     public $errorMessage = null;
 
@@ -72,6 +74,7 @@ class Classrooms extends Component
         $this->google_calendar_id = $classroom->google_calendar_id;
         $this->classroom_category_id = $classroom->classroom_category_id;
         $this->currentPhoto = $classroom->photo;
+        $this->is_hidden = (bool) $classroom->is_hidden;
 
         $this->successMessage = null;
         $this->errorMessage = null;
@@ -88,6 +91,7 @@ class Classrooms extends Component
             'google_calendar_id' => 'required|string|max:100',
             'classroom_category_id' => 'required|exists:classroom_categories,id',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
+            'is_hidden' => 'boolean',
         ];
     }
 
@@ -206,10 +210,24 @@ class Classrooms extends Component
         $this->reset([
             'room', 'description', 'equipment', 'capacity',
             'google_calendar_id', 'classroom_category_id',
-            'photo', 'currentPhoto', 'removePhoto',
+            'photo', 'currentPhoto', 'removePhoto', 'is_hidden'
         ]);
 
         $this->resetValidation();
+    }
+
+    public function toggleHidden($id)
+    {
+        $this->successMessage = null;
+        $this->errorMessage = null;
+
+        $classroom = Classroom::findOrFail($id);
+        $classroom->update(['is_hidden' => !$classroom->is_hidden]);
+
+        $this->loadData();
+        $this->successMessage = $classroom->is_hidden
+            ? 'Пространство скрыто для бронирования.'
+            : 'Пространство снова доступно для бронирования.';
     }
 
     private function deletePhotoFile(?string $path): void

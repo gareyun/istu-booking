@@ -29,6 +29,12 @@
                             class="h-12 w-16 rounded-lg object-cover border border-[#e3e6f0]">
                     @endif
                     <div class="text-xl font-bold text-[#1a2a6c]">{{ $classroom->room }}</div>
+                    @if($classroom->is_hidden)
+                        <span class="inline-flex items-center text-xs font-semibold px-3 py-1.5 rounded-full
+                                    bg-[#EEF2FF] text-[#1A2A6C] border border-[#C7D2FE]">
+                            Скрыта для бронирования
+                        </span>
+                    @endif
                 </div>
 
                 <div class="my-2 flex justify-between">
@@ -54,13 +60,16 @@
                 <div class="w-full flex mt-5 gap-3">
                     <x-button wire:click="openEditModal({{ $classroom->id }})">✏️ Редактировать</x-button>
                     <x-button wire:click="delete({{ $classroom->id }})" color="red">🗑 Удалить</x-button>
+                    <x-button wire:click="toggleHidden({{ $classroom->id }})" color="gray">
+                        {{ $classroom->is_hidden ? '👁 Показать' : '🚫 Скрыть' }}
+                    </x-button>
                 </div>
             </div>
         @endforeach
     </div>
 
     @if($showCreateModal)
-        <x-modal title="Добавить пространство" :error="$errorMessage">
+        <x-modal title="Добавить пространство" :error="$errorMessage" :is_hidden_button="true">
             <p class="mb-[5px] text-lg font-semibold">Пространство <span class="text-danger">*</span></p>
             <x-input wire:model="room" placeholder="Название пространства" class="mb-4"/>
 
@@ -121,7 +130,7 @@
     @endif
 
     @if($showEditModal)
-        <x-modal title="Редактировать пространство" :error="$errorMessage">
+        <x-modal title="Редактировать пространство" :error="$errorMessage" :is_hidden_button="true">
             <p class="mb-[5px] text-lg font-semibold">Пространство</p>
             <x-input wire:model="room" class="mb-3" />
 

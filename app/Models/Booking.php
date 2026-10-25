@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Carbon\Carbon;
 
 class Booking extends Model
 {
@@ -37,5 +38,23 @@ class Booking extends Model
     public function classroom()
     {
         return $this->belongsTo(Classroom::class);
+    }
+
+    public function startsAt(): ?Carbon
+    {
+        try {
+            return Carbon::createFromFormat('d.m.Y H:i', $this->date . ' ' . $this->start_time);
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    public function isWithdrawable(): bool
+    {
+        return match ($this->status) {
+            'pending'  => true,
+            'approved' => $this->startsAt()?->isFuture() ?? false,
+            default    => false,
+        };
     }
 }

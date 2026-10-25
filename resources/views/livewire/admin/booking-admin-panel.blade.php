@@ -64,7 +64,9 @@
                                 @elseif($booking->status === 'rejected')
                                     <div class="text-red-600">❌ Отклонена</div>
                                 @elseif($booking->status === 'cancelled')
-                                    <div class="text-gray-500">🚫 Отменена</div>
+                                    <div class="text-gray-500">
+                                        {{ $booking->cancelled_by === 'student' ? '↩️ Отозвана студентом' : '🚫 Отменена' }}
+                                    </div>
                                 @endif
                             </div>
                         @endif
